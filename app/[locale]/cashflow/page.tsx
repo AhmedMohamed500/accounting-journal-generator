@@ -1,0 +1,3 @@
+import { CashflowCenter } from "@/components/cashflow/cashflow-center";
+import type { Locale } from "@/types";
+export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) { const { locale } = await params; return <div className="container section"><h1>{locale === "ar" ? "مركز التحصيلات والمدفوعات والسيولة" : "Collections, Payments & Cashflow Center"}</h1><p className="muted">{locale === "ar" ? "حوّل الاستحقاقات إلى مهام يومية، توقع العجز، وسجل التحصيل أو السداد مع القيد والتأثير تلقائيًا." : "Turn due items into daily work, forecast shortfalls, and record payments with their accounting impact."}</p><CashflowCenter locale={locale}/></div>; }

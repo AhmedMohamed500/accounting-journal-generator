@@ -1,0 +1,3 @@
+import { OperationsCenter } from "@/components/operations/operations-center";
+import type { Locale } from "@/types";
+export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) { const { locale } = await params; return <div className="container section"><h1>{locale === "ar" ? "بطاقات العمليات المحاسبية" : "Accounting Operation Dossiers"}</h1><p className="muted">{locale === "ar" ? "تتبّع كل عملية من مستندها الأصلي حتى القوائم المالية وافتح ملفها الكامل." : "Trace every operation from source document to financial statements."}</p><OperationsCenter locale={locale} /></div>; }

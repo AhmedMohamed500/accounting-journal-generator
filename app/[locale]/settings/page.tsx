@@ -1,0 +1,1 @@
+import{SettingsCenter}from"@/components/settings/settings-center";import type{Locale}from"@/types";export default async function Page({params}:{params:Promise<{locale:Locale}>}){const{locale}=await params;return <div className="container section"><h1>{locale==="ar"?"إعدادات الشركة والنسخ الاحتياطي":"Company Settings & Backup"}</h1><SettingsCenter locale={locale}/></div>}

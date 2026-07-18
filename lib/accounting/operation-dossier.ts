@@ -1,0 +1,30 @@
+import { analyzeEntryImpact } from "./impact";
+import { roundCurrency } from "./calculations";
+import type { AccountingDocument, AccountBalanceSnapshot, BankTransaction, BusinessDocument, ChartAccount, CustodyAdvance, GeneratedJournalEntry, OpenItem, OperationDossier, OperationSource, Party } from "@/types";
+
+interface DossierInput { entry: GeneratedJournalEntry; entries: GeneratedJournalEntry[]; accounts: ChartAccount[]; businessDocuments?: BusinessDocument[]; documents?: AccountingDocument[]; custodies?: CustodyAdvance[]; bankTransactions?: BankTransaction[]; parties?: Party[]; openItems?: OpenItem[] }
+const posted = (entry: GeneratedJournalEntry) => !entry.workflowStatus || entry.workflowStatus === "posted";
+const order = (entry: GeneratedJournalEntry) => `${entry.date}|${entry.audit?.[0]?.at || ""}|${entry.entryNumber}`;
+const key = (line: GeneratedJournalEntry["lines"][number]) => line.accountCode || line.accountNameEn;
+
+function sourceFor(input: DossierInput): { source: OperationSource; linkedDocumentIds: string[]; linkedCustodyId?: string; linkedBankTransactionId?: string } {
+  const business = input.businessDocuments?.find((document) => document.linkedEntryId === input.entry.id), uploaded = input.documents?.find((document) => document.linkedEntryId === input.entry.id), custody = input.custodies?.find((item) => item.issueEntryId === input.entry.id || item.settlements.some((settlement) => settlement.entryId === input.entry.id)), bank = input.bankTransactions?.find((item) => item.matchedEntryId === input.entry.id);
+  if (business) { const party = input.parties?.find((item) => item.id === business.partyId); return { source: { kind: "business-document", titleAr: "مستند من الدورة المستندية", titleEn: "Accounting cycle document", reference: business.number, partyAr: party?.nameAr, partyEn: party?.nameEn, date: business.date, amount: business.grandTotal, currency: business.currency, detailAr: `${business.type} — ${business.status}`, detailEn: `${business.type} — ${business.status}` }, linkedDocumentIds: [business.id] }; }
+  if (uploaded) return { source: { kind: "uploaded-document", titleAr: "مستند مرفوع", titleEn: "Uploaded document", reference: uploaded.reference || uploaded.name, partyAr: uploaded.party, partyEn: uploaded.party, date: uploaded.documentDate, amount: uploaded.amount, currency: uploaded.currency, detailAr: uploaded.name, detailEn: uploaded.name }, linkedDocumentIds: [uploaded.id] };
+  if (custody) { const settlement = custody.settlements.find((item) => item.entryId === input.entry.id), issue = custody.issueEntryId === input.entry.id; return { source: { kind: "custody", titleAr: issue ? "صرف عهدة" : "تسوية عهدة", titleEn: issue ? "Custody issue" : "Custody settlement", reference: custody.number, partyAr: custody.employee, partyEn: custody.employee, date: issue ? custody.issueDate : settlement?.date, amount: issue ? custody.amount : settlement ? settlement.netAmount + settlement.vatAmount + settlement.returnedAmount : undefined, currency: custody.currency, detailAr: issue ? custody.purpose : settlement?.description, detailEn: issue ? custody.purpose : settlement?.description }, linkedDocumentIds: [], linkedCustodyId: custody.id }; }
+  if (bank) return { source: { kind: "bank", titleAr: "حركة كشف بنك", titleEn: "Bank statement transaction", reference: bank.reference, date: bank.date, amount: bank.debit || bank.credit, currency: bank.currency, detailAr: bank.description, detailEn: bank.description }, linkedDocumentIds: [], linkedBankTransactionId: bank.id };
+  const openItem = input.openItems?.find((item) => item.linkedEntryId === input.entry.id), party = openItem && input.parties?.find((item) => item.id === openItem.partyId);
+  return { source: { kind: "manual", titleAr: "عملية أو قيد مباشر", titleEn: "Direct transaction or entry", reference: openItem?.invoiceNumber || input.entry.entryNumber, partyAr: party?.nameAr, partyEn: party?.nameEn, date: input.entry.date, amount: input.entry.totalDebit, currency: input.entry.currency, detailAr: input.entry.narrationAr, detailEn: input.entry.narrationEn }, linkedDocumentIds: [] };
+}
+
+export function accountBalanceSnapshots(target: GeneratedJournalEntry, entries: GeneratedJournalEntry[], accounts: ChartAccount[]): AccountBalanceSnapshot[] {
+  const impacts = analyzeEntryImpact(target, accounts).lines, targetOrder = order(target), officialEntries = entries.filter((entry) => posted(entry) && entry.id !== target.id && order(entry) < targetOrder), isPosted = posted(target);
+  return [...new Map(impacts.map((impact) => [impact.code || impact.nameEn, impact])).values()].map((impact) => {
+    const account = accounts.find((item) => item.code === impact.code) || accounts.find((item) => item.nameEn === impact.nameEn), normal = account?.normalBalance || (impact.type === "asset" || impact.type === "expense" ? "debit" : "credit");
+    const before = roundCurrency(officialEntries.flatMap((entry) => entry.lines).filter((line) => key(line) === (impact.code || impact.nameEn)).reduce((sum, line) => sum + (normal === "debit" ? line.debit - line.credit : line.credit - line.debit), 0));
+    const movement = roundCurrency(impact.movement === "increase" ? impact.amount : -impact.amount), afterPosting = roundCurrency(before + movement);
+    return { code: impact.code || "—", nameAr: impact.nameAr, nameEn: impact.nameEn, type: impact.type, section: impact.section, before, movement, afterPosting, officialAfter: isPosted ? afterPosting : before, posted: isPosted };
+  });
+}
+
+export function buildOperationDossier(input: DossierInput): OperationDossier { const links = sourceFor(input); return { entry: input.entry, source: links.source, balances: accountBalanceSnapshots(input.entry, input.entries, input.accounts), linkedDocumentIds: links.linkedDocumentIds, linkedCustodyId: links.linkedCustodyId, linkedBankTransactionId: links.linkedBankTransactionId }; }

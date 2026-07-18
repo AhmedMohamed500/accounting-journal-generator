@@ -1,0 +1,1 @@
+import {Recent} from "@/components/recent";import type {Locale} from "@/types";export default async function Page({params}:{params:Promise<{locale:Locale}>}){const {locale}=await params;return <div className="container section"><h1>{locale==="ar"?"القيود الحديثة":"Recent entries"}</h1><Recent locale={locale}/></div>}

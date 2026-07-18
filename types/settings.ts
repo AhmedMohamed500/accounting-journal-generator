@@ -1,0 +1,1 @@
+export interface CompanySettings{companyNameAr:string;companyNameEn:string;defaultCurrency:string;defaultVatRate:number;fiscalYearStartMonth:number;entryPrefix:string;invoicePrefix:string;nextEntryNumber:number;nextInvoiceNumber:number;defaultCashAccountCode:string;defaultBankAccountCode:string;inputVatAccountCode:string;outputVatAccountCode:string;dateFormat:string}

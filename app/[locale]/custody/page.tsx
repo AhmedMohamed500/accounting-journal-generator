@@ -1,0 +1,3 @@
+import { CustodyCenter } from "@/components/custody/custody-center";
+import type { Locale } from "@/types";
+export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) { const { locale } = await params; return <div className="container section"><h1>{locale === "ar" ? "عهد الموظفين وتسوياتها" : "Employee Custody & Settlements"}</h1><p className="muted">{locale === "ar" ? "اصرف العهدة، سجل الفواتير والمبالغ المرتجعة، ودع النظام ينشئ القيود ويقفل العهدة تلقائيًا." : "Issue advances, record receipts and returns, and automatically post and close custody balances."}</p><CustodyCenter locale={locale} /></div>; }

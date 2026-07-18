@@ -1,0 +1,1 @@
+import{describe,expect,it}from"vitest";import type{AccountingDocument}from"@/types";describe("document inbox",()=>{it("detects duplicate fingerprints",()=>{const docs=[{fingerprint:"same"},{fingerprint:"same"},{fingerprint:"other"}]as AccountingDocument[];expect(docs.filter((d,i)=>docs.findIndex(x=>x.fingerprint===d.fingerprint)!==i)).toHaveLength(1)})});

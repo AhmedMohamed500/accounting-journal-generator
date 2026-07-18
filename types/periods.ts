@@ -1,0 +1,1 @@
+export type PeriodStatus="open"|"soft-closed"|"locked";export interface FinancialPeriod{id:string;name:string;startDate:string;endDate:string;status:PeriodStatus;lockedAt?:string;lockedBy?:string;note?:string}export interface FiscalYear{id:string;name:string;startDate:string;endDate:string;periods:FinancialPeriod[];active:boolean}

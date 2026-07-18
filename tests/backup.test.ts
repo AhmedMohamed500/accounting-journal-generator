@@ -1,0 +1,1 @@
+import{describe,expect,it}from"vitest";import{validateBackup}from"@/lib/storage/backup";describe("backup validation",()=>{it("accepts versioned backup",()=>expect(validateBackup({schemaVersion:1,companyId:"c",exportedAt:"x",data:{}})).toBe(true));it("rejects unknown structure",()=>expect(validateBackup({schemaVersion:2,data:{}})).toBe(false))});

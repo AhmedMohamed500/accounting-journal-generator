@@ -1,0 +1,1 @@
+import{describe,expect,it}from"vitest";import{formatSequence}from"@/lib/storage/settings";describe("numbering",()=>it("formats stable sequence",()=>expect(formatSequence("JE",42)).toBe("JE-000042")));
