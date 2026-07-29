@@ -160,7 +160,9 @@ describe("invoice extraction", () => {
       "البائع: إبراهيم رشاد",
       "رقم الفاتورة: ETA-22",
       "تاريخ الإصدار: 21/07/2026",
-      "أجهزة كهربائية 1 2550 2550",
+      "مروحة بريفيكس حائط 1.00 /",
+      "أجهزة كهربائية EG-429853386-ER1 1 2550 2550",
+      "C62 بريموت 21 بوصة",
       "إجمالي المبيعات: 2550",
       "ضريبة القيمة المضافة: 357",
       "الخصم تحت حساب الضريبة: 25.5",
@@ -169,6 +171,9 @@ describe("invoice extraction", () => {
 
     expect(invoice.lines).toHaveLength(1);
     expect(invoice.lines[0]).toMatchObject({ net: 2550, vatRate: 14, vat: 357, total: 2907 });
+    expect(invoice.lines[0].description).toBe("مروحة بريفيكس حائط بريموت 21 بوصة");
+    expect(invoice.lines[0].description).not.toContain("EG-");
+    expect(invoice.lines[0].description).not.toContain("أجهزة كهربائية");
     expect(invoice.withholdingTax).toBe(25.5);
     expect(invoice.total).toBe(2881.5);
     expect(invoice.warnings).not.toContain("totals-do-not-match");
