@@ -1,6 +1,6 @@
 import type { CategoricalProfile, CellValue, CategoryBreakdown, DataQualityIssue, DateProfile, NumericProfile, SheetAnalysis, SheetData } from "@/types";
 
-const MAX_ANALYSIS_ROWS = 150_000;
+const MAX_ANALYSIS_ROWS = 60_000;
 const MEDIAN_SAMPLE_SIZE = 8_000;
 const DUPLICATE_SCAN_ROWS = 50_000;
 const round = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -49,7 +49,7 @@ function findBreakdown(sheet:SheetData, numeric:NumericProfile[], categorical:Ca
   const category=categorical.find(profile=>profile.unique>=2&&profile.unique<=Math.min(500,Math.max(12,sheet.rows.length*.35)));
   if(!amount||!category) return;
   const amountIndex=sheet.headers.indexOf(amount.column), categoryIndex=sheet.headers.indexOf(category.column), values=new Map<string,number>();
-  for(const row of sampledRows(sheet.rows)) { const raw=row[amountIndex], label=String(row[categoryIndex]??"").trim(); if(!label||typeof raw!=="number"||!Number.isFinite(raw)) continue; values.set(label,(values.get(label)||0)+Math.abs(raw)); }
+  for(const row of sheet.rows) { const raw=row[amountIndex], label=String(row[categoryIndex]??"").trim(); if(!label||typeof raw!=="number"||!Number.isFinite(raw)) continue; values.set(label,(values.get(label)||0)+Math.abs(raw)); }
   return topBreakdown(`${category.column} × ${amount.column}`,values);
 }
 
@@ -66,6 +66,13 @@ export function analyzeSheet(sheet:SheetData):SheetAnalysis {
     if(rows.length&&missing/rows.length>.3) quality.push({severity:"medium",code:"many-missing",column:header,message:"More than 30% of values are missing."});
     if(present&&numbers.length>0&&numericRatio<.6) quality.push({severity:"low",code:"mixed-types",column:header,message:"The column mixes numbers with text; review formatting."});
   });
+  if(sheet.rows.length>rows.length){
+    for(const profile of numeric){
+      const columnIndex=sheet.headers.indexOf(profile.column);let count=0,missing=0,sum=0,min=Infinity,max=-Infinity,negative=0,zero=0;
+      for(const row of sheet.rows){const value=row[columnIndex]??null;if(blank(value)){missing++;continue;}if(typeof value!=="number"||!Number.isFinite(value))continue;count++;sum+=value;if(value<min)min=value;if(value>max)max=value;if(value<0)negative++;if(value===0)zero++;}
+      Object.assign(profile,{count,missing,sum:round(sum),average:count?round(sum/count):0,minimum:count?min:0,maximum:count?max:0,negative,zero});
+    }
+  }
   const absoluteTotal=numeric.reduce((sum,profile)=>sum+Math.abs(profile.sum),0); numeric.forEach(profile=>profile.shareOfNumericTotal=absoluteTotal?round(Math.abs(profile.sum)/absoluteTotal*100):0);
   const completeness=round((1-missingCells/totalCells)*100); if(completeness<80) quality.push({severity:"high",code:"sparse-data",message:"More than 20% of the analyzed cells are blank."});
   const seen=new Set<string>(); let duplicateRows=0; const duplicateScan=rows.slice(0,DUPLICATE_SCAN_ROWS); for(const row of duplicateScan){const key=JSON.stringify(row);if(seen.has(key))duplicateRows++;else seen.add(key);} if(duplicateRows) quality.push({severity:"medium",code:"duplicate-rows",message:`${duplicateRows} duplicate rows detected${rows.length>DUPLICATE_SCAN_ROWS?" in the scan sample":""}.`});

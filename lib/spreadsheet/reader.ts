@@ -15,8 +15,8 @@ const typed=(value:unknown):CellValue=>{
 };
 
 function detectDelimiter(text:string){
-  const sample=text.slice(0,20_000), candidates=[",",";","\t"];
-  return candidates.map(delimiter=>({delimiter,count:sample.split(delimiter).length-1})).sort((a,b)=>b.count-a.count)[0].delimiter;
+  const lines=text.slice(0,40_000).split(/\r?\n/).filter(Boolean).slice(0,30), candidates=[",",";","\t","|"];
+  return candidates.map(delimiter=>{const counts=lines.map(line=>line.split(delimiter).length-1),positive=counts.filter(Boolean),average=positive.reduce((sum,count)=>sum+count,0)/Math.max(1,positive.length),variance=positive.reduce((sum,count)=>sum+Math.abs(count-average),0)/Math.max(1,positive.length);return{delimiter,score:positive.length*10+average-variance};}).sort((a,b)=>b.score-a.score)[0].delimiter;
 }
 
 function parseDelimited(text:string):CellValue[][]{
@@ -33,8 +33,9 @@ function parseDelimited(text:string):CellValue[][]{
 }
 
 function headerScore(row:CellValue[]){
-  const values=row.filter(value=>value!==null&&value!==""), strings=values.filter(value=>typeof value==="string"), unique=new Set(strings.map(String)).size;
-  return strings.length*3+unique-values.filter(value=>typeof value==="number").length*2;
+  const values=row.filter(value=>value!==null&&value!==""), strings=values.filter(value=>typeof value==="string"), unique=new Set(strings.map(value=>String(value).toLowerCase())).size;
+  if(values.length<2)return-Infinity;
+  return strings.length*4+unique*2+values.length-values.filter(value=>typeof value==="number").length*3;
 }
 
 function uniqueHeaders(values:CellValue[],width:number){
@@ -47,7 +48,7 @@ function uniqueHeaders(values:CellValue[],width:number){
 function normalizeSheet(name:string,matrix:CellValue[][]):SheetData{
   const nonEmpty:CellValue[][]=[]; let width=0; for(const row of matrix){if(!row.some(value=>value!==null&&value!==""))continue;nonEmpty.push(row);if(row.length>width)width=row.length;} if(!nonEmpty.length)return{name,headers:[],rows:[]};
   const searchLimit=Math.min(25,nonEmpty.length); let best=0,bestScore=-Infinity;
-  for(let index=0;index<searchLimit;index++){const score=headerScore(nonEmpty[index]);if(score>bestScore){best=index;bestScore=score;}}
+  for(let index=0;index<searchLimit;index++){const next=nonEmpty[index+1]||[],nextValues=next.filter(value=>value!==null&&value!=="").length,score=headerScore(nonEmpty[index])+Math.min(8,nextValues)*.5-index*.15;if(score>bestScore){best=index;bestScore=score;}}
   const used=new Uint8Array(width);for(let rowIndex=best;rowIndex<nonEmpty.length;rowIndex++){const row=nonEmpty[rowIndex];for(let column=0;column<row.length;column++)if(row[column]!==null&&row[column]!=="")used[column]=1;}
   const keepColumns:number[]=[];for(let column=0;column<width;column++)if(used[column])keepColumns.push(column);
   const headers=uniqueHeaders(keepColumns.map(index=>nonEmpty[best][index]),keepColumns.length);
@@ -60,7 +61,7 @@ export async function readSpreadsheet(file:File,options:SpreadsheetReadOptions={
   const lower=file.name.toLowerCase(); if(file.size>MAX_BROWSER_FILE_BYTES)throw new Error("The workbook is over 120 MB. Split it into smaller workbooks for safe browser analysis.");
   if(lower.endsWith(".xls"))throw new Error("Legacy .xls is not supported. Save the workbook as .xlsx first.");
   report("opening",5);
-  if(lower.endsWith(".csv")||file.type.includes("csv")){const text=(await file.text()).replace(/^\uFEFF/,"");report("parsing",35);await yieldToBrowser();const matrix=parseDelimited(text);report("normalizing",75,file.name);await yieldToBrowser();const result=normalizeSheet(file.name.replace(/\.csv$/i,""),matrix);report("done",100,result.name);return[result];}
+  if(lower.endsWith(".csv")||file.type.includes("csv")){const buffer=await file.arrayBuffer();let text=new TextDecoder("utf-8").decode(buffer);if((text.match(/\uFFFD/g)||[]).length>2)try{text=new TextDecoder("windows-1256").decode(buffer);}catch{}text=text.replace(/^\uFEFF/,"");report("parsing",35);await yieldToBrowser();const matrix=parseDelimited(text);report("normalizing",75,file.name);await yieldToBrowser();const result=normalizeSheet(file.name.replace(/\.csv$/i,""),matrix);report("done",100,result.name);return[result];}
   if(!lower.endsWith(".xlsx"))throw new Error("Supported formats are .xlsx and .csv");
   report("parsing",15); const excelReader=await import("read-excel-file/browser"), workbook=await excelReader.default(file), sheets:SheetData[]=[];
   for(let index=0;index<workbook.length;index++){const sheet=workbook[index];report("normalizing",25+Math.round(index/Math.max(1,workbook.length)*70),sheet.sheet);await yieldToBrowser();sheets.push(normalizeSheet(sheet.sheet,sheet.data.map(row=>row.map(typed))));}

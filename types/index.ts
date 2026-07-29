@@ -15,3 +15,4 @@ export * from "./operations";
 export * from "./scenarios";
 export * from "./academy";
 export * from "./pos";
+export * from "./vat";

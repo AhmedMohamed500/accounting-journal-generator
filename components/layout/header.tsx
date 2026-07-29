@@ -39,6 +39,7 @@ export function Header({ locale }: { locale: Locale }) {
     ] },
     { labelAr: "التحليل والتقارير", labelEn: "Analysis & reports", icon: BarChart3, items: [
       { path: "reports", ar: "القوائم والتقارير", en: "Statements & reports", descAr: "الأستاذ وميزان المراجعة والدخل والميزانية", descEn: "Ledger, trial balance, income, and balance sheet", icon: FileBarChart },
+      { path: "vat", ar: "القيمة المضافة والفترات", en: "VAT periods", descAr: "تحليل المدخلات والمخرجات وصافي كل فترة ضريبية", descEn: "Input, output, and net VAT by tax period", icon: ReceiptText },
       { path: "spreadsheet-analysis", ar: "تحليل ملفات Excel", en: "Excel analysis", descAr: "نسب ورسومات وجودة بيانات وتقرير PDF", descEn: "Ratios, charts, data quality, and PDF", icon: FileSpreadsheet },
       { path: "scenario-simulator", ar: "محاكي القرارات", en: "Decision simulator", descAr: "قارن البدائل قبل الدفع أو التحصيل", descEn: "Compare options before payment or collection", icon: Sparkles },
     ] },

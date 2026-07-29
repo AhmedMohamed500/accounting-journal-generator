@@ -2,8 +2,15 @@ import type { ExtractedInvoice, ExtractedInvoiceLine } from "@/types";
 import { normalizeArabicNumbers } from "@/lib/parser/normalize";
 import { roundCurrency } from "@/lib/accounting/calculations";
 
-const amountToken=/[0-9][0-9,٬]*(?:[.٫][0-9]{1,3})?%?/g;
-const numeric=(value:string)=>Number(value.replace(/[,%٬،\s]/g,"").replace("٫","."))||0;
+const amountToken=/-?[0-9][0-9,٬]*(?:[.٫][0-9]{1,3})?%?/g;
+const numeric=(value:string)=>{
+  let text=value.replace(/[%\s٬،]/g,"").replace(/٫/g,".");
+  const comma=text.lastIndexOf(","),dot=text.lastIndexOf(".");
+  if(comma>=0&&dot>=0){const decimal=Math.max(comma,dot);text=text.slice(0,decimal).replace(/[,.]/g,"")+"."+text.slice(decimal+1).replace(/[,.]/g,"");}
+  else if(comma>=0){const decimals=text.length-comma-1;text=decimals===1||decimals===2?text.replace(",","."):text.replace(/,/g,"");}
+  else if(dot>=0){const decimals=text.length-dot-1;if(decimals===3&&dot>0)text=text.replace(/\./g,"");}
+  return Number(text)||0;
+};
 const clean=(value:string)=>value.replace(/^[\s:#|–—-]+|[\s:#|–—-]+$/g,"").trim();
 const linesOf=(text:string)=>text.split(/\r?\n/).map(line=>line.replace(/[\t ]+/g," ").trim()).filter(Boolean);
 
@@ -31,7 +38,7 @@ function lineCandidate(tokens:string[],offset:number,fallbackRate:number){
 
 function lineItems(text:string,fallbackRate:number):ExtractedInvoiceLine[]{
   const ignore=/(subtotal|grand total|invoice total|invoice(?: no| number)?|due date|^date\b|net amount|tax amount|vat amount|الإجمالي|الصافي|الضريبة|رقم الفاتورة|تاريخ|supplier|vendor|المورد|صفحة|page)/i,results:ExtractedInvoiceLine[]=[];
-  for(const source of linesOf(text)){if(ignore.test(source))continue;const tokens=source.match(amountToken)||[];if(tokens.length<3||tokens.some(token=>/^20\d{2}$/.test(token)))continue;const description=clean(source.replace(amountToken," ").replace(/\s+/g," ").replace(/^[.)\-\d\s]+/,""));if(description.length<2||description.length>140)continue;const candidates=[lineCandidate(tokens,0,fallbackRate),lineCandidate(tokens,1,fallbackRate)].filter(Boolean) as NonNullable<ReturnType<typeof lineCandidate>>[];if(!candidates.length)continue;const candidate=candidates.sort((a,b)=>a.score-b.score)[0];results.push({id:`line-${results.length+1}`,description,quantity:candidate.quantity,unitPrice:candidate.unitPrice,discount:candidate.discount,vatRate:candidate.vatRate,net:candidate.net,vat:candidate.vat,total:candidate.total});if(results.length>=200)break;
+  for(const source of linesOf(text)){if(ignore.test(source))continue;const tokens=(source.match(amountToken)||[]).map(token=>token.trim()).filter(Boolean);if(tokens.length<3||tokens.some(token=>/^20\d{2}$/.test(token)))continue;const description=clean(source.replace(amountToken," ").replace(/\s+/g," ").replace(/^[.)\-\d\s]+/,""));if(description.length<2||description.length>140)continue;const reversed=[...tokens].reverse(),candidates=[lineCandidate(tokens,0,fallbackRate),lineCandidate(tokens,1,fallbackRate),lineCandidate(reversed,0,fallbackRate),lineCandidate(reversed,1,fallbackRate)].filter(Boolean) as NonNullable<ReturnType<typeof lineCandidate>>[];if(!candidates.length)continue;const candidate=candidates.sort((a,b)=>a.score-b.score)[0];results.push({id:`line-${results.length+1}`,description,quantity:candidate.quantity,unitPrice:candidate.unitPrice,discount:candidate.discount,vatRate:candidate.vatRate,net:candidate.net,vat:candidate.vat,total:candidate.total});if(results.length>=200)break;
   }
   return results;
 }
@@ -39,7 +46,7 @@ function lineItems(text:string,fallbackRate:number):ExtractedInvoiceLine[]{
 function invoiceNumberFrom(text:string){const raw=value(text,["invoice(?: no| number| #)?","رقم الفاتورة","فاتورة رقم"]),token=raw.match(/[A-Z0-9][A-Z0-9\/_-]{1,35}/i)?.[0];return token||"";}
 
 export function parseInvoiceText(raw:string):ExtractedInvoice{
-  const text=normalizeArabicNumbers(raw).replace(/\u00a0/g," ").replace(/[ \t]+/g," "),hasInvoiceLabel=/(?:tax invoice|invoice|فاتورة|فاتوره)/i.test(text);
+  const text=normalizeArabicNumbers(raw).normalize("NFKC").replace(/\u00a0/g," ").replace(/[ \t]+/g," ").replace(/إجمالى/g,"إجمالي").replace(/الضريبه/g,"الضريبة").replace(/فاتوره/g,"فاتورة"),hasInvoiceLabel=/(?:tax invoice|invoice|فاتورة)/i.test(text);
   const invoiceNumber=invoiceNumberFrom(text),taxNumber=value(text,["tax(?: registration)?(?: no| number)?","VAT No","الرقم الضريبي","رقم التسجيل الضريبي"]).replace(/[^0-9A-Za-z-]/g,"").slice(0,30),supplier=value(text,["supplier name","supplier","vendor","اسم المورد","المورد","البائع"])||inferSupplier(text);
   const explicitDate=text.match(/(?:invoice date|تاريخ الفاتورة|تاريخ الاصدار)\s*[:#-]?\s*(\d{1,4}[\/-]\d{1,2}[\/-]\d{1,4})/i),genericDate=hasInvoiceLabel?text.match(/(?:^|\n)(?:date|التاريخ)\s*[:#-]?\s*(\d{1,4}[\/-]\d{1,2}[\/-]\d{1,4})/im)||text.match(/\b(\d{4}-\d{2}-\d{2})\b/):null,dueMatch=text.match(/(?:due date|تاريخ الاستحقاق)\s*[:#-]?\s*(\d{1,4}[\/-]\d{1,2}[\/-]\d{1,4})/i),date=isoDate((explicitDate||genericDate)?.[1]||""),dueDate=isoDate(dueMatch?.[1]||"");
   let total=amount(text,["grand total","total amount","invoice total","amount due","الإجمالي شامل الضريبة","إجمالي الفاتورة","المبلغ المستحق","الإجمالي"]),vat=amount(text,["VAT amount","tax amount","قيمة ضريبة القيمة المضافة","قيمة الضريبة","الضريبة"]),discount=amount(text,["discount total","total discount","إجمالي الخصم","الخصم"]),subtotal=amount(text,["subtotal","gross amount","الإجمالي قبل الخصم","المجموع"]),net=amount(text,["net amount","amount before tax","taxable amount","الصافي","الإجمالي قبل الضريبة","قبل الضريبة"]);

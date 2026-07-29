@@ -87,4 +87,19 @@ describe("invoice extraction", () => {
     expect(report.total).toBe(0);
     expect(report.warnings).toContain("possibly-not-invoice");
   });
+
+  it("rebuilds Arabic RTL line items when OCR returns the numeric columns in reverse order", () => {
+    const invoice = parseInvoiceText([
+      "فاتورة ضريبية",
+      "المورد: شركة النور للتوريدات",
+      "رقم الفاتورة: INV-88",
+      "تاريخ الفاتورة: 2026-07-15",
+      "228 28 200 100 2 أقلام زرقاء",
+      "الصافي: 200",
+      "قيمة الضريبة: 28",
+      "إجمالي الفاتورة: 228",
+    ].join("\n"));
+    expect(invoice.lines).toHaveLength(1);
+    expect(invoice.lines[0]).toMatchObject({ description: "أقلام زرقاء", quantity: 2, unitPrice: 100, net: 200, vat: 28, total: 228 });
+  });
 });

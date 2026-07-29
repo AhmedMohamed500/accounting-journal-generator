@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultAccounts } from "@/data/accounts";
-import { custodyOutstanding, custodyReimbursementDue, issueCustody, reimburseCustody, settleCustody } from "@/lib/custody/settlement";
+import { custodyOutstanding, custodyReimbursementDue, issueCustody, reimburseCustody, replenishPermanentCustody, settleCustody } from "@/lib/custody/settlement";
 
 const issue = () => issueCustody({ employee: "أحمد محمد", purpose: "شراء أدوات مكتبية", issueDate: "2026-07-13", amount: 1000, currency: "EGP", paymentAccountId: "cash" }, defaultAccounts);
 
@@ -49,5 +49,16 @@ describe("employee custody workflow", () => {
     expect(paid.entry.lines.find((line) => line.accountCode === "2230")?.debit).toBe(200);
     expect(paid.entry.lines.find((line) => line.accountCode === "1100")?.credit).toBe(200);
     expect(paid.custody.status).toBe("settled");
+  });
+
+  it("keeps permanent custody active and replenishes it to the approved balance", () => {
+    const issued = issueCustody({ employee: "أحمد محمد", purpose: "مصروفات تشغيل", issueDate: "2026-07-01", amount: 1000, currency: "EGP", paymentAccountId: "cash", kind: "permanent", replenishmentPolicy: "monthly" }, defaultAccounts);
+    const settled = settleCustody(issued.custody, { date: "2026-07-10", description: "أدوات مكتبية", expenseAccountId: "office-supplies", netAmount: 800, vatAmount: 0, returnedAmount: 0 }, defaultAccounts);
+    expect(settled.custody.status).toBe("permanent-active");
+    expect(custodyOutstanding(settled.custody)).toBe(200);
+    const replenished = replenishPermanentCustody(settled.custody, "2026-07-11", "cash", defaultAccounts);
+    expect(replenished.amount).toBe(800);
+    expect(custodyOutstanding(replenished.custody)).toBe(1000);
+    expect(replenished.entry.isBalanced).toBe(true);
   });
 });
