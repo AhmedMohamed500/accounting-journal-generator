@@ -3,7 +3,7 @@ export const PDF_WORKER_URL = new URL("pdfjs-dist/build/pdf.worker.min.mjs", imp
 
 type ExtractionOptions = { forceOcr?: boolean };
 
-type PositionedText = { text: string; x: number; y: number };
+type PositionedText = { text: string; x: number; y: number; width: number; fontSize: number };
 
 function invoiceTextScore(text: string) {
   const normalized = text.replace(/\s+/g, " ");
@@ -50,7 +50,7 @@ async function imageForOcr(file: File) {
   return canvas;
 }
 
-function textFromPdfItems(positioned: PositionedText[]) {
+export function textFromPdfItems(positioned: PositionedText[]) {
   const rows: Array<{ y: number; items: PositionedText[] }> = [];
   for (const item of positioned) {
     const row = rows.find((current) => Math.abs(current.y - item.y) < 3);
@@ -62,9 +62,26 @@ function textFromPdfItems(positioned: PositionedText[]) {
     const joined = row.items.map((item) => item.text).join("");
     const arabic = (joined.match(/[\u0600-\u06ff]/g) || []).length;
     const latin = (joined.match(/[a-z]/gi) || []).length;
-    row.items.sort((a, b) => arabic > latin ? b.x - a.x : a.x - b.x);
-    return row.items.map((item) => item.text).join("   ");
+    const rtl = arabic > latin;
+    row.items.sort((a, b) => rtl ? b.x - a.x : a.x - b.x);
+    return row.items.reduce((result,item,index,items)=>{
+      if(!index)return item.text;
+      const previous=items[index-1],gap=rtl?previous.x-(item.x+item.width):item.x-(previous.x+previous.width),threshold=Math.max(1.25,Math.min(previous.fontSize,item.fontSize)*.28);
+      return`${result}${gap>threshold?" ":""}${item.text}`;
+    },"");
   }).join("\n");
+}
+
+function mergePageReadings(primary: string, secondary: string) {
+  const seen = new Set<string>(), result: string[] = [];
+  for (const line of `${primary}\n${secondary}`.split(/\r?\n/)) {
+    const clean = line.replace(/\s+/g, " ").trim();
+    const key = clean.toLocaleLowerCase("ar-EG").replace(/[^\p{L}\p{N}%.,]/gu, "");
+    if (!clean || (key && seen.has(key))) continue;
+    if (key) seen.add(key);
+    result.push(clean);
+  }
+  return result.join("\n");
 }
 
 export async function extractTextFromInvoice(file: File, onProgress?: (value: number) => void, options: ExtractionOptions = {}): Promise<string> {
@@ -81,8 +98,8 @@ export async function extractTextFromInvoice(file: File, onProgress?: (value: nu
         const page = await pdf.getPage(pageNumber);
         const content = await page.getTextContent();
         const positioned = content.items
-          .filter((item): item is typeof item & { str: string; transform: number[] } => "str" in item && "transform" in item)
-          .map((item) => ({ text: item.str.trim(), x: item.transform[4] || 0, y: item.transform[5] || 0 }))
+          .filter((item): item is typeof item & { str: string; transform: number[]; width: number } => "str" in item && "transform" in item && "width" in item)
+          .map((item) => ({ text: item.str.trim(), x: item.transform[4] || 0, y: item.transform[5] || 0, width: Math.abs(item.width || 0), fontSize: Math.abs(item.transform[0] || item.transform[3] || 10) }))
           .filter((item) => item.text);
         const embeddedText = textFromPdfItems(positioned);
         const compactLength = embeddedText.replace(/\s/g, "").length;
@@ -92,7 +109,7 @@ export async function extractTextFromInvoice(file: File, onProgress?: (value: nu
           if (!ocrWorker) {
             const { createWorker, PSM } = await import("tesseract.js");
             ocrWorker = await createWorker(["ara", "eng"]);
-            await ocrWorker.setParameters({ preserve_interword_spaces: "1", user_defined_dpi: "300", tessedit_pageseg_mode: PSM.SINGLE_BLOCK });
+            await ocrWorker.setParameters({ preserve_interword_spaces: "1", user_defined_dpi: "300", tessedit_pageseg_mode: PSM.AUTO });
           }
           const viewport = page.getViewport({ scale: 3.25 });
           const canvas = document.createElement("canvas");
@@ -103,10 +120,11 @@ export async function extractTextFromInvoice(file: File, onProgress?: (value: nu
           canvasContext.fillStyle = "#ffffff";
           canvasContext.fillRect(0, 0, canvas.width, canvas.height);
           await page.render({ canvas, canvasContext, viewport }).promise;
-          enhanceCanvas(canvas);
           const recognized = await ocrWorker.recognize(canvas);
           const ocrText = recognized.data.text.trim();
-          pages.push(extractionQuality(ocrText) >= embeddedQuality ? ocrText : embeddedText);
+          const best = extractionQuality(ocrText) >= embeddedQuality ? ocrText : embeddedText;
+          const other = best === ocrText ? embeddedText : ocrText;
+          pages.push(mergePageReadings(best, other));
           canvas.width = 1;
           canvas.height = 1;
         } else pages.push(embeddedText);
@@ -119,7 +137,7 @@ export async function extractTextFromInvoice(file: File, onProgress?: (value: nu
   }
   const { createWorker, PSM } = await import("tesseract.js");
   const worker = await createWorker(["ara", "eng"], undefined, { logger: (event) => { if (event.status === "recognizing text") onProgress?.(Math.round(event.progress * 100)); } });
-  await worker.setParameters({ preserve_interword_spaces: "1", user_defined_dpi: "300", tessedit_pageseg_mode: PSM.SINGLE_BLOCK });
+  await worker.setParameters({ preserve_interword_spaces: "1", user_defined_dpi: "300", tessedit_pageseg_mode: PSM.AUTO });
   try { const result = await worker.recognize(await imageForOcr(file)); return result.data.text; }
   finally { await worker.terminate(); }
 }

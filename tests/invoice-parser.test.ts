@@ -102,4 +102,51 @@ describe("invoice extraction", () => {
     expect(invoice.lines).toHaveLength(1);
     expect(invoice.lines[0]).toMatchObject({ description: "أقلام زرقاء", quantity: 2, unitPrice: 100, net: 200, vat: 28, total: 228 });
   });
+
+  it("reads Arabic PDF cells when labels and values are on separate lines", () => {
+    const invoice = parseInvoiceText([
+      "فاتورة ضريبية مبسطة",
+      "اسم المورد",
+      "شركة إبراهيم رشاد للتجارة",
+      "رقم الفاتورة",
+      "INV-2026-155",
+      "تاريخ الإصدار",
+      "29/07/2026",
+      "إجمالي المبلغ",
+      "1,140.00 ج.م",
+      "ضريبة القيمة المضافة 14%",
+    ].join("\n"));
+
+    expect(invoice.supplier).toBe("شركة إبراهيم رشاد للتجارة");
+    expect(invoice.invoiceNumber).toBe("INV-2026-155");
+    expect(invoice.date).toBe("2026-07-29");
+    expect(invoice.net).toBe(1000);
+    expect(invoice.vat).toBe(140);
+    expect(invoice.total).toBe(1140);
+    expect(invoice.warnings).not.toContain("possibly-not-invoice");
+  });
+
+  it("preserves extracted money for manual review instead of erasing it", () => {
+    const invoice = parseInvoiceText("فاتورة\nإجمالي المستحق: 2,500.00 ج.م");
+    expect(invoice.total).toBe(2500);
+    expect(invoice.net).toBe(2500);
+  });
+
+  it("normalizes visual-order Arabic text embedded by ETA invoice PDFs", () => {
+    const invoice = parseInvoiceText([
+      "ةرﻮﺗﺎﻓ",
+      "ﻊﺋﺎﺒﻟا",
+      "ﻲﻠﻋ نﺎﺒﻌﺷ دﺎﺷر ﻢﻴﻫاﺮﺑا : ﻢﺳﻻا",
+      "429853386# : ﻞﻴﺠﺴﺘﻟا ﻢﻗر",
+      "٢,٥٥٠,٠٠ (م.ج) تﺎﻌﻴﺒﻤﻟا ﻲﻟﺎﻤﺟا",
+      "٣٥٧,٠٠ (م.ج) ﻪﻓﺎﻀﻤﻟا ﻪﻤﻴﻘﻟا ﻪﺒﻳﺮﺿ",
+      "٢,٨٨١,٥٠ (م.ج) ﻎﻠﺒﻤﻟا ﻲﻟﺎﻤﺟا",
+    ].join("\n"));
+
+    expect(invoice.supplier).toContain("ابراهيم رشاد شعبان علي");
+    expect(invoice.net).toBe(2550);
+    expect(invoice.vat).toBe(357);
+    expect(invoice.total).toBe(2881.5);
+    expect(invoice.warnings).not.toContain("possibly-not-invoice");
+  });
 });
