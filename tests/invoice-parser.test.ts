@@ -140,13 +140,37 @@ describe("invoice extraction", () => {
       "429853386# : ﻞﻴﺠﺴﺘﻟا ﻢﻗر",
       "٢,٥٥٠,٠٠ (م.ج) تﺎﻌﻴﺒﻤﻟا ﻲﻟﺎﻤﺟا",
       "٣٥٧,٠٠ (م.ج) ﻪﻓﺎﻀﻤﻟا ﻪﻤﻴﻘﻟا ﻪﺒﻳﺮﺿ",
+      "٢٥,٥٠ (م.ج) ﻪﺒﻳﺮﻀﻟا بﺎﺴﺣ ﺖﺤﺗ ﻢﺼﺨﻟا",
       "٢,٨٨١,٥٠ (م.ج) ﻎﻠﺒﻤﻟا ﻲﻟﺎﻤﺟا",
     ].join("\n"));
 
     expect(invoice.supplier).toContain("ابراهيم رشاد شعبان علي");
     expect(invoice.net).toBe(2550);
     expect(invoice.vat).toBe(357);
+    expect(invoice.discount).toBe(0);
+    expect(invoice.withholdingTax).toBe(25.5);
+    expect(invoice.withholdingRate).toBe(1);
     expect(invoice.total).toBe(2881.5);
     expect(invoice.warnings).not.toContain("possibly-not-invoice");
+  });
+
+  it("applies header VAT to ETA lines and keeps withholding outside item cost", () => {
+    const invoice = parseInvoiceText([
+      "فاتورة ضريبية",
+      "البائع: إبراهيم رشاد",
+      "رقم الفاتورة: ETA-22",
+      "تاريخ الإصدار: 21/07/2026",
+      "أجهزة كهربائية 1 2550 2550",
+      "إجمالي المبيعات: 2550",
+      "ضريبة القيمة المضافة: 357",
+      "الخصم تحت حساب الضريبة: 25.5",
+      "إجمالي المبلغ: 2881.5",
+    ].join("\n"));
+
+    expect(invoice.lines).toHaveLength(1);
+    expect(invoice.lines[0]).toMatchObject({ net: 2550, vatRate: 14, vat: 357, total: 2907 });
+    expect(invoice.withholdingTax).toBe(25.5);
+    expect(invoice.total).toBe(2881.5);
+    expect(invoice.warnings).not.toContain("totals-do-not-match");
   });
 });

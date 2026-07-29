@@ -20,6 +20,8 @@ export interface ExtractedInvoice {
   lines: ExtractedInvoiceLine[];
   subtotal: number;
   discount: number;
+  withholdingTax: number;
+  withholdingRate: number;
   net: number;
   vatRate: number;
   vat: number;
