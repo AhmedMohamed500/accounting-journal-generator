@@ -12,7 +12,11 @@ export interface VatPeriodSummary {
   transactionCount: number;
   pendingInputVat: number;
   pendingOutputVat: number;
+  nonDeductibleInputVat: number;
+  adjustments: number;
 }
+
+export interface VatConfiguration { inputAccountCodes: string[]; outputAccountCodes: string[]; nonDeductibleAccountCodes: string[]; adjustmentAccountCodes: string[]; defaultRate: number }
 
 export interface VatAnalysis {
   year: number;
@@ -22,5 +26,8 @@ export interface VatAnalysis {
   netVat: number;
   pendingInputVat: number;
   pendingOutputVat: number;
+  nonDeductibleInputVat: number;
+  adjustments: number;
+  configuration: VatConfiguration;
   periods: VatPeriodSummary[];
 }

@@ -480,13 +480,24 @@
 }
 
 @page { size: A4 landscape; margin: 10mm; }
+.print-only { display: none !important; }
 @media print {
   .no-print, .nav, .footer { display: none !important; }
   html, body { background: #fff !important; color: #000; }
-  body * { visibility: hidden !important; }
-  .pos-print-report, .pos-print-report * { visibility: visible !important; }
+  body { font-size: 10pt; }
+  .print-only { display: block !important; }
   .card { box-shadow: none; border-color: #ddd; }
   .container { width: 100%; }
+  .printable-report { width: 100% !important; max-width: none !important; overflow: visible !important; }
+  .report-print-header { margin-bottom: 8mm; padding-bottom: 4mm; border-bottom: 2px solid #1769aa; }
+  .report-print-header h1 { margin: 0 0 2mm; font-size: 18pt; }
+  .table-wrap { overflow: visible !important; }
+  table { width: 100% !important; min-width: 0 !important; border-collapse: collapse; font-size: 8.5pt; }
+  thead { display: table-header-group; }
+  th, td { padding: 4px 6px !important; border: 1px solid #d8dee8; }
+  tr, .card, article { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  input, select { border: 0 !important; box-shadow: none !important; }
   #pos-app-root > :not(.pos-print-report) { display: none !important; }
   #pos-app-root { display: block !important; }
   .pos-print-report { position: absolute !important; inset: 0 !important; display: block !important; width: 100% !important; padding: 0 !important; border: 0 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }

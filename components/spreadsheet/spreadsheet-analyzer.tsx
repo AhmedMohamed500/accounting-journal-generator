@@ -1,12 +1,13 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AlertTriangle, BarChart3, CheckCircle2, Database, Download, FileSpreadsheet,
   Filter, Layers3, LoaderCircle, Search, Table2, TrendingUp,
 } from "lucide-react";
 import { readSpreadsheet, type SpreadsheetReadProgress } from "@/lib/spreadsheet/reader";
 import { analyzeSheet } from "@/lib/spreadsheet/analyzer";
+import { runSpreadsheetQuery } from "@/lib/spreadsheet/query";
 import type { CategoryBreakdown, DataQualityIssue, Locale, SheetAnalysis } from "@/types";
 
 const colors=["#1769aa","#10b981","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#84cc16","#ec4899","#64748b","#14b8a6","#f97316","#6366f1","#94a3b8"];
@@ -30,11 +31,20 @@ export function SpreadsheetAnalyzer({locale}:{locale:Locale}){
       {analysis.sampled&&<div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-blue-900"><Database className="shrink-0"/><div><b>{ar?"وضع تحليل الملفات الكبيرة":"Large-sheet analysis mode"}</b><p className="mt-1 text-sm">{ar?`تم تحليل عينة موزعة من ${analysis.analyzedRows.toLocaleString()} صف بدل تجميد الصفحة، مع الاحتفاظ بعدد الصفوف الحقيقي ${analysis.rowCount.toLocaleString()}.`:`A representative ${analysis.analyzedRows.toLocaleString()}-row sample was analyzed from ${analysis.rowCount.toLocaleString()} total rows.`}</p></div></div>}
 
       <SmartCharts analysis={analysis} ar={ar}/>
+      <AnalysisBuilder analysis={analysis} ar={ar}/>
       <QualityPanel issues={analysis.quality} completeness={analysis.completeness} duplicateRows={analysis.duplicateRows} ar={ar}/>
       <NumericTable analysis={analysis} ar={ar}/>
       <DataPreview analysis={analysis} ar={ar}/>
     </>}
   </div>;
+}
+
+function AnalysisBuilder({analysis,ar}:{analysis:SheetAnalysis;ar:boolean}){
+  const categories=analysis.categorical.map((item)=>item.column),numbers=analysis.numeric.map((item)=>item.column);
+  const[groupBy,setGroupBy]=useState(categories[0]||analysis.headers[0]||""),[valueColumn,setValueColumn]=useState(numbers[0]||""),[aggregate,setAggregate]=useState<"sum"|"average"|"count"|"min"|"max">(numbers.length?"sum":"count"),[topN,setTopN]=useState(12),[filterColumn,setFilterColumn]=useState(""),[filterValue,setFilterValue]=useState("");
+  const result=useMemo(()=>runSpreadsheetQuery({headers:analysis.headers,rows:analysis.rows},{groupBy,valueColumn:aggregate==="count"?undefined:valueColumn,aggregate,topN,filters:filterColumn&&filterValue?[{column:filterColumn,operator:"contains",value:filterValue}]:[]}),[analysis,groupBy,valueColumn,aggregate,topN,filterColumn,filterValue]);
+  const max=Math.max(...result.rows.map((row)=>Math.abs(row.value)),1);
+  return <section className="rounded-3xl border border-daftar-line bg-daftar-card p-5 shadow-sm md:p-7"><div className="flex flex-wrap items-start justify-between gap-3"><div><span className="text-sm font-bold text-daftar-primary">{ar?"منشئ التحليل الديناميكي":"Dynamic analysis builder"}</span><h2 className="mt-1 text-2xl font-black">{ar?"اختر التحليل بنفسك":"Build the view you need"}</h2><p className="mt-1 text-sm text-daftar-muted">{ar?"التصفية والتجميع والرسم تعتمد على الصفوف الفعلية، وليست مثالًا ثابتًا.":"Filters, groups, and charts use the actual workbook rows."}</p></div><BarChart3 className="text-daftar-primary"/></div><div className="no-print mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5"><label><span>{ar?"التجميع حسب":"Group by"}</span><select value={groupBy} onChange={(e)=>setGroupBy(e.target.value)}>{analysis.headers.map((header,index)=><option key={`${header}-${index}`}>{header}</option>)}</select></label><label><span>{ar?"الحقل الرقمي":"Value column"}</span><select disabled={aggregate==="count"} value={valueColumn} onChange={(e)=>setValueColumn(e.target.value)}>{numbers.map((header,index)=><option key={`${header}-${index}`}>{header}</option>)}</select></label><label><span>{ar?"العملية":"Aggregate"}</span><select value={aggregate} onChange={(e)=>setAggregate(e.target.value as typeof aggregate)}><option value="sum">{ar?"المجموع":"Sum"}</option><option value="average">{ar?"المتوسط":"Average"}</option><option value="count">{ar?"العدد":"Count"}</option><option value="min">{ar?"الأدنى":"Minimum"}</option><option value="max">{ar?"الأعلى":"Maximum"}</option></select></label><label><span>{ar?"فلتر اختياري":"Optional filter"}</span><select value={filterColumn} onChange={(e)=>setFilterColumn(e.target.value)}><option value="">{ar?"بدون فلتر":"No filter"}</option>{analysis.headers.map((header,index)=><option key={`${header}-${index}`}>{header}</option>)}</select></label><label><span>{ar?"يحتوي على":"Contains"}</span><input value={filterValue} onChange={(e)=>setFilterValue(e.target.value)} disabled={!filterColumn}/></label></div><div className="mt-5 flex flex-wrap items-center justify-between gap-3"><b>{result.title}</b><span className="rounded-xl bg-blue-50 px-4 py-2 text-sm font-black text-blue-800">{ar?"الصفوف المطابقة":"Matched rows"}: {result.matchedRows.toLocaleString()}</span></div><div className="mt-5 grid gap-3">{result.rows.map((row,index)=><div className="grid items-center gap-2 md:grid-cols-[minmax(120px,240px)_1fr_150px]" key={`${row.label}-${index}`}><b className="truncate" title={row.label}>{row.label}</b><div className="h-8 overflow-hidden rounded-lg bg-daftar-line"><i className="block h-full rounded-lg" style={{width:`${Math.max(1,Math.abs(row.value)/max*100)}%`,background:colors[index%colors.length]}}/></div><span className="font-black md:text-end">{number(row.value)} · {row.percentage}%</span></div>)}</div><label className="no-print mt-5 block max-w-xs"><span>{ar?"عدد العناصر الظاهرة":"Visible categories"}</span><input type="number" min="1" max="50" value={topN} onChange={(e)=>setTopN(Number(e.target.value)||12)}/></label>{!result.rows.length&&<EmptyChart ar={ar}/>}</section>;
 }
 
 function SmartCharts({analysis,ar}:{analysis:SheetAnalysis;ar:boolean}){
