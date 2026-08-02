@@ -1,4 +1,4 @@
-import { createOfficeSeed } from "@/data/accounting-office";
+import { createEmptyOffice, createOfficeSeed } from "@/data/accounting-office";
 import type { AccountingOfficeData } from "@/types";
 import { activeCompanyId } from "./accounting";
 
@@ -25,6 +25,10 @@ export function resetOfficeDemo(companyId = activeCompanyId()) {
   const data = createOfficeSeed(companyId); saveOfficeData(data); return data;
 }
 
+export function startEmptyOffice(companyId = activeCompanyId(), input?: Parameters<typeof createEmptyOffice>[1]) {
+  const data = createEmptyOffice(companyId, input); saveOfficeData(data); return data;
+}
+
 export function subscribeOffice(callback: (data: AccountingOfficeData) => void) {
   if (typeof window === "undefined") return () => undefined;
   const refresh = () => callback(loadOfficeData());
@@ -32,4 +36,3 @@ export function subscribeOffice(callback: (data: AccountingOfficeData) => void) 
   window.addEventListener(OFFICE_UPDATED, refresh); window.addEventListener("storage", storage);
   return () => { window.removeEventListener(OFFICE_UPDATED, refresh); window.removeEventListener("storage", storage); };
 }
-

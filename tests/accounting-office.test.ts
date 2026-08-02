@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { createOfficeSeed } from "@/data/accounting-office";
+import { createEmptyOffice, createOfficeSeed } from "@/data/accounting-office";
 import {
-  canArchiveClient, clientHealth, clientProfitability, dashboardMetrics, detectRevenueOpportunities, employeeWorkload,
-  feeSummary, fileCompletion, generateMonthlyFiles, overdueTasks, startTimer, stopTimer, tasksFromTemplate, timeCost,
+  canArchiveClient, clientDeletionSummary, clientHealth, clientProfitability, dashboardMetrics, deleteClientCascade,
+  deleteEmployeeAndReassign, detectRevenueOpportunities, employeeDependencyCount, employeeWorkload, feeSummary,
+  fileCompletion, generateMonthlyFiles, overdueTasks, startTimer, stopTimer, tasksFromTemplate, timeCost,
 } from "@/lib/accounting-office/engine";
 import { loadOfficeData, officeStorageKey, saveOfficeData } from "@/lib/storage/accounting-office";
 import { createBackup, restoreBackup } from "@/lib/storage/backup";
@@ -121,10 +122,40 @@ describe("accounting office operating center", () => {
     expect(loadOfficeData("personal").office.nameAr).toBe("مكتب محفوظ");
   });
 
-  it("prevents destructive client deletion while related records exist", () => {
+  it("prevents client archiving while related records are open", () => {
     const guard = canArchiveClient(createOfficeSeed("personal"), "client-1");
     expect(guard.allowed).toBe(false);
     expect(guard.reasons.length).toBeGreaterThan(0);
+  });
+
+  it("creates a clean office with only the owner's chosen setup", () => {
+    const empty = createEmptyOffice("personal", { nameAr: "مكتب البداية", ownerName: "أحمد", currency: "USD", clientPrefix: "AC", filePrefix: "FL" });
+    expect(empty.office.nameAr).toBe("مكتب البداية");
+    expect(empty.settings.currency).toBe("USD");
+    expect(empty.clients).toHaveLength(0);
+    expect(empty.tasks).toHaveLength(0);
+    expect(empty.employees).toHaveLength(1);
+    expect(empty.employees[0].role).toBe("owner");
+    expect(empty.templates.length).toBeGreaterThan(0);
+  });
+
+  it("deletes a client and all of its linked office records", () => {
+    const seed = createOfficeSeed("personal"), summary = clientDeletionSummary(seed, "client-1"), result = deleteClientCascade(seed, "client-1");
+    expect(Object.values(summary).reduce((sum, value) => sum + value, 0)).toBeGreaterThan(0);
+    expect(result.clients.some((item) => item.id === "client-1")).toBe(false);
+    expect(result.tasks.some((item) => item.clientId === "client-1")).toBe(false);
+    expect(result.fees.some((item) => item.clientId === "client-1")).toBe(false);
+    expect(result.collections.some((item) => item.clientId === "client-1")).toBe(false);
+  });
+
+  it("requires a replacement for a linked employee and reassigns every reference", () => {
+    const seed = createOfficeSeed("personal");
+    expect(employeeDependencyCount(seed, "emp-3")).toBeGreaterThan(0);
+    expect(() => deleteEmployeeAndReassign(seed, "emp-3")).toThrow("employee-has-dependencies");
+    const result = deleteEmployeeAndReassign(seed, "emp-3", "emp-1");
+    expect(result.employees.some((item) => item.id === "emp-3")).toBe(false);
+    expect(employeeDependencyCount(result, "emp-3")).toBe(0);
+    expect(result.tasks.some((item) => item.assigneeId === "emp-1")).toBe(true);
   });
 
   it("computes dashboard indicators from actual local records", () => {

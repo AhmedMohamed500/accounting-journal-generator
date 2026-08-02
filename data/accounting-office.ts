@@ -121,3 +121,33 @@ export function createOfficeSeed(companyId: string): AccountingOfficeData {
     settings: defaultOfficeSettings,
   };
 }
+
+export function createEmptyOffice(companyId: string, input?: { nameAr?: string; nameEn?: string; currency?: string; ownerName?: string; dailyHours?: number; clientPrefix?: string; filePrefix?: string }): AccountingOfficeData {
+  const base = createOfficeSeed(companyId), createdAt = new Date().toISOString();
+  const dailyHours = Math.max(1, Math.min(16, input?.dailyHours || defaultOfficeSettings.dailyHours));
+  const ownerName = input?.ownerName?.trim();
+  return {
+    ...base,
+    office: {
+      id: `office-${companyId}`,
+      nameAr: input?.nameAr?.trim() || "مكتبي المحاسبي",
+      nameEn: input?.nameEn?.trim() || "My Accounting Office",
+      currency: input?.currency || "EGP",
+      createdAt,
+    },
+    clients: [],
+    employees: ownerName ? [{ id: officeIdForSeed("employee"), name: ownerName, role: "owner", hourlyCost: defaultOfficeSettings.roleHourlyCosts.owner, dailyCapacityHours: dailyHours, active: true, createdAt }] : [],
+    monthlyFiles: [], tasks: [], requiredDocuments: [], deadlines: [], reviews: [], timeEntries: [], fees: [], collections: [], opportunities: [], activities: [],
+    settings: {
+      ...defaultOfficeSettings,
+      currency: input?.currency || "EGP",
+      dailyHours,
+      clientPrefix: input?.clientPrefix?.trim().toUpperCase() || "CL",
+      filePrefix: input?.filePrefix?.trim().toUpperCase() || "MF",
+    },
+  };
+}
+
+function officeIdForSeed(prefix: string) {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}

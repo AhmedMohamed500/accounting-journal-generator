@@ -194,6 +194,66 @@ export function canArchiveClient(data: AccountingOfficeData, clientId: string) {
   return { allowed: !openFile && !openTask && !outstandingFee, reasons: [openFile && "يوجد ملف شهري مفتوح", openTask && "توجد مهام غير مكتملة", outstandingFee && "توجد أتعاب مستحقة"].filter(Boolean) as string[] };
 }
 
+export function clientDeletionSummary(data: AccountingOfficeData, clientId: string) {
+  const feeIds = new Set(data.fees.filter((item) => item.clientId === clientId).map((item) => item.id));
+  return {
+    files: data.monthlyFiles.filter((item) => item.clientId === clientId).length,
+    tasks: data.tasks.filter((item) => item.clientId === clientId).length,
+    documents: data.requiredDocuments.filter((item) => item.clientId === clientId).length,
+    deadlines: data.deadlines.filter((item) => item.clientId === clientId).length,
+    reviews: data.reviews.filter((item) => item.clientId === clientId).length,
+    timeEntries: data.timeEntries.filter((item) => item.clientId === clientId).length,
+    fees: feeIds.size,
+    collections: data.collections.filter((item) => item.clientId === clientId || feeIds.has(item.feeId)).length,
+  };
+}
+
+export function deleteClientCascade(data: AccountingOfficeData, clientId: string) {
+  const feeIds = new Set(data.fees.filter((item) => item.clientId === clientId).map((item) => item.id));
+  return {
+    ...data,
+    clients: data.clients.filter((item) => item.id !== clientId),
+    monthlyFiles: data.monthlyFiles.filter((item) => item.clientId !== clientId),
+    tasks: data.tasks.filter((item) => item.clientId !== clientId),
+    requiredDocuments: data.requiredDocuments.filter((item) => item.clientId !== clientId),
+    deadlines: data.deadlines.filter((item) => item.clientId !== clientId),
+    reviews: data.reviews.filter((item) => item.clientId !== clientId),
+    timeEntries: data.timeEntries.filter((item) => item.clientId !== clientId),
+    fees: data.fees.filter((item) => item.clientId !== clientId),
+    collections: data.collections.filter((item) => item.clientId !== clientId && !feeIds.has(item.feeId)),
+    opportunities: data.opportunities.filter((item) => item.clientId !== clientId),
+    activities: data.activities.filter((item) => item.clientId !== clientId),
+  };
+}
+
+export function employeeDependencyCount(data: AccountingOfficeData, employeeId: string) {
+  return data.clients.filter((item) => item.accountantId === employeeId || item.reviewerId === employeeId).length
+    + data.monthlyFiles.filter((item) => item.accountantId === employeeId || item.reviewerId === employeeId).length
+    + data.tasks.filter((item) => item.assigneeId === employeeId || item.reviewerId === employeeId).length
+    + data.requiredDocuments.filter((item) => item.followUpEmployeeId === employeeId).length
+    + data.deadlines.filter((item) => item.employeeId === employeeId || item.reviewerId === employeeId).length
+    + data.reviews.filter((item) => item.creatorId === employeeId || item.reviewerId === employeeId).length
+    + data.timeEntries.filter((item) => item.employeeId === employeeId).length;
+}
+
+export function deleteEmployeeAndReassign(data: AccountingOfficeData, employeeId: string, replacementId?: string) {
+  const dependencies = employeeDependencyCount(data, employeeId);
+  if (dependencies && (!replacementId || replacementId === employeeId || !data.employees.some((item) => item.id === replacementId && item.active))) throw new Error("employee-has-dependencies");
+  const replace = (value?: string) => value === employeeId ? replacementId : value;
+  return {
+    ...data,
+    employees: data.employees.filter((item) => item.id !== employeeId),
+    clients: data.clients.map((item) => ({ ...item, accountantId: replace(item.accountantId) || "", reviewerId: replace(item.reviewerId) })),
+    monthlyFiles: data.monthlyFiles.map((item) => ({ ...item, accountantId: replace(item.accountantId) || "", reviewerId: replace(item.reviewerId) })),
+    tasks: data.tasks.map((item) => ({ ...item, assigneeId: replace(item.assigneeId) || "", reviewerId: replace(item.reviewerId) })),
+    requiredDocuments: data.requiredDocuments.map((item) => ({ ...item, followUpEmployeeId: replace(item.followUpEmployeeId) || "" })),
+    deadlines: data.deadlines.map((item) => ({ ...item, employeeId: replace(item.employeeId) || "", reviewerId: replace(item.reviewerId) })),
+    reviews: data.reviews.map((item) => ({ ...item, creatorId: replace(item.creatorId) || "", reviewerId: replace(item.reviewerId) || "" })),
+    timeEntries: data.timeEntries.map((item) => ({ ...item, employeeId: replace(item.employeeId) || "" })),
+    activities: data.activities.map((item) => ({ ...item, employeeId: replace(item.employeeId) })),
+  };
+}
+
 export function mergeOfficeForBackup(original: AccountingOfficeData, restored: AccountingOfficeData) {
   if (restored.schemaVersion !== 2 || restored.companyId !== original.companyId) throw new Error("invalid-office-backup");
   return restored;
