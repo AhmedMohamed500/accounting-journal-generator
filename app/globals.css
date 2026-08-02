@@ -362,18 +362,9 @@
 .nav a.nav-new-entry, .nav a.nav-new-entry:visited, .nav a.nav-new-entry:hover,
 .nav a.nav-new-entry > span { color: #fff !important; }
 .nav a.nav-new-entry > svg { color: #fff !important; stroke: #fff !important; }
-[lang="ar"] [data-en-label]::after {
-  content: " · " attr(data-en-label);
-  direction: ltr;
-  unicode-bidi: isolate;
-  color: var(--muted);
-  font-size: .78em;
-  font-weight: 500;
-  white-space: nowrap;
-}
-[lang="ar"] h1[data-en-label]::after, [lang="ar"] h2[data-en-label]::after, [lang="ar"] h3[data-en-label]::after { font-size: .58em; }
-[lang="ar"] .btn[data-en-label]::after, [lang="ar"] .badge[data-en-label]::after { color: inherit; opacity: .72; }
-[lang="ar"] .nav [data-en-label]::after { display: none !important; content: none; }
+/* English hints are rendered explicitly by their owning component. Injecting a
+   second language into arbitrary RTL elements breaks navigation and tables. */
+[lang="ar"] [data-en-label]::after { display: none !important; content: none !important; }
 
 @media (max-width: 1080px) {
   .nav-inner { position: relative; }
