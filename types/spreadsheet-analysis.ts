@@ -1,5 +1,6 @@
 export type CellValue = string | number | boolean | Date | null;
-export interface SheetData { name: string; headers: string[]; rows: CellValue[][]; headerRowIndex?: number; sourceRowCount?: number }
+export interface SpreadsheetReadDiagnostics { headerConfidence: number; titleRowsSkipped: number; blankRowsRemoved: number; blankColumnsRemoved: number; sourceColumnCount: number; warnings: string[] }
+export interface SheetData { name: string; headers: string[]; rows: CellValue[][]; headerRowIndex?: number; sourceRowCount?: number; readDiagnostics?: SpreadsheetReadDiagnostics }
 export type SpreadsheetAggregate = "sum" | "average" | "count" | "min" | "max";
 export interface SpreadsheetFilter { column: string; operator: "equals" | "contains" | "gt" | "gte" | "lt" | "lte" | "not-empty"; value?: string | number }
 export interface SpreadsheetQuery { groupBy: string; valueColumn?: string; aggregate: SpreadsheetAggregate; filters?: SpreadsheetFilter[]; topN?: number; sort?: "asc" | "desc" }
@@ -9,6 +10,7 @@ export interface NumericProfile { column: string; count: number; missing: number
 export interface CategoricalProfile { column: string; count: number; missing: number; unique: number; topValues: { value: string; count: number; percentage: number }[] }
 export interface DateProfile { column: string; count: number; missing: number; earliest: string; latest: string }
 export interface DataQualityIssue { severity: "high" | "medium" | "low"; code: string; message: string; column?: string }
+export interface SpreadsheetColumnInsight { column: string; type: "number" | "date" | "category" | "identifier" | "boolean" | "mixed"; confidence: number; completeness: number; distinct: number; role: "measure" | "amount" | "date" | "category" | "identifier" | "text" }
 export interface CategoryBreakdownItem { label: string; value: number; percentage: number }
 export interface CategoryBreakdown { title: string; total: number; items: CategoryBreakdownItem[] }
-export interface SheetAnalysis { name: string; headers: string[]; rows: CellValue[][]; headerRowIndex?: number; rowCount: number; analyzedRows: number; sampled: boolean; completeness: number; duplicateRows: number; columnCount: number; numeric: NumericProfile[]; categorical: CategoricalProfile[]; dates: DateProfile[]; quality: DataQualityIssue[]; breakdown?: CategoryBreakdown; preview: CellValue[][] }
+export interface SheetAnalysis { name: string; headers: string[]; rows: CellValue[][]; headerRowIndex?: number; rowCount: number; analyzedRows: number; sampled: boolean; completeness: number; qualityScore: number; duplicateRows: number; columnCount: number; numeric: NumericProfile[]; categorical: CategoricalProfile[]; dates: DateProfile[]; columns: SpreadsheetColumnInsight[]; quality: DataQualityIssue[]; readDiagnostics?: SpreadsheetReadDiagnostics; breakdown?: CategoryBreakdown; preview: CellValue[][] }

@@ -8,6 +8,7 @@ describe("dynamic spreadsheet queries", () => {
     expect(result.matchedRows).toBe(2);
     expect(result.rows[0]).toMatchObject({ label: "Cairo", value: 300, percentage: 100 });
   });
+  it("aggregates a large dataset without retaining every value",()=>{const rows=Array.from({length:100_000},(_,index)=>[index%2?"A":"B",1]);const result=runSpreadsheetQuery({headers:["Group","Amount"],rows},{groupBy:"Group",valueColumn:"Amount",aggregate:"sum"});expect(result.matchedRows).toBe(100_000);expect(result.total).toBe(100_000);expect(result.rows).toHaveLength(2);});
 });
 
 describe("bank import identity", () => {

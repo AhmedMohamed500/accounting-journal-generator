@@ -1,4 +1,4 @@
-import type { CategoricalProfile, CellValue, CategoryBreakdown, DataQualityIssue, DateProfile, NumericProfile, SheetAnalysis, SheetData } from "@/types";
+import type { CategoricalProfile, CellValue, CategoryBreakdown, DataQualityIssue, DateProfile, NumericProfile, SheetAnalysis, SheetData, SpreadsheetColumnInsight } from "@/types";
 
 const MAX_ANALYSIS_ROWS = 60_000;
 const MEDIAN_SAMPLE_SIZE = 8_000;
@@ -54,7 +54,7 @@ function findBreakdown(sheet:SheetData, numeric:NumericProfile[], categorical:Ca
 }
 
 export function analyzeSheet(sheet:SheetData):SheetAnalysis {
-  const rows=sampledRows(sheet.rows), numeric:NumericProfile[]=[], categorical:CategoricalProfile[]=[], dates:DateProfile[]=[], quality:DataQualityIssue[]=[];
+  const rows=sampledRows(sheet.rows), numeric:NumericProfile[]=[], categorical:CategoricalProfile[]=[], dates:DateProfile[]=[], columns:SpreadsheetColumnInsight[]=[], quality:DataQualityIssue[]=[];
   const totalCells=Math.max(1,rows.length*sheet.headers.length); let missingCells=0;
   sheet.headers.forEach((header,columnIndex)=>{
     const numbers:number[]=[], datesFound:Date[]=[], counts=new Map<string,number>(); let missing=0, negative=0, zero=0, sum=0, min=Infinity, max=-Infinity;
@@ -65,6 +65,10 @@ export function analyzeSheet(sheet:SheetData):SheetAnalysis {
     else { categorical.push({column:header,count:present,missing,unique:counts.size,topValues:[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10).map(([value,count])=>({value,count,percentage:round(count/Math.max(1,present)*100)}))}); }
     if(rows.length&&missing/rows.length>.3) quality.push({severity:"medium",code:"many-missing",column:header,message:"More than 30% of values are missing."});
     if(present&&numbers.length>0&&numericRatio<.6) quality.push({severity:"low",code:"mixed-types",column:header,message:"The column mixes numbers with text; review formatting."});
+    const inferredType:SpreadsheetColumnInsight["type"]=identifierHeader(header)?"identifier":numericRatio>=.6?"number":dateRatio>=.6?"date":counts.size<=Math.max(20,present*.35)?"category":numbers.length||datesFound.length?"mixed":"category";
+    const confidence=round(Math.max(numericRatio,dateRatio,inferredType==="identifier"?.95:counts.size?1-Math.min(.45,counts.size/Math.max(1,present)*.25):0)*100);
+    const role:SpreadsheetColumnInsight["role"]=identifierHeader(header)?"identifier":amountHeader(header)&&inferredType==="number"?"amount":inferredType==="number"?"measure":inferredType==="date"?"date":inferredType==="category"?"category":"text";
+    columns.push({column:header,type:inferredType,confidence,completeness:round(present/Math.max(1,rows.length)*100),distinct:counts.size||new Set(numbers).size||new Set(datesFound.map(date=>date.toISOString())).size,role});
   });
   if(sheet.rows.length>rows.length){
     for(const profile of numeric){
@@ -80,5 +84,8 @@ export function analyzeSheet(sheet:SheetData):SheetAnalysis {
   const normalizedHeaders=sheet.headers.map((header)=>header.trim().toLowerCase()), duplicateHeaders=normalizedHeaders.filter((header,index)=>normalizedHeaders.indexOf(header)!==index);
   if(duplicateHeaders.length) quality.push({severity:"high",code:"duplicate-headers",message:`Duplicate headers: ${[...new Set(duplicateHeaders)].join(", ")}`});
   categorical.filter((profile)=>profile.unique===1&&profile.count>1).forEach((profile)=>quality.push({severity:"low",code:"constant-column",column:profile.column,message:"The column contains one repeated value and adds little analytical value."}));
-  return {name:sheet.name,headers:sheet.headers,rows:sheet.rows,headerRowIndex:sheet.headerRowIndex,rowCount:sheet.rows.length,analyzedRows:rows.length,sampled:sheet.rows.length>rows.length,completeness,duplicateRows,columnCount:sheet.headers.length,numeric,categorical,dates,quality,breakdown:findBreakdown(sheet,numeric,categorical),preview:sheet.rows.slice(0,25)};
+  const formulaErrors=rows.reduce((sum,row)=>sum+row.filter(value=>typeof value==="string"&&/^#(REF!|DIV\/0!|VALUE!|NAME\?|N\/A|NUM!)/i.test(value)).length,0);if(formulaErrors)quality.push({severity:"high",code:"formula-errors",message:`${formulaErrors} spreadsheet formula errors detected.`});
+  const typeConfidence=columns.reduce((sum,column)=>sum+column.confidence,0)/Math.max(1,columns.length),high=quality.filter(issue=>issue.severity==="high").length,medium=quality.filter(issue=>issue.severity==="medium").length,duplicateRate=duplicateRows/Math.max(1,Math.min(rows.length,DUPLICATE_SCAN_ROWS));
+  const qualityScore=Math.max(0,Math.min(100,Math.round(completeness*.5+(sheet.readDiagnostics?.headerConfidence??70)*.2+typeConfidence*.2+10-high*8-medium*3-duplicateRate*30)));
+  return {name:sheet.name,headers:sheet.headers,rows:sheet.rows,headerRowIndex:sheet.headerRowIndex,rowCount:sheet.rows.length,analyzedRows:rows.length,sampled:sheet.rows.length>rows.length,completeness,qualityScore,duplicateRows,columnCount:sheet.headers.length,numeric,categorical,dates,columns,quality,readDiagnostics:sheet.readDiagnostics,breakdown:findBreakdown(sheet,numeric,categorical),preview:sheet.rows.slice(0,25)};
 }
