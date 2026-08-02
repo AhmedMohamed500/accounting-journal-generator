@@ -50,6 +50,7 @@ const seeds: Seed[] = [
   ["electricity", "5110", "مصروف الكهرباء والمرافق", "Utilities expense", "expense", "operating-expenses", "operating-expenses"],
   ["office-supplies", "5120", "مصروف أدوات مكتبية ومطبوعات", "Office supplies and printing", "expense", "operating-expenses", "operating-expenses"],
   ["maintenance", "5130", "مصروف الصيانة والإصلاح", "Maintenance and repairs", "expense", "operating-expenses", "operating-expenses"],
+  ["general-operating-expenses", "5190", "مصروفات تشغيلية أخرى", "Other operating expenses", "expense", "operating-expenses", "operating-expenses"],
   ["salaries", "5200", "مصروف الرواتب والأجور", "Salaries and wages", "expense", "operating-expenses", "operating-expenses"],
   ["depreciation", "5300", "مصروف الإهلاك", "Depreciation expense", "expense", "operating-expenses", "operating-expenses"],
   ["marketing", "5400", "مصروف التسويق والإعلان", "Marketing expense", "expense", "operating-expenses", "operating-expenses"],
