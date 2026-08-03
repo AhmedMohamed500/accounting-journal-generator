@@ -493,8 +493,11 @@
   tr, .card, article { break-inside: avoid; page-break-inside: avoid; }
   h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
   input, select { border: 0 !important; box-shadow: none !important; }
-  #pos-app-root > :not(.pos-print-report) { display: none !important; }
+  #pos-app-root > :not(.pos-print-report):not(:has(.merchant-print-report)) { display: none !important; }
   #pos-app-root { display: block !important; }
+  #pos-app-root > :has(.merchant-print-report) > :not(:has(.merchant-print-report)),
+  #pos-app-root > :has(.merchant-print-report) > :has(.merchant-print-report) > :not(.merchant-print-report) { display: none !important; }
+  .merchant-print-report { display: block !important; width: 100% !important; padding: 0 !important; }
   .pos-print-report { position: absolute !important; inset: 0 !important; display: block !important; width: 100% !important; padding: 0 !important; border: 0 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .print-hidden { display: none !important; }
   .pos-print-report .mt-8 { margin-top: 16px !important; }

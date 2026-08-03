@@ -5,6 +5,8 @@ import Image from "next/image";
 import { AlertTriangle, Banknote, BarChart3, CheckCircle2, Clock3, ImageUp, Info, Landmark, LockKeyhole, PlusCircle, Printer, ReceiptText, RotateCcw, ShieldCheck, Store, WalletCards, X } from "lucide-react";
 import { posOperationTypes, posProviders } from "@/data/pos";
 import { ServicePointIntelligence } from "@/components/pos/service-point-intelligence";
+import { MerchantAccountingCenter } from "@/components/pos/merchant-accounting-center";
+import { ServicePointControl } from "@/components/pos/service-point-control";
 import { calculatePosOperation, calculatePosShiftSnapshot, createPosJournalEntry, createPosReversal, createPosReversalJournalEntry, createPosVarianceEntry, isDuplicatePosOperation } from "@/lib/pos/engine";
 import { createPosStore, loadActivePosStoreId, loadPosEntries, loadPosOperations, loadPosShifts, loadPosStores, migrateLegacyPosData, openPosShift, savePosEntry, savePosOperation, savePosOperations, setActivePosStoreId, updatePosShift, updatePosStore } from "@/lib/storage/pos";
 
@@ -24,7 +26,15 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
   const [receiptOperation,setReceiptOperation]=useState<PosOperation>();
 
   const refresh = (storeId: string) => { setShifts(loadPosShifts(storeId)); setOperations(loadPosOperations(storeId)); setEntries(loadPosEntries(storeId)); };
-  useEffect(() => { const migrated = migrateLegacyPosData(), loaded = migrated.length ? migrated : loadPosStores(), selected = loadActivePosStoreId() || loaded[0]?.id || ""; setStores(loaded); setActiveStore(selected); if (selected) refresh(selected); }, []);
+  useEffect(() => {
+    const migrated = migrateLegacyPosData();
+    let loaded = migrated.length ? migrated : loadPosStores();
+    if (!loaded.length) loaded = [createPosStore(locale === "ar" ? "المحل الرئيسي" : "Main store")];
+    const selected = loadActivePosStoreId() || loaded[0].id;
+    setStores(loaded);
+    setActiveStore(selected);
+    refresh(selected);
+  }, [locale]);
   const activeStore = stores.find((store) => store.id === activeStoreId);
   const activeShift = shifts.find((shift) => shift.status === "open");
   const snapshot = activeShift ? calculatePosShiftSnapshot(activeShift, operations) : undefined;
@@ -112,6 +122,8 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
 
   if (!activeShift) return <div id="pos-app-root" className="grid gap-6">
     {storeBar}
+    <MerchantAccountingCenter locale={locale} storeId={activeStore.id} storeName={activeStore.name}/>
+    <ServicePointControl locale={locale} shifts={shifts} operations={operations}/>
     <section className="card overflow-hidden"><div className="grid gap-6 xl:grid-cols-[1.1fr_.9fr]"><div><span className="badge"><Store size={15}/>{ar ? "فتح وردية جديدة" : "Open a new shift"}</span><h2 className="mt-4">{ar ? "ابدأ بالأرصدة الموجودة فعلًا" : "Start with actual opening balances"}</h2><p className="muted">{ar ? "اكتب نقدية الخزنة ورصيد كل ماكينة أو محفظة. من هنا سيحسب النظام المتوقع والعجز والربح." : "Enter physical cash and every provider balance."}</p><div className="mt-5 grid gap-4 md:grid-cols-2"><div className="rounded-2xl bg-blue-50 p-4 text-daftar-primary"><small>{ar ? "المحل المختار" : "Selected store"}</small><b className="mt-1 block">{activeStore.name}</b></div><label>{ar ? "اسم الكاشير" : "Cashier"}<input value={cashierName} onChange={(event) => setCashierName(event.target.value)}/></label><label>{ar ? "رصيد الخزنة أول الوردية" : "Opening cash"}<input type="number" min="0" value={openingCash} onChange={(event) => setOpeningCash(event.target.value)}/></label></div></div><div className="rounded-3xl bg-daftar-bg p-5"><b>{ar ? "أرصدة الخدمات أول الوردية" : "Opening provider balances"}</b><div className="mt-4 grid gap-3 md:grid-cols-2">{posProviders.map((provider) => <label key={provider.id}><span className="flex items-center gap-2"><i className="h-2.5 w-2.5 rounded-full" style={{background:provider.color}}/>{ar ? provider.nameAr : provider.nameEn}</span><input type="number" min="0" value={openingProviders[provider.id]} onChange={(event) => setOpeningProviders((current) => ({ ...current, [provider.id]: event.target.value }))}/></label>)}</div></div></div><button className="btn btn-primary mt-6" onClick={openShift}><Clock3 size={18}/>{ar ? "فتح الوردية وبدء العمل" : "Open shift"}</button>{message && <p className="warning mt-4">{message}</p>}</section>
     <Reports locale={locale} period={period} setPeriod={setPeriod} provider={reportProvider} setProvider={setReportProvider} report={report} operations={effectiveReportOperations}/>
     <PrintablePosReport locale={locale} period={period} storeName={activeStore.name} storeLogo={activeStore.logoDataUrl} provider={reportProvider} operations={reportOperations} balances={Object.fromEntries(posProviders.map((item) => [item.id, shifts[0]?.providers.find((balance) => balance.providerId === item.id)?.actualClosingBalance ?? shifts[0]?.providers.find((balance) => balance.providerId === item.id)?.openingBalance ?? 0])) as Record<PosProviderId, number>} printHidden={false}/><ServicePointGuidance locale={locale}/>
@@ -119,8 +131,10 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
 
   return <div id="pos-app-root" className="grid gap-6">
     {storeBar}
+    <MerchantAccountingCenter locale={locale} storeId={activeStore.id} storeName={activeStore.name}/>
     <section className="rounded-3xl bg-gradient-to-l from-[#0f315d] to-[#1c5a9b] p-6 text-white shadow-xl"><div className="flex flex-wrap items-start justify-between gap-4"><div><span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm"><CheckCircle2 size={15}/>{ar ? "وردية مفتوحة" : "Open shift"}</span><h2 className="mt-3 text-white">{activeShift.storeName}</h2><p className="mt-1 text-white/75">{activeShift.cashierName} · {activeShift.businessDate}</p></div><div className="text-end"><small className="text-white/70">{ar ? "صافي ربح الوردية" : "Shift net profit"}</small><strong className="mt-1 block text-3xl">{money(snapshot!.profit)}</strong></div></div></section>
     <ServicePointIntelligence locale={locale} snapshot={snapshot!} operations={operations.filter((item)=>item.shiftId===activeShift.id)}/>
+    <ServicePointControl locale={locale} shifts={shifts} operations={operations}/>
     <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5"><Metric icon={Banknote} title={ar ? "الخزنة المتوقعة" : "Expected cash"} value={money(snapshot!.expectedCash)}/><Metric icon={WalletCards} title={ar ? "أرصدة الخدمات" : "Provider balances"} value={money(Object.values(snapshot!.expectedProviders).reduce((sum,value)=>sum+value,0))}/><Metric icon={ReceiptText} title={ar ? "إيراد العمولات" : "Commission revenue"} value={money(snapshot!.revenue)}/><Metric icon={Landmark} title={ar ? "تكلفة الخدمات" : "Provider costs"} value={money(snapshot!.expenses)}/><Metric icon={BarChart3} title={ar ? "عدد العمليات" : "Operations"} value={String(snapshot!.operationCount)}/></section>
 
     <section className="card">
@@ -190,7 +204,7 @@ function StoreAccountsBar({ locale, stores, activeStoreId, activeStore, newStore
   return <section className="card no-print" data-no-bilingual>
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-blue-50 text-daftar-primary"><Store size={21}/></span><div><h2>{ar ? "حسابات المحلات المستقلة" : "Independent store accounts"}</h2><p className="muted mt-1">{ar ? "كل محل له خزنة ومحافظ وقيود وتقارير منفصلة تمامًا." : "Every store has isolated cash, wallets, entries, and reports."}</p></div></div>
-      <span className="badge">{ar ? "منفصل عن حسابات الشركة" : "Isolated from company books"}</span>
+      <div className="flex flex-wrap items-center gap-2"><span className="badge">{ar ? "منفصل عن حسابات الشركة" : "Isolated from company books"}</span><a className="btn" href={`/${locale}/service-point/owner-dashboard`}>{ar ? "معاينة لوحة صاحب المحل" : "Owner dashboard preview"}</a></div>
     </div>
     <div className="mt-5 grid items-end gap-4 md:grid-cols-[1fr_1fr_auto]">
       <label>{ar ? "المحل الذي تعمل عليه الآن" : "Current store"}<select value={activeStoreId} onChange={(event) => onSelect(event.target.value)}><option value="">{ar ? "اختر محلًا" : "Select store"}</option>{stores.map((store) => <option value={store.id} key={store.id}>{store.name}</option>)}</select></label>
