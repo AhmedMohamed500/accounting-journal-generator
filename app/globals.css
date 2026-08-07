@@ -20,6 +20,17 @@
 .timeline-step.complete > span { color:#fff; background:#0a9661; }
 .journal-details { border-top:4px solid var(--primary); }
 .journal-center .card.text-start { text-align:start; }
+.coa-tree { display:grid; gap:5px; }
+.coa-row { display:grid; grid-template-columns:34px 90px minmax(220px,1fr) 150px 95px 80px auto; align-items:center; gap:12px; min-height:64px; padding:8px 10px; border:1px solid var(--line); border-radius:12px; background:var(--card); }
+.coa-row:hover { border-color:color-mix(in srgb,var(--primary) 35%,var(--line)); background:color-mix(in srgb,var(--primary) 3%,var(--card)); }
+.coa-row.inactive { opacity:.58; }
+.coa-toggle { display:grid; place-items:center; width:30px; height:30px; border:0; border-radius:8px; color:var(--primary); background:color-mix(in srgb,var(--primary) 7%,var(--card)); cursor:pointer; }
+.coa-toggle:disabled { color:var(--muted); cursor:default; background:transparent; }
+.coa-code { color:var(--primary); font-weight:900; unicode-bidi:isolate; }
+.coa-name { display:grid; gap:3px; }.coa-name small { color:var(--muted); font-size:.72rem; direction:ltr; text-align:start; }
+.badge.control { color:#5c687b; background:#eef1f6; }
+.coa-drawer { position:relative; border-top:4px solid var(--primary); }
+@media (max-width:950px) { .coa-row { grid-template-columns:30px 75px minmax(180px,1fr) auto; }.coa-row > .badge:nth-of-type(n+2) { display:none; } }
 @media (max-width:760px) { .journal-timeline { grid-template-columns:1fr 1fr; } }
 
 :root {

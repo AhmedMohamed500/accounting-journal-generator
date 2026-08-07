@@ -1,5 +1,33 @@
-import type { BankTransaction, GeneratedJournalEntry, JournalEntryLine } from "@/types";
-const hash=(value:string)=>[...value].reduce((result,character)=>((result<<5)-result+character.charCodeAt(0))|0,0);
-const line=(accountCode:string,accountNameAr:string,accountNameEn:string,debit:number,credit:number):JournalEntryLine=>({id:crypto.randomUUID(),accountCode,accountNameAr,accountNameEn,debit,credit});
-function counterpart(transaction:BankTransaction){const description=`${transaction.description} ${transaction.reference}`.toLowerCase();if(transaction.debit>0&&/رسوم|عمول|مصاريف|كشف حساب|charge|commission|fee/.test(description))return{code:"5600",ar:"مصروفات وعمولات بنكية",en:"Bank charges",confidence:90};if(transaction.credit>0&&/فوائد|فائدة|interest/.test(description))return{code:"4900",ar:"إيرادات فوائد",en:"Interest income",confidence:90};return{code:"1199",ar:"حساب التسوية البنكية المؤقت",en:"Bank reconciliation clearing",confidence:55};}
-export function createBankDraftEntry(transaction:BankTransaction):GeneratedJournalEntry{const incoming=transaction.credit>0,amount=incoming?transaction.credit:transaction.debit,other=counterpart(transaction),lines=incoming?[line("1110","البنوك","Banks",amount,0),line(other.code,other.ar,other.en,0,amount)]:[line(other.code,other.ar,other.en,amount,0),line("1110","البنوك","Banks",0,amount)],needsClassification=other.code==="1199",suffix=String(Math.abs(hash(transaction.id))).slice(0,7).padStart(7,"0");return{id:`bank-draft-${transaction.id}`,entryNumber:`BNK-${suffix}`,date:transaction.date,transactionType:"bank-statement-import",titleAr:needsClassification?"حركة بنكية تحتاج تصنيف":"حركة بنكية مصنفة تلقائياً",titleEn:needsClassification?"Bank transaction pending classification":"Automatically classified bank transaction",narrationAr:`${transaction.description||"حركة بكشف البنك"}${transaction.reference?` — ${transaction.reference}`:""}`,narrationEn:`${transaction.description||"Bank statement transaction"}${transaction.reference?` — ${transaction.reference}`:""}`,currency:transaction.currency,lines,totalDebit:amount,totalCredit:amount,isBalanced:true,explanationAr:["أُنشئ القيد تلقائياً من كشف البنك وربط بالحركة المستوردة.",incoming?"زاد رصيد البنك في الجانب المدين.":"انخفض رصيد البنك في الجانب الدائن."],explanationEn:["The draft was created automatically from the bank statement and linked to the imported transaction.",incoming?"The bank balance increased on the debit side.":"The bank balance decreased on the credit side."],assumptionsAr:needsClassification?["استُخدم حساب التسوية البنكية المؤقت لحين تحديد الحساب المقابل الصحيح."]:[],assumptionsEn:needsClassification?["The bank reconciliation clearing account is used until the correct counter-account is selected."]:[],warningsAr:needsClassification?["راجع الحساب المقابل قبل اعتماد وترحيل القيد."]:["راجع وصف الحركة والمبلغ قبل الترحيل."],warningsEn:needsClassification?["Review the counter-account before approving and posting the entry."]:["Review the description and amount before posting."],accountingRuleAr:"كشف البنك يثبت حركة حساب البنك، ويظل الحساب المقابل تحت المراجعة حتى تصنيف العملية.",accountingRuleEn:"The statement confirms the bank-side movement; the counter-account remains under review until classification.",financialStatementImpact:{assets:0,liabilities:0,equity:0,revenue:0,expenses:0,profit:0,cash:incoming?amount:-amount},cashFlowCategory:"operating",confidence:other.confidence,workflowStatus:"draft",paymentAccountCode:"1110"};}
+import { defaultAccounts } from "@/data/accounts";
+import type { BankTransaction, ChartAccount, GeneratedJournalEntry, JournalEntryLine } from "@/types";
+
+const hash = (value: string) => [...value].reduce((result, character) => ((result << 5) - result + character.charCodeAt(0)) | 0, 0);
+const line = (accountCode: string, accountNameAr: string, accountNameEn: string, debit: number, credit: number): JournalEntryLine => ({ id: crypto.randomUUID(), accountCode, accountNameAr, accountNameEn, debit, credit });
+
+function counterpart(transaction: BankTransaction) {
+  const description = `${transaction.description} ${transaction.reference}`.toLowerCase();
+  if (transaction.debit > 0 && /رسوم|عمول|مصاريف|كشف حساب|charge|commission|fee/.test(description)) return { code: "5600", ar: "مصروفات وعمولات بنكية", en: "Bank charges", confidence: 90 };
+  if (transaction.credit > 0 && /فوائد|فائدة|interest/.test(description)) return { code: "4900", ar: "إيرادات فوائد", en: "Interest income", confidence: 90 };
+  return { code: "1199", ar: "حساب التسوية البنكية المؤقت", en: "Bank reconciliation clearing", confidence: 55 };
+}
+
+export function createBankDraftEntry(transaction: BankTransaction, accounts: ChartAccount[] = defaultAccounts): GeneratedJournalEntry {
+  const incoming = transaction.credit > 0, amount = incoming ? transaction.credit : transaction.debit, other = counterpart(transaction);
+  const bankCode = transaction.bankAccountId || "1110", selectedBank = accounts.find((account) => account.code === bankCode);
+  const bank = { code: bankCode, ar: selectedBank?.nameAr || "البنوك", en: selectedBank?.nameEn || "Banks" };
+  const lines = incoming ? [line(bank.code, bank.ar, bank.en, amount, 0), line(other.code, other.ar, other.en, 0, amount)] : [line(other.code, other.ar, other.en, amount, 0), line(bank.code, bank.ar, bank.en, 0, amount)];
+  const needsClassification = other.code === "1199", suffix = String(Math.abs(hash(transaction.id))).slice(0, 7).padStart(7, "0");
+  return {
+    id: `bank-draft-${transaction.id}`, entryNumber: `BNK-${suffix}`, date: transaction.date, transactionType: "bank-statement-import",
+    titleAr: needsClassification ? "حركة بنكية تحتاج تصنيف" : "حركة بنكية مصنفة تلقائيًا", titleEn: needsClassification ? "Bank transaction pending classification" : "Automatically classified bank transaction",
+    narrationAr: `${transaction.description || "حركة بكشف البنك"}${transaction.reference ? ` — ${transaction.reference}` : ""}`, narrationEn: `${transaction.description || "Bank statement transaction"}${transaction.reference ? ` — ${transaction.reference}` : ""}`,
+    currency: transaction.currency, lines, totalDebit: amount, totalCredit: amount, isBalanced: true,
+    explanationAr: ["أُنشئ القيد تلقائيًا من كشف البنك وربط بالحركة المستوردة.", incoming ? "زاد رصيد البنك في الجانب المدين." : "انخفض رصيد البنك في الجانب الدائن."],
+    explanationEn: ["The draft was created automatically from the bank statement and linked to the imported transaction.", incoming ? "The bank balance increased on the debit side." : "The bank balance decreased on the credit side."],
+    assumptionsAr: needsClassification ? ["استُخدم حساب التسوية البنكية المؤقت لحين تحديد الحساب المقابل الصحيح."] : [], assumptionsEn: needsClassification ? ["The bank reconciliation clearing account is used until the correct counter-account is selected."] : [],
+    warningsAr: needsClassification ? ["راجع الحساب المقابل قبل اعتماد وترحيل القيد."] : ["راجع وصف الحركة والمبلغ قبل الترحيل."], warningsEn: needsClassification ? ["Review the counter-account before approving and posting the entry."] : ["Review the description and amount before posting."],
+    accountingRuleAr: "كشف البنك يثبت حركة حساب البنك، ويظل الحساب المقابل تحت المراجعة حتى تصنيف العملية.", accountingRuleEn: "The statement confirms the bank-side movement; the counter-account remains under review until classification.",
+    financialStatementImpact: { assets: 0, liabilities: 0, equity: 0, revenue: 0, expenses: 0, profit: 0, cash: incoming ? amount : -amount }, cashFlowCategory: "operating", confidence: other.confidence,
+    workflowStatus: "draft", paymentAccountCode: bank.code,
+  };
+}

@@ -17,7 +17,8 @@ export function validateJournalEntry(entry: GeneratedJournalEntry, accounts: Cha
     if (line.debit === 0 && line.credit === 0) error("empty-line", "لا يسمح ببند قيمته صفر في الطرفين.", "A line cannot be zero on both sides.", `lines.${index}`);
     const account = accounts.find((item) => item.code === line.accountCode);
     if (accounts.length && !account) error("unknown-account", `الحساب ${line.accountCode} غير موجود في الدليل.`, `Account ${line.accountCode} does not exist.`, `lines.${index}.accountCode`);
-    if (account && (!account.active || account.allowPosting === false)) error("blocked-account", `الحساب ${account.code} غير متاح للترحيل.`, `Account ${account.code} is not postable.`, `lines.${index}.accountCode`);
+    const hasChildren = account ? accounts.some((item) => item.parentId === account.id) : false;
+    if (account && (!account.active || account.allowPosting === false || hasChildren)) error("blocked-account", `الحساب ${account.code} غير متاح للترحيل. اختر حسابًا نهائيًا نشطًا.`, `Account ${account.code} is not postable. Select an active leaf account.`, `lines.${index}.accountCode`);
   });
   if (Math.abs(totals.debit - totals.credit) >= .01) error("unbalanced", "إجمالي المدين يجب أن يساوي إجمالي الدائن.", "Debit total must equal credit total.", "totals");
   if (totals.debit <= 0 || totals.credit <= 0) error("zero-total", "إجمالي القيد يجب أن يكون أكبر من صفر.", "Entry totals must be greater than zero.", "totals");

@@ -49,5 +49,6 @@ export interface ChartAccount {
   statementSection?: FinancialStatementSection;
   descriptionAr?: string;
   descriptionEn?: string;
+  openingBalance?: number;
 }
 export interface TrialBalanceRow { accountCode: string; accountNameAr: string; accountNameEn: string; totalDebit: number; totalCredit: number; debitBalance: number; creditBalance: number }

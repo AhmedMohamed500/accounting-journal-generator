@@ -7,6 +7,7 @@ import { loadCustodies, saveCustodies } from "@/lib/storage/custody";
 import { loadAccounts, saveEntry } from "@/lib/storage/accounting";
 import { EntryImpact } from "@/components/accounting/entry-impact";
 import { AccountingCycleTrace } from "@/components/accounting/accounting-cycle-trace";
+import { getPostingAccounts } from "@/lib/accounting/accounts";
 import type { ChartAccount, CustodyAdvance, CustodyIssueInput, CustodySettlementInput, GeneratedJournalEntry, Locale } from "@/types";
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -17,8 +18,9 @@ export function CustodyCenter({ locale }: { locale: Locale }) {
   const [items, setItems] = useState<CustodyAdvance[]>([]), [accounts, setAccounts] = useState<ChartAccount[]>([]), [draft, setDraft] = useState<CustodyIssueInput>(emptyIssue), [filter, setFilter] = useState("open"), [message, setMessage] = useState(""), [error, setError] = useState(""), [lastEntry, setLastEntry] = useState<GeneratedJournalEntry>();
   useEffect(() => { setItems(loadCustodies()); setAccounts(loadAccounts()); }, []);
   const commit = (next: CustodyAdvance[]) => { saveCustodies(next); setItems(next); };
-  const paymentAccounts = accounts.filter((account) => account.active && account.allowPosting !== false && account.type === "asset" && ["cash", "bank"].includes(account.id));
-  const expenseAccounts = accounts.filter((account) => account.active && account.allowPosting !== false && account.type === "expense");
+  const postingAccounts = getPostingAccounts(accounts);
+  const paymentAccounts = postingAccounts.filter((account) => account.type === "asset" && /cash|bank|صندوق|بنك/i.test(`${account.nameAr} ${account.nameEn}`));
+  const expenseAccounts = postingAccounts.filter((account) => account.type === "expense");
   const visible = useMemo(() => items.filter((item) => filter === "all" || (filter === "open" ? item.status !== "settled" : item.status === filter)).sort((a, b) => b.createdAt.localeCompare(a.createdAt)), [items, filter]);
   const issue = () => { try { setError(""); const result = issueCustody(draft, accounts); saveEntry(result.entry); commit([result.custody, ...items]); setLastEntry(result.entry); setDraft(emptyIssue()); setMessage(ar ? `تم صرف العهدة ${result.custody.number} وإنشاء القيد وترحيله لليومية.` : `${result.custody.number} issued and posted to the journal.`); } catch (cause) { setError(cause instanceof Error ? cause.message : "Failed to issue custody"); } };
   const saveSettlement = (item: CustodyAdvance, input: CustodySettlementInput) => { try { setError(""); const result = settleCustody(item, input, accounts); saveEntry(result.entry); commit(items.map((current) => current.id === item.id ? result.custody : current)); setLastEntry(result.entry); const due = custodyReimbursementDue(result.custody); setMessage(due > 0 ? (ar ? `تمت تسوية العهدة، وأصبح مبلغ ${due.toLocaleString()} ${item.currency} مستحقًا للموظف.` : `Custody settled; ${due.toLocaleString()} ${item.currency} is due to the employee.`) : result.custody.status === "settled" ? (ar ? `تمت تسوية وإقفال العهدة ${item.number} تلقائيًا.` : `${item.number} settled and closed automatically.`) : (ar ? `تم تسجيل التسوية. المتبقي ${custodyOutstanding(result.custody).toLocaleString()} ${item.currency}.` : `Settlement posted. Remaining: ${custodyOutstanding(result.custody).toLocaleString()} ${item.currency}.`)); return true; } catch (cause) { setError(cause instanceof Error ? cause.message : "Settlement failed"); return false; } };

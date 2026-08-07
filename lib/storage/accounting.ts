@@ -6,6 +6,7 @@ import { normalizeJournalEntry } from "@/lib/accounting/journal";
 import { assertValidJournalEntry } from "@/lib/accounting/validation";
 import { transitionJournalEntry } from "@/lib/accounting/posting";
 import { reversePostedEntry } from "@/lib/accounting/reversal";
+import { validateAccountCatalog } from "@/lib/accounting/accounts";
 export const ACCOUNTS_KEY = "journal-chart-accounts", ENTRIES_KEY = "journal-recent";
 export function activeCompanyId() { return loadWorkspace().activeCompanyId || "personal"; }
 export function companyKey(base: string) { return `${base}:${activeCompanyId()}`; }
@@ -16,7 +17,7 @@ function upgradeRequiredAccounts(saved: ChartAccount[]) {
   return next;
 }
 export function loadAccounts(): ChartAccount[] { if (typeof window === "undefined") return defaultAccounts; try { const saved = migrate(ACCOUNTS_KEY, defaultAccounts), upgraded = upgradeRequiredAccounts(saved); if (upgraded.length !== saved.length) localStorage.setItem(companyKey(ACCOUNTS_KEY), JSON.stringify(upgraded)); return upgraded; } catch { return defaultAccounts; } }
-export function saveAccounts(accounts: ChartAccount[]) { localStorage.setItem(companyKey(ACCOUNTS_KEY), JSON.stringify(accounts)); }
+export function saveAccounts(accounts: ChartAccount[]) { const errors = validateAccountCatalog(accounts); if (errors.length) throw new Error(errors[0]); localStorage.setItem(companyKey(ACCOUNTS_KEY), JSON.stringify(accounts)); }
 function upgradeLegacyEntryCodes(entry: GeneratedJournalEntry) {
   let changed = false; const lines = entry.lines.map((line) => ({ ...line })), apply = (line: typeof lines[number] | undefined, code: string) => { if (!line || line.accountCode === code) return; const selected = defaultAccounts.find((account) => account.code === code); line.accountCode = code; if (selected) { line.accountNameAr = selected.nameAr; line.accountNameEn = selected.nameEn; } changed = true; };
   const debit = lines.find((line) => line.debit > 0), credit = [...lines].reverse().find((line) => line.credit > 0);

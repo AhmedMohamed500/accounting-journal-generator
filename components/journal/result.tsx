@@ -5,6 +5,7 @@ import { CheckCircle2, Copy, Download, FileText, Printer, Save } from "lucide-re
 import { loadAccounts, saveEntry } from "@/lib/storage/accounting";
 import { EntryImpact } from "@/components/accounting/entry-impact";
 import { AccountingCycleTrace } from "@/components/accounting/accounting-cycle-trace";
+import { getPostingAccounts } from "@/lib/accounting/accounts";
 import type { ChartAccount, GeneratedJournalEntry, JournalEntryLine, Locale } from "@/types";
 
 const asText = (entry: GeneratedJournalEntry, locale: Locale) => [locale === "ar" ? entry.titleAr : entry.titleEn, locale === "ar" ? entry.narrationAr : entry.narrationEn, ...entry.lines.map((line) => `${line.accountCode || ""}\t${locale === "ar" ? line.accountNameAr : line.accountNameEn}\t${line.debit || "-"}\t${line.credit || "-"}`), `${entry.totalDebit}\t${entry.totalCredit}`].join("\n");
@@ -14,7 +15,7 @@ export function JournalResult({ entry, locale }: { entry: GeneratedJournalEntry;
   const [working, setWorking] = useState(entry);
   const [accounts, setAccounts] = useState<ChartAccount[]>([]);
   const [message, setMessage] = useState("");
-  useEffect(() => { setWorking(entry); setAccounts(loadAccounts().filter((account) => account.active && account.allowPosting !== false)); }, [entry]);
+  useEffect(() => { setWorking(entry); setAccounts(getPostingAccounts(loadAccounts())); }, [entry]);
   const replaceAccount = (lineId: string, accountId: string) => {
     const account = accounts.find((item) => item.id === accountId); if (!account) return;
     setWorking((current) => ({ ...current, lines: current.lines.map((line) => line.id === lineId ? { ...line, accountCode: account.code, accountNameAr: account.nameAr, accountNameEn: account.nameEn } : line) }));

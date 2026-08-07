@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Banknote, Building2, CheckCircle2, FileCheck2, FileScan, Landmark, PackageCheck, Plus, ReceiptText, RefreshCw, Save, Trash2, TriangleAlert, Workflow } from "lucide-react";
 import { extractTextFromInvoice } from "@/lib/invoice/extract";
 import { parseInvoiceText } from "@/lib/invoice/parser";
 import { roundCurrency } from "@/lib/accounting/calculations";
 import { generateJournalEntry } from "@/rules";
-import { postEntryThroughLifecycle } from "@/lib/storage/accounting";
+import { loadAccounts, postEntryThroughLifecycle } from "@/lib/storage/accounting";
+import { getPostingAccounts } from "@/lib/accounting/accounts";
 import { loadBusinessDocuments, saveBusinessDocuments } from "@/lib/storage/business-documents";
 import { loadOpenItems, loadParties, saveOpenItems, saveParties } from "@/lib/storage/parties";
-import type { BusinessDocument, BusinessDocumentLine, ExtractedInvoice, ExtractedInvoiceLine, GeneratedJournalEntry, Locale, Party } from "@/types";
+import type { BusinessDocument, BusinessDocumentLine, ChartAccount, ExtractedInvoice, ExtractedInvoiceLine, GeneratedJournalEntry, Locale, Party } from "@/types";
 import { JournalResult } from "@/components/journal/result";
 
 const emptyLine = (index = 1): ExtractedInvoiceLine => ({ id: `line-${Date.now()}-${index}`, description: "", quantity: 1, unitPrice: 0, discount: 0, vatRate: 14, net: 0, vat: 0, total: 0 });
@@ -36,6 +37,8 @@ export function InvoiceCapture({ locale }: { locale: Locale }) {
   const [sourceFile, setSourceFile] = useState<File>();
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "bank" | "cheque" | "credit">("credit");
   const [purchaseAccountCode, setPurchaseAccountCode] = useState("1200"), [posted, setPosted] = useState(false);
+  const [accounts, setAccounts] = useState<ChartAccount[]>([]);
+  useEffect(() => setAccounts(loadAccounts()), []);
 
   const scan = async (file?: File, forceOcr = false) => {
     if (!file) return;
@@ -99,7 +102,7 @@ export function InvoiceCapture({ locale }: { locale: Locale }) {
   };
 
   const warningLabels: Record<string, string> = { supplier: "اسم المورد", "invoice-number": "رقم الفاتورة", date: "التاريخ", total: "الإجمالي", "line-items": "بنود الفاتورة", "totals-do-not-match": "تطابق المجاميع", "possibly-not-invoice": "نوع المستند" };
-  const accountOptions = [{ code: "1200", ar: "مخزون", en: "Inventory" }, { code: "5120", ar: "أدوات مكتبية ومطبوعات", en: "Office supplies" }, { code: "5130", ar: "صيانة وإصلاح", en: "Maintenance" }, { code: "5100", ar: "إيجار", en: "Rent" }, { code: "5110", ar: "كهرباء ومرافق", en: "Utilities" }, { code: "5500", ar: "أتعاب مهنية", en: "Professional fees" }, { code: "1330", ar: "أجهزة ومعدات — أصل ثابت", en: "Equipment — fixed asset" }];
+  const accountOptions = getPostingAccounts(accounts).filter((account) => account.type === "asset" || account.type === "expense").map((account) => ({ ...account, ar: account.nameAr, en: account.nameEn }));
 
   return <div className="grid gap-6">
     <section className="card"><div className="flex flex-wrap items-start justify-between gap-4"><div><h2 className="flex items-center gap-2"><FileScan size={22}/>{ar ? "رفع وقراءة الفاتورة بالتفصيل" : "Detailed invoice capture"}</h2><p className="muted">{ar ? "يدعم PDF والصور، ويحافظ على سطور البنود بدل دمج النص كله." : "Reads PDFs and images while preserving line items."}</p></div><span className="badge">{ar ? "تتم القراءة محليًا" : "Local processing"}</span></div><input type="file" accept="application/pdf,image/*" onChange={(event) => scan(event.target.files?.[0])}/>{status && <p className={data.warnings.includes("possibly-not-invoice") ? "warning error" : "warning"}>{status}</p>}{progress > 0 && progress < 100 && <div className="h-2.5 overflow-hidden rounded-full bg-daftar-line"><div className="h-full rounded-full bg-daftar-primary" style={{ width: `${progress}%` }}/></div>}</section>

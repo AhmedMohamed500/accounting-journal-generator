@@ -3,8 +3,9 @@ import { defaultAccounts } from "@/data/accounts";
 import { getTransaction } from "@/data/transactions";
 import { applyDiscount, calculateVatFromNet, calculateWithholding, extractVatFromGross, roundCurrency } from "@/lib/accounting/calculations";
 import { isBalanced, journalTotals } from "@/lib/accounting/balance";
+import { loadAccounts } from "@/lib/storage/accounting";
 
-const account = (code: string) => defaultAccounts.find((item) => item.code === code);
+const account = (code: string) => (typeof window !== "undefined" ? loadAccounts() : defaultAccounts).find((item) => item.code === code) || defaultAccounts.find((item) => item.code === code);
 const line = (id: string, code: string | undefined, debit = 0, credit = 0, fallbackAr = "", fallbackEn = ""): JournalEntryLine => { const selected = code ? account(code) : undefined; return { id, accountCode: code, accountNameAr: selected?.nameAr || fallbackAr, accountNameEn: selected?.nameEn || fallbackEn, debit: roundCurrency(debit), credit: roundCurrency(credit) }; };
 
 function liquidity(input: TransactionInput) {
