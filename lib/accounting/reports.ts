@@ -1,9 +1,10 @@
 import type { GeneratedJournalEntry, TrialBalanceRow } from "@/types";
 import { roundCurrency } from "./calculations";
+import { isPostedJournalEntry } from "./journal";
 
 export function buildTrialBalance(entries: GeneratedJournalEntry[]): TrialBalanceRow[] {
   const rows = new Map<string, TrialBalanceRow>();
-  for (const entry of entries.filter((item) => item.isBalanced && (!item.workflowStatus || item.workflowStatus === "posted"))) {
+  for (const entry of entries.filter(isPostedJournalEntry)) {
     for (const line of entry.lines) {
       const key = line.accountCode || `${line.accountNameAr}|${line.accountNameEn}`;
       const current = rows.get(key) || { accountCode: line.accountCode || "—", accountNameAr: line.accountNameAr, accountNameEn: line.accountNameEn, totalDebit: 0, totalCredit: 0, debitBalance: 0, creditBalance: 0 };

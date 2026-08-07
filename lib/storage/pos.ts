@@ -1,5 +1,8 @@
 import type { GeneratedJournalEntry, PosOperation, PosShift, PosStore } from "@/types";
 import { companyKey, loadAccounts, loadEntries, saveAccounts, saveEntries } from "./accounting";
+import { normalizeJournalEntry } from "@/lib/accounting/journal";
+import { assertValidJournalEntry } from "@/lib/accounting/validation";
+import { transitionJournalEntry } from "@/lib/accounting/posting";
 
 export const POS_STORES_KEY = "finora-pos-stores";
 export const POS_ACTIVE_STORE_KEY = "finora-pos-active-store";
@@ -41,7 +44,7 @@ export function loadPosOperations(storeId: string) { return load<PosOperation[]>
 export function savePosOperations(storeId: string, operations: PosOperation[]) { save(storeKey(POS_OPERATIONS_KEY, storeId), operations.slice(0, 5000)); }
 export function loadPosEntries(storeId: string) { return load<GeneratedJournalEntry[]>(storeKey(POS_ENTRIES_KEY, storeId), []); }
 export function savePosEntries(storeId: string, entries: GeneratedJournalEntry[]) { save(storeKey(POS_ENTRIES_KEY, storeId), entries.slice(0, 5000)); }
-export function savePosEntry(storeId: string, entry: GeneratedJournalEntry) { const prepared = { ...entry, workflowStatus: "posted" as const }; savePosEntries(storeId, [prepared, ...loadPosEntries(storeId).filter((item) => item.id !== entry.id)]); return prepared; }
+export function savePosEntry(storeId: string, entry: GeneratedJournalEntry) { const current=loadPosEntries(storeId);let prepared=normalizeJournalEntry({ ...entry, workflowStatus: "draft", source: entry.source||"service-point" },current,"service-point");assertValidJournalEntry(prepared);prepared=transitionJournalEntry(prepared,"review");prepared=transitionJournalEntry(prepared,"approved");prepared=transitionJournalEntry(prepared,"posted");savePosEntries(storeId,[prepared,...current.filter((item)=>item.id!==entry.id)]);return prepared; }
 
 export function openPosShift(storeId: string, shift: PosShift) { const shifts = loadPosShifts(storeId); if (shifts.some((item) => item.status === "open")) throw new Error("يوجد وردية مفتوحة بالفعل لهذا المحل"); savePosShifts(storeId, [shift, ...shifts]); return shift; }
 export function updatePosShift(storeId: string, shift: PosShift) { savePosShifts(storeId, [shift, ...loadPosShifts(storeId).filter((item) => item.id !== shift.id)]); return shift; }

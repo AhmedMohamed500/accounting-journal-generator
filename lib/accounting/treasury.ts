@@ -1,5 +1,6 @@
 import { roundCurrency } from "./calculations";
 import type { ChartAccount, GeneratedJournalEntry } from "@/types";
+import { isPostedJournalEntry } from "./journal";
 
 export interface TreasuryBalance { account: ChartAccount; balance: number; kind: "cash" | "bank" }
 
@@ -14,7 +15,7 @@ function treasuryKind(account: ChartAccount, accounts: ChartAccount[]): "cash" |
 export function treasuryAccounts(accounts: ChartAccount[]) { return accounts.filter((account) => account.active && account.allowPosting !== false && treasuryKind(account, accounts)); }
 
 export function treasuryBalances(entries: GeneratedJournalEntry[], accounts: ChartAccount[]): TreasuryBalance[] {
-  const posted = entries.filter((entry) => entry.isBalanced && (!entry.workflowStatus || entry.workflowStatus === "posted"));
+  const posted = entries.filter(isPostedJournalEntry);
   return treasuryAccounts(accounts).map((account) => ({ account, kind: treasuryKind(account, accounts) || "bank", balance: roundCurrency(posted.flatMap((entry) => entry.lines).filter((line) => line.accountCode === account.code).reduce((sum, line) => sum + line.debit - line.credit, 0)) }));
 }
 

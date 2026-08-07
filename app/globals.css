@@ -13,6 +13,15 @@
   --radius-card: 1.125rem;
 }
 
+.journal-timeline { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0; }
+.timeline-step { display:flex; align-items:center; gap:9px; padding:12px; border:1px solid var(--line); border-radius:12px; color:var(--muted); background:var(--card); }
+.timeline-step > span { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--line); }
+.timeline-step.complete { color:#087443; border-color:#95e3bd; background:#eefbf5; }
+.timeline-step.complete > span { color:#fff; background:#0a9661; }
+.journal-details { border-top:4px solid var(--primary); }
+.journal-center .card.text-start { text-align:start; }
+@media (max-width:760px) { .journal-timeline { grid-template-columns:1fr 1fr; } }
+
 :root {
   --bg: #f7f9fc;
   --card: #ffffff;

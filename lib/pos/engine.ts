@@ -127,7 +127,7 @@ export function createPosJournalEntry(operation: PosOperation): GeneratedJournal
     id: crypto.randomUUID(), entryNumber: `POS-${Date.now().toString().slice(-8)}`, date: operation.businessDate,
     transactionType: `pos-${operation.type}`, titleAr: "عملية نقطة خدمات مالية", titleEn: "Financial service point transaction",
     narrationAr: descriptionAr, narrationEn: descriptionEn, currency: "EGP", lines, totalDebit, totalCredit,
-    isBalanced: Math.abs(totalDebit - totalCredit) < .01, workflowStatus: "posted", cashFlowCategory: "operating", confidence: 100,
+    isBalanced: Math.abs(totalDebit - totalCredit) < .01, workflowStatus: "draft", source: "service-point", reference: operation.reference, sourceReference: operation.id, linkedTransactionIds: [operation.id], cashFlowCategory: "operating", confidence: 100,
     explanationAr: operation.type === "internal-provider-transfer" ? [
       `تم تحويل ${operation.amount.toLocaleString()} جنيه من ${provider?.nameAr} إلى ${posProviders.find((item) => item.id === operation.destinationProviderId)?.nameAr}.`,
       "لم تتحرك الخزنة ولم ينتج عن التحويل إيراد أو مصروف أو ربح.",

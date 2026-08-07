@@ -1,3 +1,3 @@
-import { GeneralJournal } from "@/components/accounting/general-journal";
+import { JournalCenter } from "@/components/accounting/journal-center";
 import type { Locale } from "@/types";
-export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) { const { locale } = await params; return <div className="container section"><h1>{locale === "ar" ? "دفتر اليومية العام" : "General Journal"}</h1><p className="muted">{locale === "ar" ? "كل سطور القيود التي حفظتها، مرتبة وجاهزة للبحث والطباعة والتصدير." : "All saved journal lines, ready to search, print, and export."}</p><GeneralJournal locale={locale} /></div>; }
+export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) { const { locale } = await params; return <div className="container section"><h1>{locale === "ar" ? "مركز القيود المحاسبية" : "Journal Center"}</h1><p className="muted">{locale === "ar" ? "دورة موحدة من المسودة والمراجعة والاعتماد إلى الترحيل والعكس، مع سجل كامل لكل قيد." : "A unified lifecycle from draft and review through approval, posting, and reversal."}</p><JournalCenter locale={locale} /></div>; }

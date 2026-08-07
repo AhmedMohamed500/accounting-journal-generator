@@ -7,7 +7,7 @@ import { extractTextFromInvoice } from "@/lib/invoice/extract";
 import { parseInvoiceText } from "@/lib/invoice/parser";
 import { roundCurrency } from "@/lib/accounting/calculations";
 import { generateJournalEntry } from "@/rules";
-import { saveEntry } from "@/lib/storage/accounting";
+import { postEntryThroughLifecycle } from "@/lib/storage/accounting";
 import { loadBusinessDocuments, saveBusinessDocuments } from "@/lib/storage/business-documents";
 import { loadOpenItems, loadParties, saveOpenItems, saveParties } from "@/lib/storage/parties";
 import type { BusinessDocument, BusinessDocumentLine, ExtractedInvoice, ExtractedInvoiceLine, GeneratedJournalEntry, Locale, Party } from "@/types";
@@ -63,7 +63,7 @@ export function InvoiceCapture({ locale }: { locale: Locale }) {
   const missingRequired = unverifiedDocument || !data.supplier.trim() || !data.date || data.net <= 0 || data.total <= 0;
 
   const transactionType = purchaseAccountCode === "1330" ? "fixed-asset-purchase" : paymentMethod === "credit" ? "credit-purchase" : "cash-purchase";
-  const createEntry = () => generateJournalEntry({ type: transactionType, amount: data.net, date: data.date || undefined, currency: data.currency, paymentMethod, paymentAccountCode: paymentMethod === "cash" ? "1100" : paymentMethod === "credit" ? undefined : "1110", purchaseAccountCode, vatEnabled: data.vat > 0 || data.vatRate > 0, vatRate: data.vatRate || undefined, vatIncluded: false, withholdingEnabled:data.withholdingTax>0,withholdingRate:data.withholdingRate||(data.net?roundCurrency(data.withholdingTax/data.net*100):0), supplier: data.supplier, notes: `${ar ? "فاتورة" : "Invoice"} ${data.invoiceNumber || "—"} — ${data.supplier}` });
+  const createEntry = () => ({ ...generateJournalEntry({ type: transactionType, amount: data.net, date: data.date || undefined, currency: data.currency, paymentMethod, paymentAccountCode: paymentMethod === "cash" ? "1100" : paymentMethod === "credit" ? undefined : "1110", purchaseAccountCode, vatEnabled: data.vat > 0 || data.vatRate > 0, vatRate: data.vatRate || undefined, vatIncluded: false, withholdingEnabled:data.withholdingTax>0,withholdingRate:data.withholdingRate||(data.net?roundCurrency(data.withholdingTax/data.net*100):0), supplier: data.supplier, notes: `${ar ? "فاتورة" : "Invoice"} ${data.invoiceNumber || "—"} — ${data.supplier}` }), source: "invoice-capture" as const, reference: data.invoiceNumber, partyName: data.supplier });
 
   const suggest = () => {
     if (missingRequired) { setStatus(ar ? "أكمل المورد والتاريخ والصافي والإجمالي أولًا." : "Complete supplier, date, net, and total first."); return; }
@@ -85,7 +85,7 @@ export function InvoiceCapture({ locale }: { locale: Locale }) {
     const documents = loadBusinessDocuments();
     if (data.invoiceNumber && documents.some((document) => document.type === "purchase-invoice" && (document.reference === data.invoiceNumber || document.number === data.invoiceNumber))) { setStatus(ar ? "الفاتورة دي مسجلة قبل كده؛ تم إيقاف التكرار." : "This invoice is already posted; duplicate blocked."); return; }
     try {
-      const generated = entry || createEntry(), postedEntry = saveEntry({ ...generated, workflowStatus: "posted" });
+      const generated = entry || createEntry(), postedEntry = postEntryThroughLifecycle(generated);
       const supplier = ensureSupplier();
       const documentLines: BusinessDocumentLine[] = (data.lines.length ? data.lines : [{ ...emptyLine(), description: ar ? "إجمالي الفاتورة" : "Invoice total", unitPrice: data.net, net: data.net, vat: data.vat, total: data.total, vatRate: data.vatRate }]).map((line) => ({ id: line.id, description: line.description || (ar ? "بند فاتورة" : "Invoice item"), quantity: line.quantity, unitPrice: line.unitPrice, discount: line.discount, vatRate: line.vatRate, accountCode: purchaseAccountCode, net: line.net, vat: line.vat, total: line.total }));
       const document: BusinessDocument = { id: crypto.randomUUID(), number: data.invoiceNumber || `PI-${Date.now().toString().slice(-6)}`, type: "purchase-invoice", status: "posted", date: data.date, dueDate: data.dueDate || undefined, partyId: supplier.id, currency: data.currency, lines: documentLines, subtotal: data.subtotal || data.net + data.discount, discountTotal: data.discount, netTotal: data.net, vatTotal: data.vat,withholdingTax:data.withholdingTax||undefined,withholdingRate:data.withholdingRate||undefined, grandTotal: data.total, reference: data.invoiceNumber || undefined, notes: ar ? "مقروءة ومُرحّلة من مركز قراءة الفواتير" : "Captured and posted from invoice capture", linkedEntryId: postedEntry.id, createdAt: new Date().toISOString() };

@@ -1,9 +1,10 @@
 import { roundCurrency } from "@/lib/accounting/calculations";
 import type { GeneratedJournalEntry, VatAnalysis, VatConfiguration, VatPeriodFrequency, VatPeriodSummary } from "@/types";
+import { isPostedJournalEntry } from "@/lib/accounting/journal";
 
 export const DEFAULT_VAT_CONFIGURATION:VatConfiguration={inputAccountCodes:["1151"],outputAccountCodes:["2201"],nonDeductibleAccountCodes:["5119"],adjustmentAccountCodes:["2202"],defaultRate:14};
-const posted=(entry:GeneratedJournalEntry)=>["approved","posted"].includes(entry.workflowStatus||"");
-const valid=(entry:GeneratedJournalEntry)=>!["rejected","reversed"].includes(entry.workflowStatus||"");
+const posted=(entry:GeneratedJournalEntry)=>entry.workflowStatus==="approved"||isPostedJournalEntry(entry);
+const valid=(entry:GeneratedJournalEntry)=>entry.workflowStatus!=="rejected";
 const monthEnd=(year:number,month:number)=>new Date(Date.UTC(year,month,0)).toISOString().slice(0,10);
 
 export function vatMovement(entry:GeneratedJournalEntry,configuration:VatConfiguration=DEFAULT_VAT_CONFIGURATION){let inputVat=0,outputVat=0,nonDeductibleInputVat=0,adjustments=0;for(const line of entry.lines){if(configuration.inputAccountCodes.includes(line.accountCode||""))inputVat+=line.debit-line.credit;if(configuration.outputAccountCodes.includes(line.accountCode||""))outputVat+=line.credit-line.debit;if(configuration.nonDeductibleAccountCodes.includes(line.accountCode||""))nonDeductibleInputVat+=line.debit-line.credit;if(configuration.adjustmentAccountCodes.includes(line.accountCode||""))adjustments+=line.credit-line.debit;}return{inputVat:roundCurrency(inputVat),outputVat:roundCurrency(outputVat),nonDeductibleInputVat:roundCurrency(nonDeductibleInputVat),adjustments:roundCurrency(adjustments)};}

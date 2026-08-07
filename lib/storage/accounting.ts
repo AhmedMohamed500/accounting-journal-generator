@@ -2,6 +2,10 @@ import { defaultAccounts } from "@/data/accounts";
 import type { ChartAccount, GeneratedJournalEntry } from "@/types";
 import { loadWorkspace } from "./workspace";
 import { assertDateOpen } from "./periods";
+import { normalizeJournalEntry } from "@/lib/accounting/journal";
+import { assertValidJournalEntry } from "@/lib/accounting/validation";
+import { transitionJournalEntry } from "@/lib/accounting/posting";
+import { reversePostedEntry } from "@/lib/accounting/reversal";
 export const ACCOUNTS_KEY = "journal-chart-accounts", ENTRIES_KEY = "journal-recent";
 export function activeCompanyId() { return loadWorkspace().activeCompanyId || "personal"; }
 export function companyKey(base: string) { return `${base}:${activeCompanyId()}`; }
@@ -22,7 +26,7 @@ function upgradeLegacyEntryCodes(entry: GeneratedJournalEntry) {
   const mapping = legacy[entry.transactionType]; if (mapping) { if (!debit?.accountCode) apply(debit, mapping[0]); if (!credit?.accountCode) apply(credit, mapping[1]); }
   return changed ? { ...entry, lines, paymentAccountCode: entry.paymentAccountCode || lines.find((line) => line.accountCode === "1100" || line.accountCode === "1110")?.accountCode } : entry;
 }
-export function loadEntries(): GeneratedJournalEntry[] { if (typeof window === "undefined") return []; try { const saved = migrate<GeneratedJournalEntry[]>(ENTRIES_KEY, []), upgraded = saved.map(upgradeLegacyEntryCodes); if (upgraded.some((entry, index) => entry !== saved[index])) localStorage.setItem(companyKey(ENTRIES_KEY), JSON.stringify(upgraded)); return upgraded; } catch { return []; } }
+export function loadEntries(): GeneratedJournalEntry[] { if (typeof window === "undefined") return []; try { const saved = migrate<GeneratedJournalEntry[]>(ENTRIES_KEY, []), legacyUpgraded = saved.map(upgradeLegacyEntryCodes), upgraded = legacyUpgraded.reduce<GeneratedJournalEntry[]>((items, entry) => [...items, normalizeJournalEntry(entry, items)], []); if (upgraded.some((entry, index) => JSON.stringify(entry) !== JSON.stringify(saved[index]))) localStorage.setItem(companyKey(ENTRIES_KEY), JSON.stringify(upgraded)); return upgraded; } catch { return []; } }
 export const ACCOUNTING_ENTRIES_UPDATED = "accounting-entries-updated";
 export function saveEntries(entries: GeneratedJournalEntry[]) {
   localStorage.setItem(companyKey(ENTRIES_KEY), JSON.stringify(entries));
@@ -36,4 +40,24 @@ export function subscribeToEntries(callback: (entries: GeneratedJournalEntry[]) 
   window.addEventListener("storage", storage);
   return () => { window.removeEventListener(ACCOUNTING_ENTRIES_UPDATED, refresh); window.removeEventListener("storage", storage); };
 }
-export function saveEntry(entry: GeneratedJournalEntry) { assertDateOpen(entry.date); const companyId = activeCompanyId(); const prepared: GeneratedJournalEntry = { ...entry, companyId, workflowStatus: entry.workflowStatus || "draft", audit: entry.audit?.length ? entry.audit : [{ id: crypto.randomUUID(), entryId: entry.id, action: "created", at: new Date().toISOString(), actor: "Local user" }] }; saveEntries([prepared, ...loadEntries().filter((item) => item.id !== entry.id)].slice(0, 500)); window.dispatchEvent(new CustomEvent<GeneratedJournalEntry>("accounting-entry-saved", { detail: prepared })); return prepared; }
+export function saveEntry(entry: GeneratedJournalEntry) {
+  const existing = loadEntries(), companyId = activeCompanyId(), prepared = normalizeJournalEntry({ ...entry, companyId }, existing, entry.source);
+  if (prepared.workflowStatus !== "draft" && prepared.workflowStatus !== "rejected") assertValidJournalEntry(prepared, loadAccounts());
+  if (prepared.workflowStatus === "posted") assertDateOpen(prepared.date);
+  saveEntries([prepared, ...existing.filter((item) => item.id !== prepared.id)].slice(0, 500));
+  window.dispatchEvent(new CustomEvent<GeneratedJournalEntry>("accounting-entry-saved", { detail: prepared })); return prepared;
+}
+export function transitionStoredEntry(entryId: string, next: GeneratedJournalEntry["workflowStatus"], note?: string) {
+  if (!next) throw new Error("حالة القيد مطلوبة."); const entries = loadEntries(), current = entries.find((entry) => entry.id === entryId); if (!current) throw new Error("القيد غير موجود.");
+  const updated = transitionJournalEntry(current, next, { note, accounts: loadAccounts(), assertPeriodOpen: assertDateOpen });
+  saveEntries(entries.map((entry) => entry.id === entryId ? updated : entry)); return updated;
+}
+export function postEntryThroughLifecycle(entry: GeneratedJournalEntry) {
+  let saved = saveEntry({ ...entry, workflowStatus: "draft" });
+  saved = transitionStoredEntry(saved.id, "review"); saved = transitionStoredEntry(saved.id, "approved"); return transitionStoredEntry(saved.id, "posted");
+}
+export function reverseStoredEntry(entryId: string, reason: string) {
+  const entries = loadEntries(), current = entries.find((entry) => entry.id === entryId); if (!current) throw new Error("القيد غير موجود."); assertDateOpen(current.date);
+  const result = reversePostedEntry(current, reason, loadAccounts());
+  saveEntries([result.reversal, ...entries.map((entry) => entry.id === entryId ? result.original : entry)]); return result;
+}
