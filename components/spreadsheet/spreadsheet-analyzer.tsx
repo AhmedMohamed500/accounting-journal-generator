@@ -8,6 +8,7 @@ import {
 import { readSpreadsheet, type SpreadsheetReadProgress } from "@/lib/spreadsheet/reader";
 import { analyzeSheet } from "@/lib/spreadsheet/analyzer";
 import { runSpreadsheetQuery } from "@/lib/spreadsheet/query";
+import { AccountingIntelligence } from "@/components/spreadsheet/accounting-intelligence";
 import type { CategoryBreakdown, DataQualityIssue, Locale, SheetAnalysis } from "@/types";
 
 const colors=["#1769aa","#10b981","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#84cc16","#ec4899","#64748b","#14b8a6","#f97316","#6366f1","#94a3b8"];
@@ -32,6 +33,7 @@ export function SpreadsheetAnalyzer({locale}:{locale:Locale}){
       {analysis.sampled&&<div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-blue-900"><Database className="shrink-0"/><div><b>{ar?"وضع تحليل الملفات الكبيرة":"Large-sheet analysis mode"}</b><p className="mt-1 text-sm">{ar?`تم تحليل عينة موزعة من ${analysis.analyzedRows.toLocaleString()} صف بدل تجميد الصفحة، مع الاحتفاظ بعدد الصفوف الحقيقي ${analysis.rowCount.toLocaleString()}.`:`A representative ${analysis.analyzedRows.toLocaleString()}-row sample was analyzed from ${analysis.rowCount.toLocaleString()} total rows.`}</p></div></div>}
 
       <ExecutiveSummary analysis={analysis} ar={ar}/>
+      <AccountingIntelligence key={`${analysis.name}-${active}`} analysis={analysis} locale={locale}/>
       <SmartCharts analysis={analysis} ar={ar}/>
       <AnalysisBuilder analysis={analysis} ar={ar}/>
       <ColumnMap analysis={analysis} ar={ar}/>

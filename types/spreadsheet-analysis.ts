@@ -14,3 +14,13 @@ export interface SpreadsheetColumnInsight { column: string; type: "number" | "da
 export interface CategoryBreakdownItem { label: string; value: number; percentage: number }
 export interface CategoryBreakdown { title: string; total: number; items: CategoryBreakdownItem[] }
 export interface SheetAnalysis { name: string; headers: string[]; rows: CellValue[][]; headerRowIndex?: number; rowCount: number; analyzedRows: number; sampled: boolean; completeness: number; qualityScore: number; duplicateRows: number; columnCount: number; numeric: NumericProfile[]; categorical: CategoricalProfile[]; dates: DateProfile[]; columns: SpreadsheetColumnInsight[]; quality: DataQualityIssue[]; readDiagnostics?: SpreadsheetReadDiagnostics; breakdown?: CategoryBreakdown; preview: CellValue[][] }
+
+export type AccountingSpreadsheetCategory = "revenue" | "purchases" | "cost-of-sales" | "administrative-expense" | "bank-expense" | "payroll" | "rent" | "utilities" | "maintenance" | "marketing" | "tax" | "asset" | "inventory" | "loan" | "capital" | "transfer" | "unclassified";
+export interface AccountingSpreadsheetMapping { date?: string; description?: string; amount?: string; debit?: string; credit?: string; category?: string; accountCode?: string; counterAccountCode?: string; reference?: string; party?: string }
+export interface AccountingSpreadsheetRow {
+  id: string; rowNumber: number; date: string; description: string; reference?: string; party?: string; amount: number; direction: "in" | "out";
+  category: AccountingSpreadsheetCategory; categoryAr: string; categoryEn: string; accountCode: string; counterAccountCode: string; confidence: number;
+  warnings: string[]; source: CellValue[];
+}
+export interface AccountingSpreadsheetSummary { totalIn: number; totalOut: number; netCashFlow: number; categorized: number; needsReview: number; categories: { category: AccountingSpreadsheetCategory; labelAr: string; labelEn: string; count: number; amount: number }[] }
+export interface AccountingSpreadsheetResult { mapping: AccountingSpreadsheetMapping; rows: AccountingSpreadsheetRow[]; summary: AccountingSpreadsheetSummary; warnings: string[] }

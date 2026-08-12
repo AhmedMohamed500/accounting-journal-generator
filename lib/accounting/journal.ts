@@ -8,6 +8,7 @@ export const JOURNAL_STATUS_LABELS: Record<EntryWorkflowStatus, { ar: string; en
 };
 export const JOURNAL_SOURCE_LABELS: Record<JournalEntrySource, { ar: string; en: string }> = {
   manual: { ar: "إدخال يدوي", en: "Manual" }, "natural-language-generator": { ar: "مولد اللغة الطبيعية", en: "Natural Language Generator" },
+  "spreadsheet-import": { ar: "تحليل Excel المحاسبي", en: "Accounting Excel Analysis" },
   "bank-import": { ar: "استيراد البنك", en: "Bank Import" }, "bank-reconciliation": { ar: "التسوية البنكية", en: "Bank Reconciliation" },
   vat: { ar: "ضريبة القيمة المضافة", en: "VAT" }, "service-point": { ar: "نقطة الخدمات", en: "Service Point" },
   "merchant-accounting": { ar: "محاسبة التجار", en: "Merchant Accounting" }, "opening-balance": { ar: "رصيد افتتاحي", en: "Opening Balance" },
