@@ -20,7 +20,7 @@ Arabic-first, bilingual journal-entry generator built with Next.js, TypeScript, 
 - Accounting document inbox with SHA-256 duplicate detection, review workflow, and links to entries and tasks
 - Local Arabic/English invoice OCR and PDF text extraction with editable structured fields, total validation, and draft entry proposals
 - Smart CSV bank reconciliation with amount/date/reference matching, confidence scores, manual links, and draft entries for unmatched activity
-- Customer and supplier subledgers with credit terms, open invoices, partial payments, aging buckets, and collection/payment draft entries
+- Company-scoped customer receivables center with credit limits, tax-aware credit invoices, partial collections, running statements, aging buckets, and journal-linked draft entries
 - Fiscal years and monthly periods with soft close, final locking, and enforced entry-save/post protection
 - General ledger, income statement, and balance sheet with date filters, print, and CSV export
 - Company defaults, numbering configuration, and versioned per-company JSON backup and restore

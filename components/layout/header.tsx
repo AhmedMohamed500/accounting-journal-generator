@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3, BookOpen, BriefcaseBusiness, Building2, ChevronDown, CircleDollarSign, FileBarChart,
+  BanknoteArrowDown, BarChart3, BookOpen, BriefcaseBusiness, Building2, ChevronDown, CircleDollarSign, FileBarChart,
   FileSpreadsheet, GraduationCap, Landmark, Languages, LayoutDashboard, Menu, Moon, Plus, ReceiptText,
   ScanText, Settings, ShieldCheck, Sparkles, Store, Users, WalletCards, Workflow, X,
 } from "lucide-react";
@@ -31,6 +31,7 @@ export function Header({ locale }: { locale: Locale }) {
       { path: "custody", ar: "العهد والتسويات", en: "Custody", descAr: "صرف وتسوية ورد وإقفال العهد", descEn: "Issue, settle, return, and close custody", icon: WalletCards },
       { path: "service-point", ar: "نقاط الخدمات والمحافظ", en: "Service point POS", descAr: "فوري والمحافظ والخزنة والورديات وصافي الربح", descEn: "Wallets, shifts, cash, and net profit", icon: Store },
       { path: "parties", ar: "العملاء والموردون", en: "Customers & suppliers", descAr: "الأرصدة والفواتير والأعمار والتواصل", descEn: "Balances, invoices, aging, and contact", icon: Users },
+      { path: "receivables", ar: "حسابات العملاء الآجلين", en: "Customer receivables", descAr: "فواتير آجلة وتحصيلات وأعمار ديون وقيود", descEn: "Credit invoices, collections, aging, and entries", icon: BanknoteArrowDown },
     ] },
     { labelAr: "الحسابات والخزينة", labelEn: "Accounting & treasury", icon: BookOpen, items: [
       { path: "accounts", ar: "دليل الحسابات", en: "Chart of accounts", descAr: "دليل احترافي قابل للتخصيص والترميز", descEn: "Customizable coded chart of accounts", icon: BookOpen },

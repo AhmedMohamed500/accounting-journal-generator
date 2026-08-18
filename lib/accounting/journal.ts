@@ -11,7 +11,7 @@ export const JOURNAL_SOURCE_LABELS: Record<JournalEntrySource, { ar: string; en:
   "spreadsheet-import": { ar: "تحليل Excel المحاسبي", en: "Accounting Excel Analysis" },
   "bank-import": { ar: "استيراد البنك", en: "Bank Import" }, "bank-reconciliation": { ar: "التسوية البنكية", en: "Bank Reconciliation" },
   vat: { ar: "ضريبة القيمة المضافة", en: "VAT" }, "service-point": { ar: "نقطة الخدمات", en: "Service Point" },
-  "merchant-accounting": { ar: "محاسبة التجار", en: "Merchant Accounting" }, "opening-balance": { ar: "رصيد افتتاحي", en: "Opening Balance" },
+  "merchant-accounting": { ar: "محاسبة التجار", en: "Merchant Accounting" }, "customer-receivables": { ar: "حسابات العملاء الآجلين", en: "Customer Receivables" }, "opening-balance": { ar: "رصيد افتتاحي", en: "Opening Balance" },
   adjustment: { ar: "قيد تسوية", en: "Adjustment" }, closing: { ar: "قيد إقفال", en: "Closing" },
   "invoice-capture": { ar: "قراءة فاتورة", en: "Invoice Capture" }, legacy: { ar: "قيد سابق", en: "Legacy" },
 };
