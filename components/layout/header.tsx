@@ -30,8 +30,8 @@ export function Header({ locale }: { locale: Locale }) {
       { path: "invoice-capture", ar: "قراءة الفواتير", en: "Invoice capture", descAr: "ارفع الفاتورة واستخرج بياناتها وقيدها", descEn: "Extract invoice data and create its entry", icon: ScanText },
       { path: "custody", ar: "العهد والتسويات", en: "Custody", descAr: "صرف وتسوية ورد وإقفال العهد", descEn: "Issue, settle, return, and close custody", icon: WalletCards },
       { path: "service-point", ar: "نقاط الخدمات والمحافظ", en: "Service point POS", descAr: "فوري والمحافظ والخزنة والورديات وصافي الربح", descEn: "Wallets, shifts, cash, and net profit", icon: Store },
-      { path: "parties", ar: "العملاء والموردون", en: "Customers & suppliers", descAr: "الأرصدة والفواتير والأعمار والتواصل", descEn: "Balances, invoices, aging, and contact", icon: Users },
       { path: "receivables", ar: "حسابات العملاء الآجلين", en: "Customer receivables", descAr: "فواتير آجلة وتحصيلات وأعمار ديون وقيود", descEn: "Credit invoices, collections, aging, and entries", icon: BanknoteArrowDown },
+      { path: "parties", ar: "حسابات الموردين", en: "Supplier payables", descAr: "فواتير شراء آجلة وسداد وأعمار المستحقات", descEn: "Credit purchases, payments, and payable aging", icon: Users },
     ] },
     { labelAr: "الحسابات والخزينة", labelEn: "Accounting & treasury", icon: BookOpen, items: [
       { path: "accounts", ar: "دليل الحسابات", en: "Chart of accounts", descAr: "دليل احترافي قابل للتخصيص والترميز", descEn: "Customizable coded chart of accounts", icon: BookOpen },
