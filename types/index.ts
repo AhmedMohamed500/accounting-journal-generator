@@ -18,3 +18,4 @@ export * from "./pos";
 export * from "./vat";
 export * from "./accounting-office";
 export * from "./merchant";
+export * from "./missions";

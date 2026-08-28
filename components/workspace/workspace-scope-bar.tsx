@@ -10,7 +10,7 @@ import type { Locale, WorkspaceData } from "@/types";
 export function WorkspaceScopeBar({ locale }: { locale: Locale }) {
   const ar = locale === "ar", pathname = usePathname(), [data, setData] = useState<WorkspaceData>({ companies: [], branches: [], fiscalYears: [], members: [] });
   useEffect(() => { setData(loadWorkspace()); return subscribeToWorkspace(setData); }, []);
-  if (pathname === `/${locale}` || !data.activeCompanyId || !loadWorkspaceSession()) return null;
+  if (pathname === `/${locale}` || pathname.startsWith(`/${locale}/missions`) || !data.activeCompanyId || !loadWorkspaceSession()) return null;
   const company = data.companies.find((item) => item.id === data.activeCompanyId), branches = data.branches.filter((item) => item.companyId === company?.id && item.active), years = data.fiscalYears.filter((item) => item.companyId === company?.id && item.active);
   const change = (companyId: string, branchId?: string, yearId?: string) => { setActiveWorkspaceScope(companyId, branchId, yearId); window.location.reload(); };
   return <aside className="workspace-scope-bar no-print" data-no-bilingual><div className="container workspace-scope-inner">

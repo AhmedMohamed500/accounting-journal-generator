@@ -50,6 +50,7 @@ export function AcademyHome({ locale }: { locale: Locale }) {
           <h1>{ar ? "اتعلم المحاسبة كأنك شغال جوه شركة حقيقية" : "Learn accounting as if you work inside a real company"}</h1>
           <p>{ar ? "من طبيعة الحسابات والقيود اليومية إلى الموردين والشيكات والقوائم والإقفال. كل درس يجمع الفكرة والمستند والقيد وتأثيره واختبارًا عمليًا." : "From account nature and journal entries to suppliers, cheques, statements, and close. Every lesson connects the idea, document, entry, impact, and practice."}</p>
           <div className="actions mt-7 flex flex-wrap gap-3">
+            <Link className="btn btn-primary" href={`/${locale}/missions`}><Target size={19}/>{ar ? "حل موقف محاسبي الآن" : "Solve an accounting case now"}{ar ? <ArrowLeft size={17}/> : <ArrowRight size={17}/>}</Link>
             <Link className="btn btn-primary" href={`/${locale}/academy/${continueLesson.course.slug}/${continueLesson.lesson.slug}`}><PlayCircle size={19}/>{completed ? (ar ? "كمّل من حيث توقفت" : "Continue learning") : (ar ? "ابدأ أول درس مجانًا" : "Start the first lesson")}{ar ? <ArrowLeft size={17}/> : <ArrowRight size={17}/>}</Link>
             <Link className="btn" href={`/${locale}/academy/account-guide`}><TableProperties size={18}/>{ar ? "مرجع طبيعة الحسابات" : "Account nature guide"}</Link>
             <Link className="btn" href={`/${locale}/academy/practice`}><Target size={18}/>{ar ? "افتح معمل التدريب" : "Open practice lab"}</Link>

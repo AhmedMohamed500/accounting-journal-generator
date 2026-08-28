@@ -21,6 +21,7 @@ Arabic-first, bilingual journal-entry generator built with Next.js, TypeScript, 
 - Local Arabic/English invoice OCR and PDF text extraction with editable structured fields, total validation, and draft entry proposals
 - Smart CSV bank reconciliation with amount/date/reference matching, confidence scores, manual links, and draft entries for unmatched activity
 - Company-scoped customer receivables center with credit limits, tax-aware credit invoices, partial collections, running statements, aging buckets, and journal-linked draft entries
+- FINORA Missions: five mobile-first consequence-based accounting cases with hints, scoring, impact simulation, balanced training entries, and isolated local progress
 - Fiscal years and monthly periods with soft close, final locking, and enforced entry-save/post protection
 - General ledger, income statement, and balance sheet with date filters, print, and CSV export
 - Company defaults, numbering configuration, and versioned per-company JSON backup and restore
@@ -53,6 +54,7 @@ npm run check
 - `components/`: layout, generator, journal result, library, and history UI
 - `data/`: central transaction, currency, accounting-office mock data, and account-learning registries
 - `components/accounting-office/`: the navigable frontend prototype for accounting firms
+- `data/missions.ts`, `lib/missions/`, and `components/missions/`: reusable interactive mission data, scoring/impact engine, and student experience
 - `lib/accounting/`: currency-safe calculations and balance validation
 - `lib/parser/`: number normalization and deterministic text parsing
 - `rules/`: typed journal-entry rules engine
