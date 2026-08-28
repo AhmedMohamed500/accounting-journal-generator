@@ -20,7 +20,8 @@ import { defaultSettings, saveSettings } from "@/lib/storage/settings";
 const today = () => new Date().toISOString();
 
 export function WorkspaceShell({ locale, children }: { locale: Locale; children: React.ReactNode }) {
-  const ar = locale === "ar", pathname = usePathname(), publicLanding = pathname === `/${locale}`;
+  const ar = locale === "ar", pathname = usePathname();
+  const publicExperience = pathname === `/${locale}` || pathname.startsWith(`/${locale}/missions`);
   const [ready, setReady] = useState(false), [workspace, setWorkspace] = useState<WorkspaceData>({ companies: [], branches: [], fiscalYears: [], members: [] });
   const [sessionValid, setSessionValid] = useState(false);
   const [form, setForm] = useState({ companyAr: "", companyEn: "", owner: "", email: "", pin: "" });
@@ -34,7 +35,7 @@ export function WorkspaceShell({ locale, children }: { locale: Locale; children:
   };
   useEffect(refresh, []);
 
-  if (publicLanding) return children;
+  if (publicExperience) return children;
   if (!ready) return <GateFrame ar={ar}><p className="muted">{ar ? "جاري تجهيز مساحة العمل…" : "Preparing workspace…"}</p></GateFrame>;
 
   const firstSetup = workspace.companies.length === 0;
