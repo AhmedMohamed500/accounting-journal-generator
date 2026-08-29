@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { DetectiveHome } from "@/components/detective/detective-home";
 import type { Locale } from "@/types";
 
 export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  redirect(`/${locale}/academy/detective`);
+  return <DetectiveHome locale={locale}/>;
 }

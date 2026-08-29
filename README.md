@@ -77,7 +77,7 @@ Future AI support can sit behind a server-only adapter that returns the existing
 
 Accounting Detective teaches investigation rather than recall. A learner opens a company case, reviews only the panels needed for that case, marks or excludes evidence, links related items, keeps a notebook, and confirms a conclusion. A wrong conclusion returns focused feedback and a progressive hint without exposing the solution.
 
-Routes: `/ar/detective`, `/en/detective`, and the localized case route `/{locale}/detective/{case-slug}`. The section uses the Learn/Missions navigation and remains visually separate from the operational accounting sidebar.
+Accounting Detective is part of the Academy practical-training area. Canonical routes are `/ar/academy/detective`, `/en/academy/detective`, and `/{locale}/academy/detective/{case-slug}`. Legacy `/{locale}/detective` links redirect to the Academy routes without changing the isolated progress data.
 
 Each case lives in `data/detective/cases.ts` and implements `DetectiveCase`: identity and bilingual copy, difficulty and duration, skills and panels, typed evidence, exact relevant-evidence IDs, logical conclusion choices, three hints, balanced training treatments, financial impact, explanation, review checks, note presets, related Mission, and score rules. Evidence supports bank transactions, journal entries, invoices, receipts, party messages, cash movements, balances, documents, Excel rows, internal notes, and asset-register records. Components never contain case content.
 

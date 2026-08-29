@@ -2,24 +2,32 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpenCheck, Clock3, GraduationCap, ListOrdered, PlayCircle, Search, Sparkles, TableProperties, Target, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpenCheck, Clock3, FileSearch, GraduationCap, ListOrdered, PlayCircle, Search, ShieldCheck, Sparkles, TableProperties, Target, Trophy } from "lucide-react";
 import { academyCourses, academyLessonCount } from "@/data/academy";
+import { detectiveCases } from "@/data/detective/cases";
 import { loadAcademyProgress } from "@/lib/academy/progress";
-import type { AcademyCourse, AcademyProgress, Locale } from "@/types";
+import { loadDetectiveProgress, subscribeToDetectiveProgress } from "@/lib/storage/detective";
+import type { AcademyCourse, AcademyProgress, DetectiveProgress, Locale } from "@/types";
 
 const emptyProgress: AcademyProgress = { completedLessonIds: [], quizScores: {} };
+const emptyDetectiveProgress: DetectiveProgress = { schemaVersion: 1, records: {}, skills: {} };
 
 export function AcademyHome({ locale }: { locale: Locale }) {
   const ar = locale === "ar";
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState("all");
   const [progress, setProgress] = useState<AcademyProgress>(emptyProgress);
+  const [detectiveProgress, setDetectiveProgress] = useState<DetectiveProgress>(emptyDetectiveProgress);
 
   useEffect(() => {
     const refresh = () => setProgress(loadAcademyProgress());
     refresh();
     window.addEventListener("academy-progress-updated", refresh);
     return () => window.removeEventListener("academy-progress-updated", refresh);
+  }, []);
+  useEffect(() => {
+    setDetectiveProgress(loadDetectiveProgress());
+    return subscribeToDetectiveProgress(setDetectiveProgress);
   }, []);
 
   const filtered = useMemo(() => academyCourses.filter((course) => {
@@ -54,6 +62,7 @@ export function AcademyHome({ locale }: { locale: Locale }) {
             <Link className="btn btn-primary" href={`/${locale}/academy/${continueLesson.course.slug}/${continueLesson.lesson.slug}`}><PlayCircle size={19}/>{completed ? (ar ? "كمّل من حيث توقفت" : "Continue learning") : (ar ? "ابدأ أول درس مجانًا" : "Start the first lesson")}{ar ? <ArrowLeft size={17}/> : <ArrowRight size={17}/>}</Link>
             <Link className="btn" href={`/${locale}/academy/account-guide`}><TableProperties size={18}/>{ar ? "مرجع طبيعة الحسابات" : "Account nature guide"}</Link>
             <Link className="btn" href={`/${locale}/academy/practice`}><Target size={18}/>{ar ? "افتح معمل التدريب" : "Open practice lab"}</Link>
+            <Link className="btn" href={`/${locale}/academy/detective`}><ShieldCheck size={18}/>{ar ? "تدريب التحقيق المحاسبي" : "Accounting Detective training"}</Link>
           </div>
         </div>
         <div className="academy-hero-board rounded-3xl border border-white/15 bg-white/5 p-6 backdrop-blur-xl">
@@ -84,6 +93,16 @@ export function AcademyHome({ locale }: { locale: Locale }) {
         <div className="grid gap-3 lg:grid-cols-3">{academyCourses.map((course,index)=><Link className="group flex items-center gap-4 rounded-2xl border border-daftar-line p-4 transition hover:border-daftar-primary hover:bg-[color-mix(in_srgb,var(--primary)_4%,var(--card))]" href={`/${locale}/academy/${course.slug}`} key={course.slug}><span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-daftar-primary font-black text-white">{index+1}</span><span className="flex-1"><small className="block text-daftar-muted">{ar?`المرحلة ${index+1}`:`Stage ${index+1}`}</small><b className="mt-1 block">{ar?course.titleAr:course.titleEn}</b></span>{ar?<ArrowLeft className="text-daftar-primary"/>:<ArrowRight className="text-daftar-primary"/>}</Link>)}</div>
         <Link className="mt-5 flex items-center justify-between rounded-2xl bg-daftar-primary p-5 text-white" href={`/${locale}/academy/account-guide`}><span><b className="block text-lg">{ar?"مرجع طبيعة الحسابات الكامل":"Complete account nature guide"}</b><small className="mt-1 block text-white/70">{ar?"كل حساب: يزيد ويقل إزاي، يظهر فين، ومستنده إيه":"Every account: movement, statements, and documents"}</small></span><TableProperties/></Link>
       </div>
+
+      <section className="mb-14 overflow-hidden rounded-3xl border border-daftar-line bg-daftar-card shadow-sm" aria-labelledby="academy-detective-title">
+        <div className="grid gap-7 bg-[linear-gradient(120deg,color-mix(in_srgb,var(--primary)_10%,var(--card)),var(--card))] p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+          <div className="flex items-start gap-4"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-daftar-primary text-white"><ShieldCheck/></span><div><span className="text-xs font-black text-daftar-primary">FINORA ACCOUNTING DETECTIVE</span><h2 id="academy-detective-title" className="mt-1 text-2xl font-black">{ar ? "التدريب العملي: حقّق في الأخطاء المحاسبية" : "Practical training: investigate accounting errors"}</h2><p className="mt-2 max-w-3xl text-sm leading-7 text-daftar-muted">{ar ? "خمس قضايا تدريبية داخل الأكاديمية. افحص المستندات والقيود وحركات البنك والأستاذ، ثم كوّن استنتاجك واحصل على تقييم مهاراتك." : "Five Academy training cases. Inspect documents, journals, bank movements, and ledgers, then form a conclusion and receive a skill assessment."}</p></div></div>
+          <Link className="btn btn-primary" href={`/${locale}/academy/detective`}><FileSearch size={18}/>{ar ? "افتح كل القضايا" : "Open all cases"}{ar ? <ArrowLeft size={17}/> : <ArrowRight size={17}/>}</Link>
+        </div>
+        <div className="grid gap-3 p-5 md:grid-cols-2 md:p-8 xl:grid-cols-5">
+          {detectiveCases.map((caseDefinition) => { const record = detectiveProgress.records[caseDefinition.id]; return <Link className="group rounded-2xl border border-daftar-line p-4 transition hover:-translate-y-1 hover:border-daftar-primary hover:shadow-lg" href={`/${locale}/academy/detective/${caseDefinition.slug}`} key={caseDefinition.id}><span className="flex items-center justify-between text-xs font-black text-daftar-primary"><b>CASE {caseDefinition.caseNumber}</b><small className={record?.solved ? "text-emerald-600" : "text-daftar-muted"}>{record?.solved ? (ar ? "مكتملة" : "Complete") : (ar ? "ابدأ" : "Start")}</small></span><h3 className="mt-4 text-base font-black">{ar ? caseDefinition.titleAr : caseDefinition.titleEn}</h3><p className="mt-2 line-clamp-3 text-xs leading-6 text-daftar-muted">{ar ? caseDefinition.briefAr : caseDefinition.briefEn}</p><span className="mt-4 flex items-center justify-between border-t border-daftar-line pt-3 text-xs text-daftar-muted"><small><Clock3 className="inline" size={14}/> {caseDefinition.estimatedMinutes} {ar ? "د" : "min"}</small><b className="text-daftar-primary">{record ? `${record.bestScore}/1000` : ar ? "غير مبدوءة" : "Not started"}</b></span></Link>; })}
+        </div>
+      </section>
 
       <div className="academy-catalog-head mb-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div><span>{ar ? "الخطة التعليمية الكاملة" : "Complete learning plan"}</span><h2>{ar ? "اختار المسار وابدأ خطوة بخطوة" : "Choose a track and learn step by step"}</h2></div>
