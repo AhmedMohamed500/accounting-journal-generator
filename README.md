@@ -1,5 +1,7 @@
 # FINORA — Accounting Operations Platform
 
+آخر تحديث: 29 أغسطس 2026 — FINORA Accounting Detective. الحالة الحالية: مكتمل محليًا، ومغطى بالاختبارات، ومتصل بـFINORA Missions.
+
 Arabic-first, bilingual journal-entry generator built with Next.js, TypeScript, Tailwind CSS, React Hook Form, Zod, Vitest, and a local accounting rules engine. No database, login, AI key, or paid API is required.
 
 ## Features
@@ -22,6 +24,7 @@ Arabic-first, bilingual journal-entry generator built with Next.js, TypeScript, 
 - Smart CSV bank reconciliation with amount/date/reference matching, confidence scores, manual links, and draft entries for unmatched activity
 - Company-scoped customer receivables center with credit limits, tax-aware credit invoices, partial collections, running statements, aging buckets, and journal-linked draft entries
 - FINORA Missions: five mobile-first consequence-based accounting cases with hints, scoring, impact simulation, balanced training entries, and isolated local progress
+- FINORA Accounting Detective: five evidence-led investigations with case files, progressive hints, conclusions, notebooks, evidence links, scoring, skills, and isolated training treatments
 - Fiscal years and monthly periods with soft close, final locking, and enforced entry-save/post protection
 - General ledger, income statement, and balance sheet with date filters, print, and CSV export
 - Company defaults, numbering configuration, and versioned per-company JSON backup and restore
@@ -55,6 +58,7 @@ npm run check
 - `data/`: central transaction, currency, accounting-office mock data, and account-learning registries
 - `components/accounting-office/`: the navigable frontend prototype for accounting firms
 - `data/missions.ts`, `lib/missions/`, and `components/missions/`: reusable interactive mission data, scoring/impact engine, and student experience
+- `data/detective/`, `lib/detective/`, `lib/storage/detective.ts`, and `components/detective/`: case definitions, evidence/conclusion engine, isolated progress, and the responsive investigator workspace
 - `lib/accounting/`: currency-safe calculations and balance validation
 - `lib/parser/`: number normalization and deterministic text parsing
 - `rules/`: typed journal-entry rules engine
@@ -68,6 +72,24 @@ Add a transaction definition in `data/transactions.ts`, then add its calculation
 To add a language, introduce a locale route, translated registry fields/copy, locale-aware formatting, and direction in the localized layout. Change currencies in `data/currencies.ts`. The default VAT is supplied by the form and rules input; country defaults are in the same data module.
 
 Future AI support can sit behind a server-only adapter that returns the existing `ParseResult` contract. Never expose `AI_API_KEY` to client code; deterministic rules should remain the final accounting calculator.
+
+## FINORA Accounting Detective
+
+Accounting Detective teaches investigation rather than recall. A learner opens a company case, reviews only the panels needed for that case, marks or excludes evidence, links related items, keeps a notebook, and confirms a conclusion. A wrong conclusion returns focused feedback and a progressive hint without exposing the solution.
+
+Routes: `/ar/detective`, `/en/detective`, and the localized case route `/{locale}/detective/{case-slug}`. The section uses the Learn/Missions navigation and remains visually separate from the operational accounting sidebar.
+
+Each case lives in `data/detective/cases.ts` and implements `DetectiveCase`: identity and bilingual copy, difficulty and duration, skills and panels, typed evidence, exact relevant-evidence IDs, logical conclusion choices, three hints, balanced training treatments, financial impact, explanation, review checks, note presets, related Mission, and score rules. Evidence supports bank transactions, journal entries, invoices, receipts, party messages, cash movements, balances, documents, Excel rows, internal notes, and asset-register records. Components never contain case content.
+
+The Evidence Engine also supports ledger movements, important/excluded states, evidence links, quick/custom notes, and a chronological timeline built only from evidence the learner has opened. The Hint System exposes three progressive levels and each used level reduces the final score.
+
+The conclusion engine requires both the exact relevant evidence set and the correct conclusion. The score has a 1,000-point ceiling: 400 for the correct conclusion, 300 for relevant evidence, 150 for using no hints, 100 for efficient investigation, and a light 50-point time bonus. Constants and penalties for wrong evidence, hints, and extra attempts are defined in `DETECTIVE_SCORE_RULES`.
+
+Case progress, notes, opened/important/excluded evidence, evidence links, best scores, results, and skill progress are stored only under `finora-training-detective-v1`. Training entries are plain sandbox projections marked `sandbox: true`; the Detective code has no adapter to real journals, customers, banks, reports, or workspaces.
+
+To add a case, append a `DetectiveCase` object to `detectiveCases`, use unique case/evidence/conclusion IDs, include exactly three progressive hints, make every `correctEvidence` ID refer to an existing evidence item, set a valid `correctConclusion`, and keep every accounting treatment balanced. `validateDetectiveCase` and the Detective test suite verify these invariants.
+
+Link a case to FINORA Missions with `relatedMissionSlug`; this only creates a result-page practice CTA and does not make either learning engine depend on the other. Detective is a public learning experience like Missions and never requires creating or opening a real company workspace. The complete suite currently contains 53 test files and 269 passing tests.
 
 The accounting-office prototype intentionally uses `data/accounting-office.ts` only. Replace that module with backend adapters later while preserving the page and component contracts. Real authentication, tenant isolation, file storage, notifications, and audit logging remain future backend work.
 
