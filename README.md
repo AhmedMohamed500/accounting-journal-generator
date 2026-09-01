@@ -1,6 +1,6 @@
 # FINORA — Accounting Operations Platform
 
-آخر تحديث: 29 أغسطس 2026 — FINORA Accounting Detective. الحالة الحالية: مكتمل محليًا، ومغطى بالاختبارات، ومتصل بـFINORA Missions.
+آخر تحديث: 2 سبتمبر 2026 — FINORA Money Flow Lab. الحالة الحالية: مكتمل محليًا، ومغطى بالاختبارات، ومتصل بـFINORA Learn وMissions.
 
 Arabic-first, bilingual journal-entry generator built with Next.js, TypeScript, Tailwind CSS, React Hook Form, Zod, Vitest, and a local accounting rules engine. No database, login, AI key, or paid API is required.
 
@@ -25,6 +25,7 @@ Arabic-first, bilingual journal-entry generator built with Next.js, TypeScript, 
 - Company-scoped customer receivables center with credit limits, tax-aware credit invoices, partial collections, running statements, aging buckets, and journal-linked draft entries
 - FINORA Missions: five mobile-first consequence-based accounting cases with hints, scoring, impact simulation, balanced training entries, and isolated local progress
 - FINORA Accounting Detective: five evidence-led investigations with case files, progressive hints, conclusions, notebooks, evidence links, scoring, skills, and isolated training treatments
+- FINORA Money Flow Lab: seven visual value-movement scenarios with accessible drag/tap controls, before/after balances, derived debit/credit logic, consequences, variations, reverse mode, and isolated skill progress
 - Fiscal years and monthly periods with soft close, final locking, and enforced entry-save/post protection
 - General ledger, income statement, and balance sheet with date filters, print, and CSV export
 - Company defaults, numbering configuration, and versioned per-company JSON backup and restore
@@ -58,6 +59,7 @@ npm run check
 - `data/`: central transaction, currency, accounting-office mock data, and account-learning registries
 - `components/accounting-office/`: the navigable frontend prototype for accounting firms
 - `data/missions.ts`, `lib/missions/`, and `components/missions/`: reusable interactive mission data, scoring/impact engine, and student experience
+- `data/money-flow/`, `lib/money-flow/`, and `components/money-flow/`: visual money-movement scenarios, accounting derivation engine, reusable account/token components, and training UI
 - `data/detective/`, `lib/detective/`, `lib/storage/detective.ts`, and `components/detective/`: case definitions, evidence/conclusion engine, isolated progress, and the responsive investigator workspace
 - `lib/accounting/`: currency-safe calculations and balance validation
 - `lib/parser/`: number normalization and deterministic text parsing

@@ -19,4 +19,5 @@ export * from "./vat";
 export * from "./accounting-office";
 export * from "./merchant";
 export * from "./missions";
+export * from "./money-flow";
 export * from "./detective";

@@ -63,6 +63,7 @@ export function AcademyHome({ locale }: { locale: Locale }) {
             <Link className="btn" href={`/${locale}/academy/account-guide`}><TableProperties size={18}/>{ar ? "مرجع طبيعة الحسابات" : "Account nature guide"}</Link>
             <Link className="btn" href={`/${locale}/academy/practice`}><Target size={18}/>{ar ? "افتح معمل التدريب" : "Open practice lab"}</Link>
             <Link className="btn" href={`/${locale}/academy/detective`}><ShieldCheck size={18}/>{ar ? "تدريب التحقيق المحاسبي" : "Accounting Detective training"}</Link>
+            <Link className="btn" href={`/${locale}/money-flow`}><Sparkles size={18}/>{ar ? "حرّك الفلوس" : "Money Flow Lab"}</Link>
           </div>
         </div>
         <div className="academy-hero-board rounded-3xl border border-white/15 bg-white/5 p-6 backdrop-blur-xl">
