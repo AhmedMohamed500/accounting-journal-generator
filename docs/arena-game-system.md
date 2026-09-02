@@ -40,11 +40,13 @@ Task assessment records accounting accuracy, account selection, debit/credit acc
 
 Hiring Readiness is a 0–100 evidence indicator based on skill coverage, accuracy, verified skills, unique cases, closing exposure, banking, and journal performance. It is not an employment guarantee. Demo competitors and demo companies are explicitly labeled and do not imply real employer interest.
 
-## UI system
+## Approved gameplay UI
 
-Arena uses a bright white and ice-blue finance workspace with restrained teal, green, and orange signals. Every primary control has visible hover, pressed, focus, and disabled states. Layouts are defined for 320, 360, 390, 430, tablet, and desktop widths. Arabic is RTL and English is LTR.
+Arena uses a bright, information-rich finance workspace with restrained blue, green, amber, and red signals. It deliberately avoids a landing-page hero, decorative invoice, oversized portrait, and large empty regions.
 
-The dashboard contains the fixed professional status bar, current mission, realistic CFO Mentor, work shift, job readiness, company health, company challenges, and demo talent interest. The mission route contains the source document, analysis note, account cards, journal rows, totals, consequence feedback, impact review, score dimensions, and approval.
+Desktop has three compact columns. The left rail contains career progression and weekly ranking. The center contains the horizontal current mission, five-step workflow, real account cards, and complete journal builder. The right rail contains live transaction impact, a small CFO Mentor card, and performance/competition indicators. The former hiring-readiness, demo-company, company-challenge, oversized CFO, and presentation-style hero sections are not part of the main workspace.
+
+On mobile the order is mission, workflow, account selection, journal builder, immediate impact, CFO feedback, performance, career progress, and leaderboard. Controls remain touch and keyboard accessible without horizontal page overflow. Arabic is RTL and English is LTR.
 
 ## Extending Arena
 

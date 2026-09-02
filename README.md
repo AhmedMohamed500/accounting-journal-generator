@@ -4,12 +4,12 @@
 
 ## FINORA Arena
 
-FINORA Arena is FINORA's primary game-based accounting learning experience: a professional career simulation rather than a lesson catalog. Its new professional workspace opens with a current supplier-invoice mission, CFO Mentor, work shift, company health, hiring readiness, and an end-to-end Document → Analysis → Accounts → Journal → Impact → Approval workflow.
+FINORA Arena is FINORA's primary game-based accounting learning experience: a dense professional workspace rather than a lesson catalog or marketing page. Desktop uses three columns: career and weekly ranking, the active accounting mission and journal work, then live impact, compact CFO feedback, and performance. Mobile moves the mission and accounting interaction first.
 
 Routes:
 
-- `/:locale/arena` — professional daily workspace, current mission, shift, readiness, and company health
-- `/:locale/arena/career` — document review, analysis, real-account selection, Journal Builder, impact, and approval
+- `/:locale/arena` — complete accounting gameplay workspace with mission, real accounts, journal, live impact, career, and competition
+- `/:locale/arena/career` — the same active workspace entry for existing career links
 - `/:locale/arena/profile` — score, rank, skill matrix, confidence, and privacy
 - `/:locale/arena/leaderboard` — fair demo ranking with local profile
 - `/:locale/arena/daily` — deterministic daily challenge and streak
