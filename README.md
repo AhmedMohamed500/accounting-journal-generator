@@ -1,5 +1,40 @@
 # FINORA — Accounting Operations Platform
 
+> Last updated: 2 September 2026
+
+## FINORA Arena
+
+FINORA Arena is FINORA's primary game-based accounting learning experience: a professional career simulation rather than a lesson catalog. A learner joins **Nova Services** as an Accounting Intern and builds the accounting system from zero through situations, actions, decisions, consequences, discovery, explanation, evaluation, and career progress.
+
+Routes:
+
+- `/:locale/arena` — career hub and company health
+- `/:locale/arena/career` — Chart Builder, discovery, Journal Builder, and career map
+- `/:locale/arena/profile` — score, rank, skill matrix, confidence, and privacy
+- `/:locale/arena/leaderboard` — fair demo ranking with local profile
+- `/:locale/arena/daily` — deterministic daily challenge and streak
+- `/:locale/arena/missions`, `/money-flow`, `/detective` — safe bridges to the existing game modes
+- `/:locale/academy/account-guide` — preserved official Account Nature reference
+
+The Academy landing route redirects safely to Arena. Every deep Academy lesson remains available and is documented in [the migration audit](docs/academy-to-arena-migration.md). Account Nature is the explicit exception: its existing content and teaching model remain the official reference library, with two-way navigation that preserves Arena state.
+
+Career play covers the journey from why accounts exist, Chart of Accounts, Account Nature, increase/decrease and debit/credit discovery, Journal Builder and balance validation, posting, General Ledger, Trial Balance, customers, suppliers, cash, banking, VAT, adjustments, financial statements, closing, and the full accounting cycle. Existing FINORA Missions become Quick Missions, Money Flow Lab becomes the visual learning mode, and Accounting Detective becomes the investigation and error-recovery mode.
+
+Professional evaluation is configurable in `lib/arena/engine.ts`:
+
+- Accuracy 45%, difficulty 20%, consistency 15%, error detection 10%, efficiency 10%.
+- Score range: 0–1000. Ranking uses best attempt per unique case, difficulty weighting, and ranked attempts only.
+- Skill ratings cover 20 dimensions at 0–100 with Low, Medium, High, and Verified confidence.
+- Verification requires at least five unique attempts/cases, 85% best accuracy, and non-beginner difficulty evidence.
+- Replays may be practice-only; 500 repeats of one easy case cannot outrank diverse hard-case performance.
+- Career stages use configured evidence requirements, not XP alone.
+
+Season 1, Service Company world architecture, Work Shifts, professional Boss Challenges, Company Health, CFO Trust, Daily Challenge, achievement/performance-review models, profile visibility, and future talent-network fields are included as a local-first foundation. The leaderboard uses real sorting logic with demo competitors; live multi-user seasons and employer discovery require a future backend.
+
+Arena is isolated from operational accounting. It persists only to `finora-training-arena-v1`; it never calls real journal, company, customer, supplier, bank, VAT, report, or close storage adapters. RTL Arabic, LTR English, tap alternatives to drag, and layouts for 320px through desktop are included.
+
+Release verification: TypeScript, ESLint, all **339 tests across 56 test files**, and the Next.js production build pass.
+
 آخر تحديث: 2 سبتمبر 2026 — FINORA Money Flow Lab. الحالة الحالية: مكتمل محليًا، ومغطى بالاختبارات، ومتصل بـFINORA Learn وMissions.
 
 Arabic-first, bilingual journal-entry generator built with Next.js, TypeScript, Tailwind CSS, React Hook Form, Zod, Vitest, and a local accounting rules engine. No database, login, AI key, or paid API is required.

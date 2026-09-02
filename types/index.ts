@@ -14,6 +14,7 @@ export * from "./custody";
 export * from "./operations";
 export * from "./scenarios";
 export * from "./academy";
+export * from "./arena";
 export * from "./pos";
 export * from "./vat";
 export * from "./accounting-office";

@@ -1,5 +1,16 @@
 # FINORA — تقرير التحديثات الأخيرة
 
+## FINORA Arena — 2 سبتمبر 2026
+
+- تحويل نقطة الدخول التعليمية إلى تجربة مسيرة محاسب احترافية تبدأ من الصفر داخل Nova للخدمات.
+- إضافة Chart Builder باللمس للهاتف، Debit/Credit Discovery، Journal Builder، Company Health، CFO Trust، الملف المهني، Leaderboard عادل، والتحدي اليومي.
+- إعادة استخدام Missions وMoney Flow وAccounting Detective داخل تنقل Arena دون تكرار محركاتها أو بياناتها.
+- إبقاء طبيعة الحسابات كمرجع رسمي كامل مع رجوع إلى اللعبة دون فقد الحالة.
+- إضافة Season 1 وService Company World وWork Shift وBoss Challenges وWeekly Mystery وMistake Chains وAchievements وPerformance Review كأساس قابل للتوسع.
+- توثيق انتقال 28 درسًا وكل أوضاع التدريب في `docs/academy-to-arena-migration.md`.
+- تخزين Arena معزول حصريًا في `finora-training-arena-v1` ولا يتصل ببيانات الشركات الحقيقية.
+- نجحت فحوص TypeScript وESLint و339 اختبارًا في 56 ملفًا وProduction Build لـ97 صفحة مولدة.
+
 > تحديث 18 أغسطس 2026: تمت إضافة مركز حسابات العملاء الآجلين لكل شركة، مع فواتير البيع الآجل والتحصيلات وحدود الائتمان وأعمار الديون وكشف الحساب والقيود المرتبطة. التفاصيل الكاملة موجودة في `CUSTOMER_RECEIVABLES_UPDATE_AR.md`.
 
 > تحديث 17 أغسطس 2026: تمت إضافة الدخول المحلي وتعدد الشركات والفروع والسنوات المالية مع فصل القيود والمستندات والبنك والعهد والتقارير حسب مساحة العمل النشطة. التفاصيل الكاملة موجودة في `LOCAL_MULTI_COMPANY_UPDATE_AR.md`.

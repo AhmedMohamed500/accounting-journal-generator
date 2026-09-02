@@ -1,5 +1,23 @@
 # FINORA — التوثيق الشامل للمشروع
 
+> آخر تحديث: 2 سبتمبر 2026 — إضافة FINORA Arena واختبارات محرك المسيرة والتقييم والعزل.
+
+## FINORA Arena — التعلم المحاسبي القائم على اللعب
+
+أصبحت Arena هي نقطة الدخول التعليمية الأساسية في FINORA. يدخل المستخدم كـ **Accounting Intern** في شركة Nova للخدمات ويبدأ من سؤال «لماذا نحتاج حسابات؟»، ثم يبني شجرة الحسابات ويكتشف الزيادة والنقص والمدين والدائن قبل عرض المصطلحات. النمط هو: موقف ← فعل ← قرار ← نتيجة ← أثر ← تفكير ← اكتشاف ← شرح ← تقييم ← تقدم مهني.
+
+المسارات الرئيسية هي `/ar/arena` و`/en/arena`، مع `career` و`profile` و`leaderboard` و`daily`. توجد جسور آمنة إلى Missions وMoney Flow وDetective. مسار Academy الرئيسي يعيد التوجيه إلى Arena، بينما تظل كل روابط الدروس العميقة قائمة دون حذف أو 404.
+
+قسم **طبيعة الحسابات** استثناء إلزامي ومحفوظ كما هو كـOfficial Reference Library على `/academy/account-guide`. أضيفت له عودة مباشرة إلى اللعبة، وتفتح اللعبة المرجع بزر «راجع طبيعة الحساب» دون نسخ محتواه. حالة اللعب لا تضيع لأن التخزين معزول.
+
+تغطي خريطة المسيرة: Chart of Accounts، Account Nature، Increase/Decrease، Debit/Credit Discovery، Journal Builder، Posting Simulation، General Ledger، Trial Balance، العملاء، الموردين، النقدية، البنك، VAT، التسويات، القوائم المالية، الإقفال، والدورة المحاسبية الكاملة. Missions هي Quick Missions، وMoney Flow هو Visual Learning Mode، وDetective هو التحقيق واكتشاف الأخطاء والتعافي منها. تم تجهيز Work Shifts وBoss Challenges وDaily Challenge وWeekly Mystery foundation وAchievements وPerformance Reviews.
+
+FINORA Accounting Score من 0 إلى 1000: الدقة 45%، الصعوبة 20%، الاتساق 15%، اكتشاف الأخطاء 10%، والكفاءة 10%. المنطق يأخذ أفضل محاولة لكل حالة فريدة ويهمل Practice Replay من الترتيب، مع Diminishing Returns طبيعي بمنع تكرار الحالة. ترتيب المسيرة لا يعتمد على XP وحده. Skill Ratings تضم 20 مهارة بدرجات 0–100 وثقة Low/Medium/High/Verified؛ التوثيق يتطلب خمس حالات فريدة على الأقل، دقة مناسبة، ومحاولة غير سهلة.
+
+الـLeaderboard الحالي يجمع ملف المستخدم المحلي مع منافسين Demo ويستخدم محرك ترتيب حقيقي. Season 1 وService Company World وCompany Health وCFO Trust وError Recovery موجودة كأساس قابل للتوسع. Future Talent Network وVisible to Companies معرفة معماريًا فقط؛ لا Backend ولا Company Portal ولا معلومات اتصال حاليًا.
+
+كل بيانات Arena داخل Training Sandbox بالمفتاح `finora-training-arena-v1`. لا تستورد Arena أي محول تخزين للشركات أو اليومية أو العملاء أو الموردين أو البنك أو VAT أو التقارير أو الإقفال. نجحت 339 حالة اختبار في 56 ملفًا، وتشمل العزل والمنطق المحاسبي والـScore والمهارات ومنع grinding وعدالة الترتيب. تدقيق انتقال كل محتوى Academy موجود في `docs/academy-to-arena-migration.md`.
+
 > آخر تحديث: 2 سبتمبر 2026 — FINORA Money Flow Lab
 > المستودع: [AhmedMohamed500/accounting-journal-generator](https://github.com/AhmedMohamed500/accounting-journal-generator)  
 > النسخة المباشرة: [accounting-journal-generator.vercel.app](https://accounting-journal-generator.vercel.app/ar)  
@@ -599,9 +617,9 @@ npm.cmd run dev
 
 - TypeScript: ناجح.
 - ESLint: ناجح بدون تحذيرات.
-- الاختبارات: 296 اختبارًا ناجحًا.
+- الاختبارات: 339 اختبارًا ناجحًا.
 - Production Build: ناجح.
-- عدد ملفات الاختبار الموجودة حاليًا: 55 ملفًا.
+- عدد ملفات الاختبار الموجودة حاليًا: 56 ملفًا.
 
 تشمل الاختبارات:
 

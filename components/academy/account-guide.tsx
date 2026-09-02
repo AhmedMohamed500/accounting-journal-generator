@@ -30,7 +30,7 @@ export function AccountGuide({ locale }: { locale: Locale }) {
   return <main className="min-h-screen bg-daftar-bg pb-20">
     <section className="border-b border-daftar-line bg-[linear-gradient(135deg,color-mix(in_srgb,var(--primary)_9%,var(--bg)),var(--bg))] py-14">
       <div className="container">
-        <Link className="mb-7 inline-flex items-center gap-2 text-sm font-bold text-daftar-primary" href={`/${locale}/academy`}><GraduationCap size={18}/>{ar ? "العودة للأكاديمية" : "Back to academy"}</Link>
+        <Link className="mb-7 inline-flex items-center gap-2 text-sm font-bold text-daftar-primary" href={`/${locale}/arena/career`}><GraduationCap size={18}/>{ar ? "العودة إلى اللعبة" : "Return to game"}</Link>
         <div className="grid gap-8 lg:grid-cols-[1fr_340px] lg:items-end">
           <div><span className="academy-kicker"><BookOpenCheck/>{ar ? "المرجع المحاسبي الشامل" : "Complete accounting reference"}</span><h1 className="my-4 max-w-4xl text-4xl font-black leading-tight md:text-6xl">{ar ? "افهم طبيعة كل حساب قبل ما تعمل أي قيد" : "Understand every account before posting an entry"}</h1><p className="max-w-3xl text-lg leading-8 text-daftar-muted">{ar ? "مرجع عملي يشرح طبيعة الحساب والزيادة والنقص والقيد ومكان الظهور في القوائم، بدون خلط بين الشرح والمثال." : "A practical reference for normal balance, movement, journal examples, and statement impact."}</p></div>
           <div className="rounded-2xl border border-daftar-line bg-daftar-card p-6 shadow-lg"><b className="text-4xl text-daftar-primary">{accountLearningGuide.length}</b><p className="mt-2 font-bold">{ar ? "حسابًا مشروحًا بالتأثير والدورة المستندية" : "accounts explained end to end"}</p></div>
@@ -55,7 +55,7 @@ export function AccountGuide({ locale }: { locale: Locale }) {
       {!rows.length && <div className="mt-7 rounded-2xl border border-dashed border-daftar-line p-12 text-center text-lg text-daftar-muted">{ar ? "لا توجد حسابات مطابقة للبحث." : "No matching accounts."}</div>}
     </section>
 
-    <section className="container mt-10"><div className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-daftar-primary p-8 text-white md:flex-row md:items-center"><div><Workflow className="mb-4"/><h2 className="text-2xl font-black">{ar ? "بعد ما تفهم الحسابات، طبّقها في القيود" : "Apply what you learned"}</h2><p className="mt-2 max-w-2xl text-white/75">{ar ? "ابدأ مسار القيود اليومية وشاهد كل عملية من المستند وحتى القوائم المالية." : "Continue to the journal entry track and follow each transaction end to end."}</p></div><Link className="btn border-white/25 bg-white text-daftar-primary" href={`/${locale}/academy/journal-entry-masterclass`}>{ar ? "ابدأ مسار القيود" : "Start entries track"}{ar ? <ArrowLeft/> : <ArrowRight/>}</Link></div></section>
+    <section className="container mt-10"><div className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-daftar-primary p-8 text-white md:flex-row md:items-center"><div><Workflow className="mb-4"/><h2 className="text-2xl font-black">{ar ? "ارجع إلى مهمتك بدون فقد التقدم" : "Return without losing your progress"}</h2><p className="mt-2 max-w-2xl text-white/75">{ar ? "هذا المرجع الرسمي مستقل عن اللعب. حالة Arena محفوظة داخل Training Sandbox." : "This official reference stays separate from gameplay. Arena state is preserved in the training sandbox."}</p></div><Link className="btn border-white/25 bg-white text-daftar-primary" href={`/${locale}/arena/career`}>{ar ? "العودة إلى اللعبة" : "Return to game"}{ar ? <ArrowLeft/> : <ArrowRight/>}</Link></div></section>
   </main>;
 }
 
