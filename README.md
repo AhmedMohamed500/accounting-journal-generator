@@ -4,7 +4,7 @@
 
 ## FINORA Arena
 
-FINORA Arena is FINORA's primary game-based accounting learning experience: a dense professional workspace rather than a lesson catalog or marketing page. Desktop uses a readable 22% / 53% / 25% composition: career and weekly ranking, the dominant active accounting mission and journal work, then major live impact, compact CFO feedback, and performance. Mobile moves the mission and accounting interaction first.
+FINORA Arena is FINORA's primary game-based accounting learning experience: a dense professional workspace rather than a lesson catalog or marketing page. Its approved desktop composition matches the `4444.png` reference: one FINORA status bar, a left rail for career, company challenges, and weekly leaders; a dominant center for the active mission, six-step workflow, real account cards, journal builder, and immediate impact; a right rail for the CFO message, hiring readiness, verified skills, and demo companies; and one season progress bar at the bottom. The general site header and footer are omitted on the Arena workspace so no extra navigation or content surrounds the approved composition. Mobile moves the mission and accounting interaction first.
 
 Routes:
 

@@ -13,7 +13,7 @@ import type { Locale } from "@/types";
 
 export function Header({ locale }: { locale: Locale }) {
   const { setTheme, resolvedTheme } = useTheme();
-  const pathname = usePathname(), ar = locale === "ar", other = ar ? "en" : "ar", landing = pathname === `/${locale}`, learningMode = pathname.startsWith(`/${locale}/arena`) || pathname.startsWith(`/${locale}/missions`) || pathname.startsWith(`/${locale}/money-flow`) || pathname.startsWith(`/${locale}/academy/detective`) || pathname.startsWith(`/${locale}/detective`);
+  const pathname = usePathname(), ar = locale === "ar", other = ar ? "en" : "ar", landing = pathname === `/${locale}`, arenaWorkspace = pathname === `/${locale}/arena` || pathname === `/${locale}/arena/career`, learningMode = pathname.startsWith(`/${locale}/arena`) || pathname.startsWith(`/${locale}/missions`) || pathname.startsWith(`/${locale}/money-flow`) || pathname.startsWith(`/${locale}/academy/detective`) || pathname.startsWith(`/${locale}/detective`);
   const [open, setOpen] = useState(false), [activeMenu, setActiveMenu] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -55,6 +55,8 @@ export function Header({ locale }: { locale: Locale }) {
     ] },
   ];
   const activePath = (path: string) => pathname === `/${locale}/${path}` || pathname.startsWith(`/${locale}/${path}/`);
+
+  if (arenaWorkspace) return null;
 
   return <header ref={headerRef} className={`nav no-print ${landing ? "landing-nav" : ""}`} data-no-bilingual><div className="container nav-inner">
     <Link className="brand" href={`/${locale}`}><span className="brand-mark">ف</span><span><b>فينورا</b><small>FINORA</small></span></Link>

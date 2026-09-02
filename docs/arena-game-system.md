@@ -42,9 +42,9 @@ Hiring Readiness is a 0–100 evidence indicator based on skill coverage, accura
 
 ## Approved gameplay UI
 
-Arena uses a bright, information-rich finance workspace with restrained blue, green, amber, and red signals. It deliberately avoids a landing-page hero, decorative invoice, oversized portrait, and large empty regions.
+Arena uses a bright, information-rich finance workspace with restrained blue, green, amber, and red signals. Its approved composition is the supplied `4444.png` reference, without any additional site header, footer, hero, or surrounding presentation content.
 
-Desktop has three compact columns at approximately 22% / 53% / 25%. The left rail contains career progression and weekly ranking. The dominant center contains the horizontal current mission, five-step workflow, icon-led real account cards, and readable journal builder. The right rail contains major live transaction-impact tiles with balance status, a small CFO Mentor card with the existing hint action, and performance/competition indicators. The site learning navigation is the only navigation row. The former hiring-readiness, demo-company, company-challenge, oversized CFO, and presentation-style hero sections are not part of the main workspace.
+Desktop has one top bar with the FINORA identity and six status metrics. Below it are three compact columns: the left rail contains career progression, company challenges, and weekly leaders; the dominant center contains the horizontal current mission, six-step workflow, icon-led real account cards, journal builder, and immediate impact; the right rail contains the CFO message, hiring readiness, verified skills, and explicitly labeled demo companies. A season and experience bar closes the workspace at the bottom.
 
 On mobile the order is mission, workflow, account selection, journal builder, immediate impact, CFO feedback, performance, career progress, and leaderboard. Controls remain touch and keyboard accessible without horizontal page overflow. Arabic is RTL and English is LTR.
 
