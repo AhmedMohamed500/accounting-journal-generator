@@ -25,3 +25,9 @@ export interface LeaderboardEntry { id: string; player: string; careerRank: Care
 export interface GameWorld { id: string; titleAr: string; titleEn: string; companyAr: string; companyEn: string; active: boolean; stageIds: string[]; }
 export interface JournalLine { accountId: string; debit: number; credit: number; }
 export interface LedgerBalance { accountId: string; debit: number; credit: number; balance: number; side: "debit" | "credit"; }
+export type ArenaWorkflowStep = "document" | "analysis" | "accounts" | "journal" | "impact" | "approval";
+export interface ArenaDocument { type: "supplier-invoice" | "receipt" | "bank-notice" | "expense-document"; number: string; date: string; partyAr: string; partyEn: string; net: number; vat: number; total: number; currency: string; }
+export interface ArenaTaskLine { accountCode: string; side: "debit" | "credit"; amount: number; }
+export interface ArenaTaskDefinition { id: string; companyAr: string; companyEn: string; titleAr: string; titleEn: string; objectiveAr: string; objectiveEn: string; priority: "normal" | "important" | "urgent"; estimatedMinutes: number; difficulty: ArenaDifficulty; document: ArenaDocument; expectedLines: ArenaTaskLine[]; skillIds: ArenaSkillId[]; reward: number; }
+export interface TaskScoreDimensions { accountingAccuracy: number; accountSelection: number; debitCreditAccuracy: number; amountAccuracy: number; errorDetection: number; hints: number; efficiency: number; recovery: number; difficulty: number; total: number; }
+export interface HiringReadiness { score: number; level: "building" | "developing" | "junior-ready"; evidence: { skillCoverage: number; accuracy: number; verifiedSkills: number; uniqueCases: number; closing: number; banking: number; journal: number; }; }

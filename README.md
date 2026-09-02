@@ -1,15 +1,15 @@
 # FINORA — Accounting Operations Platform
 
-> Last updated: 2 September 2026
+> Last updated: 3 September 2026
 
 ## FINORA Arena
 
-FINORA Arena is FINORA's primary game-based accounting learning experience: a professional career simulation rather than a lesson catalog. A learner joins **Nova Services** as an Accounting Intern and builds the accounting system from zero through situations, actions, decisions, consequences, discovery, explanation, evaluation, and career progress.
+FINORA Arena is FINORA's primary game-based accounting learning experience: a professional career simulation rather than a lesson catalog. Its new professional workspace opens with a current supplier-invoice mission, CFO Mentor, work shift, company health, hiring readiness, and an end-to-end Document → Analysis → Accounts → Journal → Impact → Approval workflow.
 
 Routes:
 
-- `/:locale/arena` — career hub and company health
-- `/:locale/arena/career` — Chart Builder, discovery, Journal Builder, and career map
+- `/:locale/arena` — professional daily workspace, current mission, shift, readiness, and company health
+- `/:locale/arena/career` — document review, analysis, real-account selection, Journal Builder, impact, and approval
 - `/:locale/arena/profile` — score, rank, skill matrix, confidence, and privacy
 - `/:locale/arena/leaderboard` — fair demo ranking with local profile
 - `/:locale/arena/daily` — deterministic daily challenge and streak
@@ -31,9 +31,9 @@ Professional evaluation is configurable in `lib/arena/engine.ts`:
 
 Season 1, Service Company world architecture, Work Shifts, professional Boss Challenges, Company Health, CFO Trust, Daily Challenge, achievement/performance-review models, profile visibility, and future talent-network fields are included as a local-first foundation. The leaderboard uses real sorting logic with demo competitors; live multi-user seasons and employer discovery require a future backend.
 
-Arena is isolated from operational accounting. It persists only to `finora-training-arena-v1`; it never calls real journal, company, customer, supplier, bank, VAT, report, or close storage adapters. RTL Arabic, LTR English, tap alternatives to drag, and layouts for 320px through desktop are included.
+Arena reads account definitions from FINORA's existing `data/accounts.ts`, filters them through the shared postability rules, and validates training entries with the existing journal validator. It persists only to `finora-training-arena-v1` and never calls operational journal, company, customer, supplier, bank, VAT, report, or close storage adapters. RTL Arabic, LTR English, tap/select alternatives, and layouts for 320px through desktop are included. See [the Arena game-system guide](docs/arena-game-system.md).
 
-Release verification: TypeScript, ESLint, all **339 tests across 56 test files**, and the Next.js production build pass.
+Release verification: TypeScript, ESLint, and all **349 tests across 57 test files** pass; production-build verification is part of every release.
 
 آخر تحديث: 2 سبتمبر 2026 — FINORA Money Flow Lab. الحالة الحالية: مكتمل محليًا، ومغطى بالاختبارات، ومتصل بـFINORA Learn وMissions.
 

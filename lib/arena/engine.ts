@@ -1,10 +1,12 @@
 import type { Achievement, ArenaAttempt, ArenaDifficulty, ArenaProfile, ArenaSkillId, CareerRank, CompanyHealth, JournalLine, LeaderboardEntry, MistakeChain, PerformanceReview, ProfessionalScoreConfig, SkillConfidence, SkillRating } from "@/types/arena";
+import { defaultAccounts } from "@/data/accounts";
 
 export const ARENA_SCORE_CONFIG: ProfessionalScoreConfig = { accuracy: .45, difficulty: .20, consistency: .15, errorDetection: .10, efficiency: .10 };
 export const difficultyWeight: Record<ArenaDifficulty, number> = { beginner: .55, intermediate: .78, advanced: 1 };
 export const normalSide = (category: string): "debit" | "credit" => ["asset", "expense", "cost-of-sales"].includes(category) ? "debit" : "credit";
 export const movementSide = (category: string, movement: "increase" | "decrease") => movement === "increase" ? normalSide(category) : normalSide(category) === "debit" ? "credit" : "debit";
-export const classifyAccount = (accountId: string) => ({ cash:"asset", bank:"asset", customers:"asset", inventory:"asset", equipment:"asset", suppliers:"liability", loans:"liability", capital:"equity", revenue:"revenue", rent:"expense", salaries:"expense", utilities:"expense", "cost-of-sales":"cost-of-sales" } as Record<string,string>)[accountId];
+const legacyAccountAliases: Record<string, string> = { customers: "receivables", suppliers: "payables", revenue: "service-revenue", utilities: "electricity" };
+export const classifyAccount = (accountId: string) => defaultAccounts.find((account) => account.id === (legacyAccountAliases[accountId] ?? accountId))?.type;
 export const validateJournal = (lines: JournalLine[]) => { const debit = lines.reduce((s,l)=>s+l.debit,0), credit=lines.reduce((s,l)=>s+l.credit,0); return { debit, credit, difference: Math.round(Math.abs(debit-credit)*100)/100, balanced: lines.length >= 2 && Math.abs(debit-credit) < .01 && lines.every(l=>l.debit>=0&&l.credit>=0&&!(l.debit&&l.credit)) }; };
 export const postToLedger = (lines: JournalLine[]) => Object.values(lines.reduce<Record<string,{accountId:string;debit:number;credit:number}>>((map,line)=>{ const row=map[line.accountId]??{accountId:line.accountId,debit:0,credit:0}; row.debit+=line.debit;row.credit+=line.credit;map[line.accountId]=row;return map;},{})).map(row=>({...row,balance:Math.abs(row.debit-row.credit),side:row.debit>=row.credit?"debit" as const:"credit" as const}));
 export const buildTrialBalance = (ledgers: ReturnType<typeof postToLedger>) => ({ debit:ledgers.filter(l=>l.side==="debit").reduce((s,l)=>s+l.balance,0), credit:ledgers.filter(l=>l.side==="credit").reduce((s,l)=>s+l.balance,0) });
