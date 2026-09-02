@@ -44,7 +44,7 @@ Hiring Readiness is a 0–100 evidence indicator based on skill coverage, accura
 
 Arena uses a bright, information-rich finance workspace with restrained blue, green, amber, and red signals. It deliberately avoids a landing-page hero, decorative invoice, oversized portrait, and large empty regions.
 
-Desktop has three compact columns. The left rail contains career progression and weekly ranking. The center contains the horizontal current mission, five-step workflow, real account cards, and complete journal builder. The right rail contains live transaction impact, a small CFO Mentor card, and performance/competition indicators. The former hiring-readiness, demo-company, company-challenge, oversized CFO, and presentation-style hero sections are not part of the main workspace.
+Desktop has three compact columns at approximately 22% / 53% / 25%. The left rail contains career progression and weekly ranking. The dominant center contains the horizontal current mission, five-step workflow, icon-led real account cards, and readable journal builder. The right rail contains major live transaction-impact tiles with balance status, a small CFO Mentor card with the existing hint action, and performance/competition indicators. The site learning navigation is the only navigation row. The former hiring-readiness, demo-company, company-challenge, oversized CFO, and presentation-style hero sections are not part of the main workspace.
 
 On mobile the order is mission, workflow, account selection, journal builder, immediate impact, CFO feedback, performance, career progress, and leaderboard. Controls remain touch and keyboard accessible without horizontal page overflow. Arabic is RTL and English is LTR.
 
