@@ -19,7 +19,8 @@ const call = (method, params = {}) => new Promise((resolve, reject) => { const r
 const evaluate = async (expression) => (await call("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true })).result.value;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const navigate = async (url, delay = 1000) => { await call("Page.navigate", { url }); await wait(delay); };
-const click = async (selector) => { const clicked = await evaluate(`Boolean((()=>{const el=document.querySelector(${JSON.stringify(selector)});if(el)el.click();return el})())`); if (!clicked) throw new Error(`Missing ${selector}`); await wait(350); };
+const waitFor = async (selector, timeout = 8000) => { const started = Date.now(); while (Date.now() - started < timeout) { if (await evaluate(`Boolean(document.querySelector(${JSON.stringify(selector)}))`)) return true; await wait(250); } return false; };
+const click = async (selector) => { const found = await waitFor(selector); if (!found) throw new Error(`Missing ${selector}`); await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`); await wait(350); };
 
 await call("Runtime.enable"); await call("Page.enable"); await call("Network.enable");
 await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
