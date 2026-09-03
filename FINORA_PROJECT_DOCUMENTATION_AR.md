@@ -860,3 +860,7 @@ FINORA حاليًا نموذج Frontend قوي، لكنه ليس بعد نظام
 3. أضف أسئلة الفهم والقيد المتوازن وتأثيره وعواقب الحركات الخاطئة.
 4. أضف «ليه؟» لكل سطر وVariation وReverse Question والمهارات.
 5. شغّل `validateMoneyFlowScenario` واختبارات `money-flow-engine` للتأكد من التوازن والاشتقاق وعدم وجود أرصدة سالبة.
+
+## FINORA Service Point — Owner Command Center
+
+أضيفت لوحة قيادة يومية للمالك على `/ar/service-point/owner-dashboard` ونسختها الإنجليزية. تجمع لقطة اليوم، Smart Daily Brief، توصيات حتمية مرتبة بالأولوية، خريطة السيولة، ربحية مقدمي الخدمة، أداء الكاشير، مقارنة الفترات، تقرير طباعة/PDF، ومقارنة المحلات. تعمل كلها من بيانات `localStorage` الحالية من دون Backend أو AI API أو خدمة مدفوعة. الحدود التجارية في `data/service-point-owner-config.ts`، والمحرك في `lib/pos/recommendations.ts`، والتوثيق التفصيلي في `docs/service-point-owner-command-center.md`.

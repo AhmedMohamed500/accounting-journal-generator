@@ -2,7 +2,7 @@ import { beforeEach,describe,expect,it } from "vitest";
 import { annualPlanPrice,servicePointCommercialConfig } from "@/data/service-point-plans";
 import { activationRequestCode,canLocalRole,createLocalTrial,effectiveSubscriptionStatus,hashLocalPin,planPrice,trialDaysRemaining } from "@/lib/pos/demo";
 import { appendLocalAudit,createLocalUser,exportServicePointBackup,loadLocalAudit,loadLocalUsers,parseServicePointBackup,resetSalesDemo,restoreServicePointBackup,saveServicePointSettings,seedSalesDemo,verifyLocalPin } from "@/lib/storage/service-point-demo";
-import { createPosStore,loadPosOperations,loadPosStores } from "@/lib/storage/pos";
+import { createPosStore,loadPosOperations,loadPosShifts,loadPosStores } from "@/lib/storage/pos";
 
 describe("Service Point Zero-Cost Demo Edition",()=>{
  beforeEach(()=>localStorage.clear());
@@ -14,6 +14,7 @@ describe("Service Point Zero-Cost Demo Edition",()=>{
  it("stores salted PIN hashes and verifies them",async()=>{const user=await createLocalUser("Cashier","cashier","1234");expect(user.pinHash).not.toContain("1234");expect(user.pinHash).toBe(await hashLocalPin("1234",user.pinSalt));expect(await verifyLocalPin(user,"1234")).toBe(true);expect(await verifyLocalPin(user,"9999")).toBe(false);expect(loadLocalUsers()).toHaveLength(1);});
  it("records local audit events",()=>{appendLocalAudit("open-shift","shift","Shift 1");expect(loadLocalAudit()[0]).toMatchObject({action:"open-shift",entity:"shift",details:"Shift 1"});});
  it("keeps sales demo data isolated from an existing store",()=>{const real=createPosStore("Real Store"),demo=seedSalesDemo();expect(demo.id).not.toBe(real.id);expect(loadPosOperations(demo.id).length).toBeGreaterThan(3);resetSalesDemo();expect(loadPosStores().map(x=>x.id)).toContain(real.id);expect(loadPosStores().map(x=>x.id)).not.toContain(demo.id);});
+ it("seeds a coherent owner sales story",()=>{const demo=seedSalesDemo(),operations=loadPosOperations(demo.id),shifts=loadPosShifts(demo.id),open=shifts.find(x=>x.status==="open")!;expect(operations.filter(x=>x.status==="pending")).toHaveLength(2);expect(shifts.some(x=>x.status==="closed"&&Math.abs((x.actualClosingCash||0)-x.openingCash)>0)).toBe(true);expect(open.providers.find(x=>x.providerId==="fawry")?.openingBalance).toBeLessThan(2000);expect(open.providers.find(x=>x.providerId==="vodafone-cash")?.openingBalance).toBeGreaterThan(15000);});
  it("exports, previews, and restores a complete local backup",async()=>{saveServicePointSettings({schemaVersion:1,onboardingComplete:true,profileMode:"empty",businessName:"Test Business",enabledProviders:["fawry"],salesDemoMode:false,tourComplete:true,demoStoreIds:[]});createPosStore("Branch 1");await createLocalUser("Owner","owner","5678");const exported=exportServicePointBackup(),parsed=parseServicePointBackup(JSON.stringify(exported));expect(parsed.businessName).toBe("Test Business");expect(parsed.stores).toHaveLength(1);localStorage.clear();restoreServicePointBackup(parsed);expect(loadPosStores()).toHaveLength(1);expect(loadLocalUsers()).toHaveLength(1);});
  it("rejects a backup from another product",()=>expect(()=>parseServicePointBackup('{"product":"other","schemaVersion":1,"stores":[],"storeData":{}}')).toThrow(/Invalid/));
 });

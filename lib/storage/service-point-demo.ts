@@ -1,6 +1,6 @@
 import { posProviders } from "@/data/pos";
 import { servicePointCommercialConfig } from "@/data/service-point-plans";
-import { calculatePosOperation, createPosJournalEntry } from "@/lib/pos/engine";
+import { calculatePosOperation, calculatePosShiftSnapshot, createPosJournalEntry } from "@/lib/pos/engine";
 import { createLocalTrial, hashLocalPin } from "@/lib/pos/demo";
 import type { LocalAuditEntry, LocalRole, LocalSubscription, LocalUser, ServicePointBackup, ServicePointDemoSettings } from "@/types/service-point-demo";
 import type { PosShift } from "@/types";
@@ -37,15 +37,27 @@ export function seedSalesDemo(){
   const settings=loadServicePointSettings();
   const existing=settings.demoStoreIds?.map(id=>loadPosStores().find(x=>x.id===id)).find(Boolean);
   if(existing){setActivePosStoreId(existing.id);return existing;}
-  const store=createPosStore("FINORA Demo Store"),now=new Date(),date=now.toISOString().slice(0,10);
-  const shift:PosShift={id:crypto.randomUUID(),storeName:store.name,cashierName:"أحمد — Demo",businessDate:date,openedAt:new Date(now.getTime()-4*3_600_000).toISOString(),status:"open",openingCash:5000,providers:posProviders.map((provider,index)=>({providerId:provider.id,openingBalance:[8000,6500,4200,3100,2800,2200,3500][index]}))};
+  const store=createPosStore("FINORA Demo Store"),now=new Date(),date=now.toISOString().slice(0,10),yesterday=new Date(now.getTime()-86_400_000).toISOString().slice(0,10);
+  const shift:PosShift={id:crypto.randomUUID(),storeName:store.name,cashierName:"أحمد — Demo",businessDate:date,openedAt:new Date(now.getTime()-4*3_600_000).toISOString(),status:"open",openingCash:5000,providers:posProviders.map((provider,index)=>({providerId:provider.id,openingBalance:[1600,20000,4200,3100,2800,2200,3500][index]}))};
   const specs=[
     ["fawry",850,8,2,"FWR-1031"],["vodafone-cash",1200,15,3,"VFC-8842"],["orange-cash",500,7,1,"ORG-2201"],["fawry",330,5,1,"FWR-1045"],["aman",700,10,2,"AMN-7751"],
   ] as const;
   const operations=specs.map(([providerId,amount,fee,cost,reference],index)=>({...calculatePosOperation({shiftId:shift.id,businessDate:date,type:index===3?"bill-payment":"send-transfer",providerId,amount,customerFee:fee,providerCost:cost,reference}),at:new Date(now.getTime()-(index+1)*28*60_000).toISOString(),status:"successful" as const}));
-  const pending={...calculatePosOperation({shiftId:shift.id,businessDate:date,type:"recharge",providerId:"etisalat-cash",amount:250,customerFee:5,providerCost:1,reference:"ET-PENDING"}),status:"pending" as const};
-  const entries=operations.map(operation=>({...createPosJournalEntry(operation),workflowStatus:"posted" as const}));
-  savePosShifts(store.id,[shift]);savePosOperations(store.id,[pending,...operations]);savePosEntries(store.id,entries);
+  const pending=[
+    {...calculatePosOperation({shiftId:shift.id,businessDate:date,type:"recharge",providerId:"etisalat-cash",amount:250,customerFee:5,providerCost:1,reference:"ET-PENDING"}),at:new Date(now.getTime()-95*60_000).toISOString(),status:"pending" as const},
+    {...calculatePosOperation({shiftId:shift.id,businessDate:date,type:"bill-payment",providerId:"aman",amount:180,customerFee:4,providerCost:1,reference:"AM-PENDING"}),at:new Date(now.getTime()-18*60_000).toISOString(),status:"pending" as const},
+  ];
+  const previousShift:PosShift={id:crypto.randomUUID(),storeName:store.name,cashierName:"سارة — Demo",businessDate:yesterday,openedAt:new Date(now.getTime()-30*3_600_000).toISOString(),closedAt:new Date(now.getTime()-22*3_600_000).toISOString(),status:"closed",openingCash:4200,providers:posProviders.map((provider,index)=>({providerId:provider.id,openingBalance:[5200,9000,4000,3400,3200,2600,3000][index]}))};
+  const previousOperations=[
+    {...calculatePosOperation({shiftId:previousShift.id,businessDate:yesterday,type:"send-transfer",providerId:"fawry",amount:1100,customerFee:15,providerCost:3,reference:"FWR-Y-01"}),at:new Date(now.getTime()-27*3_600_000).toISOString(),status:"successful" as const},
+    {...calculatePosOperation({shiftId:previousShift.id,businessDate:yesterday,type:"cash-withdrawal",providerId:"vodafone-cash",amount:700,customerFee:12,providerCost:2,reference:"VFC-Y-02"}),at:new Date(now.getTime()-25*3_600_000).toISOString(),status:"successful" as const},
+  ];
+  const previousSnapshot=calculatePosShiftSnapshot(previousShift,previousOperations);
+  previousShift.actualClosingCash=previousSnapshot.expectedCash-18;
+  previousShift.providers=previousShift.providers.map(provider=>({...provider,actualClosingBalance:previousSnapshot.expectedProviders[provider.providerId]}));
+  const allOperations=[...pending,...operations,...previousOperations];
+  const entries=[...operations,...previousOperations].map(operation=>({...createPosJournalEntry(operation),workflowStatus:"posted" as const}));
+  savePosShifts(store.id,[shift,previousShift]);savePosOperations(store.id,allOperations);savePosEntries(store.id,entries);
   saveServicePointSettings({...settings,salesDemoMode:true,demoStoreIds:[...(settings.demoStoreIds||[]),store.id]});
   appendLocalAudit("seed-demo","store",`Created isolated sales demo: ${store.name}`);return store;
 }
