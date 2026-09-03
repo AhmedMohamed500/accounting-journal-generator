@@ -9,6 +9,8 @@ import { MerchantAccountingCenter } from "@/components/pos/merchant-accounting-c
 import { ServicePointControl } from "@/components/pos/service-point-control";
 import { calculatePosOperation, calculatePosShiftSnapshot, createPosJournalEntry, createPosReversal, createPosReversalJournalEntry, createPosVarianceEntry, isDuplicatePosOperation } from "@/lib/pos/engine";
 import { createPosStore, loadActivePosStoreId, loadPosEntries, loadPosOperations, loadPosShifts, loadPosStores, migrateLegacyPosData, openPosShift, savePosEntry, savePosOperation, savePosOperations, setActivePosStoreId, updatePosShift, updatePosStore } from "@/lib/storage/pos";
+import { appendLocalAudit, currentLocalUser } from "@/lib/storage/service-point-demo";
+import { canLocalRole } from "@/lib/pos/demo";
 
 import type { GeneratedJournalEntry, Locale, PosOperation, PosOperationStatus, PosOperationType, PosProviderId, PosShift, PosStore } from "@/types";
 
@@ -18,6 +20,8 @@ const emptyBalances = () => Object.fromEntries(posProviders.map((provider) => [p
 
 export function ServicePointCenter({ locale }: { locale: Locale }) {
   const ar = locale === "ar";
+  const localUser=currentLocalUser();
+  const allowed=(permission:Parameters<typeof canLocalRole>[1])=>!localUser||canLocalRole(localUser.role,permission);
   const [stores, setStores] = useState<PosStore[]>([]), [activeStoreId, setActiveStore] = useState(""), [newStoreName, setNewStoreName] = useState("");
   const [shifts, setShifts] = useState<PosShift[]>([]), [operations, setOperations] = useState<PosOperation[]>([]), [entries, setEntries] = useState<GeneratedJournalEntry[]>([]), [message, setMessage] = useState("");
   const [cashierName, setCashierName] = useState(""), [openingCash, setOpeningCash] = useState(""), [openingProviders, setOpeningProviders] = useState(emptyBalances);
@@ -46,13 +50,15 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
   })();
 
   const openShift = () => {
+    if(!allowed("manage-shifts")){setMessage(ar?"المستخدم الحالي لا يملك صلاحية فتح الوردية.":"Current user cannot open shifts.");return;}
     if (!activeStore || !cashierName.trim()) { setMessage(ar ? "أنشئ محلًا واختره ثم اكتب اسم الكاشير." : "Create and select a store, then enter the cashier name."); return; }
     const shift: PosShift = { id: crypto.randomUUID(), storeName: activeStore.name, cashierName: cashierName.trim(), businessDate: today(), openedAt: new Date().toISOString(), status: "open", openingCash: Number(openingCash) || 0, providers: posProviders.map((provider) => ({ providerId: provider.id, openingBalance: Number(openingProviders[provider.id]) || 0 })) };
-    try { openPosShift(activeStoreId, shift); setMessage(ar ? "تم فتح الوردية وحفظ أرصدة البداية." : "Shift opened with opening balances."); refresh(activeStoreId); }
+    try { openPosShift(activeStoreId, shift); appendLocalAudit("open-shift","shift",`${activeStore.name} — ${cashierName.trim()}`); setMessage(ar ? "تم فتح الوردية وحفظ أرصدة البداية." : "Shift opened with opening balances."); refresh(activeStoreId); }
     catch (error) { setMessage(error instanceof Error ? error.message : "Could not open shift"); }
   };
 
   const recordOperation = () => {
+    if(!allowed("create-operation")){setMessage(ar?"المستخدم الحالي لا يملك صلاحية تسجيل العمليات.":"Current user cannot create operations.");return;}
     if (!activeShift || !snapshot) return;
     try {
       const internalTransfer = operationType === "internal-provider-transfer";
@@ -65,25 +71,27 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
       if (isDuplicatePosOperation(operations,prepared)) throw new Error(ar?"تنبيه: توجد معاملة مطابقة بالقيمة والمسار والمرجع خلال وقت قصير. راجعها قبل إعادة التسجيل.":"A matching recent transaction already exists. Review it before recording again.");
       if (operationStatus === "successful") { const entry = savePosEntry(activeStoreId, createPosJournalEntry(prepared)); savePosOperation(activeStoreId, { ...prepared, entryId: entry.id }); }
       else savePosOperation(activeStoreId, prepared);
-      refresh(activeStoreId);
+      appendLocalAudit("create-transaction","operation",`${operationType} — ${calculated.amount} — ${calculated.reference||calculated.id}`);refresh(activeStoreId);
       setAmount(""); setCustomerFee(""); setProviderCost(""); setReference("");
       setMessage(operationStatus === "successful" ? (internalTransfer ? (ar ? `تم نقل ${money(calculated.amount)} بين الرصيدين دون تغيير الخزنة أو صافي الربح.` : `Transferred ${money(calculated.amount)} between balances with no cash or profit impact.`) : (ar ? `تم تسجيل العملية وترحيل القيد. صافي الربح ${money(calculated.profit)}.` : `Operation posted. Net profit ${money(calculated.profit)}.`)) : (ar?`تم حفظ العملية بحالة ${operationStatus==="pending"?"معلقة":"فاشلة"} دون تحريك الأرصدة أو إنشاء قيد.`:`Operation saved as ${operationStatus} without balance movement or posting.`));
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not record operation"); }
   };
 
   const changePendingStatus=(operation:PosOperation,status:"successful"|"failed")=>{
+    if(!allowed("create-operation")){setMessage(ar?"لا توجد صلاحية لاعتماد العملية.":"Permission required.");return;}
     if(operation.status!=="pending")return;
     if(status==="successful"){
       const entry=savePosEntry(activeStoreId,createPosJournalEntry({...operation,status}));
       savePosOperations(activeStoreId,operations.map((item)=>item.id===operation.id?{...item,status,entryId:entry.id}:item));
     }else savePosOperations(activeStoreId,operations.map((item)=>item.id===operation.id?{...item,status}:item));
-    refresh(activeStoreId);setMessage(ar?(status==="successful"?"تم اعتماد العملية المعلقة وترحيل قيدها.":"تم تعليم العملية كفاشلة دون التأثير على الأرصدة."):`Operation marked ${status}.`);
+    appendLocalAudit("approve-pending","operation",`${operation.id} → ${status}`);refresh(activeStoreId);setMessage(ar?(status==="successful"?"تم اعتماد العملية المعلقة وترحيل قيدها.":"تم تعليم العملية كفاشلة دون التأثير على الأرصدة."):`Operation marked ${status}.`);
   };
   const reverseOperation=(operation:PosOperation)=>{
+    if(!allowed("reverse-operation")){setMessage(ar?"المستخدم الحالي لا يملك صلاحية الاسترداد.":"Current user cannot reverse operations.");return;}
     if((operation.status||"successful")!=="successful"||operation.reversalOfOperationId)return;
     const originalEntry=entries.find((entry)=>entry.id===operation.entryId);if(!originalEntry)return setMessage(ar?"تعذر العثور على القيد الأصلي؛ لم يتم الاسترداد.":"Original entry not found; reversal was not created.");
     const reversal=createPosReversal(operation),reversalEntry=createPosReversalJournalEntry(originalEntry,reversal),savedEntry=savePosEntry(activeStoreId,reversalEntry),savedReversal={...reversal,entryId:savedEntry.id};
-    savePosOperations(activeStoreId,[savedReversal,...operations.map((item)=>item.id===operation.id?{...item,status:"reversed" as const,reversedByOperationId:savedReversal.id}:item)]);refresh(activeStoreId);setMessage(ar?"تم إنشاء حركة وقيد عكسيين، ولم تُحذف العملية الأصلية.":"A reversing operation and entry were created; the original was retained.");
+    savePosOperations(activeStoreId,[savedReversal,...operations.map((item)=>item.id===operation.id?{...item,status:"reversed" as const,reversedByOperationId:savedReversal.id}:item)]);appendLocalAudit("reverse-transaction","operation",`${operation.id} → ${savedReversal.id}`);refresh(activeStoreId);setMessage(ar?"تم إنشاء حركة وقيد عكسيين، ولم تُحذف العملية الأصلية.":"A reversing operation and entry were created; the original was retained.");
   };
   const printReceipt=(operation:PosOperation)=>setReceiptOperation(operation);
   const saveLogo=(file?:File)=>{if(!file||!activeStore)return;if(!file.type.startsWith("image/")||file.size>1_500_000)return setMessage(ar?"اختر صورة شعار بحجم أقل من 1.5 ميجابايت.":"Choose a logo image smaller than 1.5 MB.");const reader=new FileReader();reader.onload=()=>{updatePosStore(activeStore.id,{logoDataUrl:String(reader.result)});setStores(loadPosStores());setMessage(ar?"تم حفظ شعار المحل وسيظهر في التقارير والإيصالات.":"Store logo saved for reports and receipts.");};reader.readAsDataURL(file);};
@@ -97,11 +105,12 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
   const closingSnapshot = activeShift && actualCash !== "" ? calculatePosShiftSnapshot(activeShift, operations, Number(actualCash), Object.fromEntries(posProviders.map((provider) => [provider.id, Number(actualProviders[provider.id])])) as Record<PosProviderId, number>) : undefined;
 
   const closeShift = () => {
+    if(!allowed("manage-shifts")){setMessage(ar?"المستخدم الحالي لا يملك صلاحية إقفال الوردية.":"Current user cannot close shifts.");return;}
     if (!activeShift || !closingSnapshot) { setMessage(ar ? "اضغط تجهيز الإقفال وأدخل الأرصدة الفعلية." : "Prepare closing and enter actual balances."); return; }
     try {
       const varianceEntry = createPosVarianceEntry(activeShift, closingSnapshot); if (varianceEntry) savePosEntry(activeStoreId, varianceEntry);
       updatePosShift(activeStoreId, { ...activeShift, status: "closed", closedAt: new Date().toISOString(), actualClosingCash: Number(actualCash), providers: activeShift.providers.map((item) => ({ ...item, actualClosingBalance: Number(actualProviders[item.providerId]) })) });
-      setMessage(ar ? `تم إقفال الوردية. إجمالي فرق الجرد ${money(closingSnapshot.totalVariance || 0)}.` : `Shift closed. Total variance ${money(closingSnapshot.totalVariance || 0)}.`); setActualCash(""); refresh(activeStoreId);
+      appendLocalAudit("close-shift","shift",`${activeShift.id} — variance ${closingSnapshot.totalVariance||0}`);setMessage(ar ? `تم إقفال الوردية. إجمالي فرق الجرد ${money(closingSnapshot.totalVariance || 0)}.` : `Shift closed. Total variance ${money(closingSnapshot.totalVariance || 0)}.`); setActualCash(""); refresh(activeStoreId);
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not close shift"); }
   };
 
@@ -137,7 +146,7 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
     <ServicePointControl locale={locale} shifts={shifts} operations={operations}/>
     <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5"><Metric icon={Banknote} title={ar ? "الخزنة المتوقعة" : "Expected cash"} value={money(snapshot!.expectedCash)}/><Metric icon={WalletCards} title={ar ? "أرصدة الخدمات" : "Provider balances"} value={money(Object.values(snapshot!.expectedProviders).reduce((sum,value)=>sum+value,0))}/><Metric icon={ReceiptText} title={ar ? "إيراد العمولات" : "Commission revenue"} value={money(snapshot!.revenue)}/><Metric icon={Landmark} title={ar ? "تكلفة الخدمات" : "Provider costs"} value={money(snapshot!.expenses)}/><Metric icon={BarChart3} title={ar ? "عدد العمليات" : "Operations"} value={String(snapshot!.operationCount)}/></section>
 
-    <section className="card">
+    <section className="card" id="new-operation">
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-blue-50 text-daftar-primary dark:bg-blue-950/40"><PlusCircle size={22}/></span>
         <div>
@@ -181,7 +190,7 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
         </label>
         <div className="min-w-0">
           <span className="mb-2 block min-h-11"><b className="block text-sm leading-5">{ar ? "اعتماد العملية" : "Post transaction"}</b>{ar && <small dir="ltr" lang="en" className="mt-1 block text-start text-xs font-medium text-daftar-muted">Post transaction</small>}</span>
-          <button className="btn btn-primary h-[56px] w-full whitespace-nowrap px-5 text-base" onClick={recordOperation}><ReceiptText size={19}/><span>{ar ? "تسجيل وترحيل" : "Record and post"}</span></button>
+          <button disabled={!allowed("create-operation")} className="btn btn-primary h-[56px] w-full whitespace-nowrap px-5 text-base" onClick={recordOperation}><ReceiptText size={19}/><span>{ar ? "تسجيل وترحيل" : "Record and post"}</span></button>
         </div>
       </div>
       {operationPreview&&<div className="mt-5 grid gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 md:grid-cols-4" data-no-bilingual><ReportTotal label={ar?"تأثير الخزنة":"Cash impact"} value={money(operationPreview.cashChange)}/><ReportTotal label={ar?"تأثير رصيد الخدمة":"Provider impact"} value={money(operationPreview.providerBalanceChange)}/><ReportTotal label={ar?"إيراد العمولة":"Fee revenue"} value={money(operationPreview.revenue)}/><ReportTotal label={ar?"صافي الربح المتوقع":"Expected profit"} value={money(operationPreview.profit)}/><p className="md:col-span-4 text-sm text-blue-900">{ar?"هذه معاينة قبل الحفظ. لن تتحرك الأرصدة ولن يُنشأ القيد إلا بعد الضغط على «تسجيل وترحيل».":"Preview only. Balances and entries change only after posting."}</p></div>}

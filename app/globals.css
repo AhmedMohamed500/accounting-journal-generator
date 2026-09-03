@@ -140,9 +140,10 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { max-width:100%; overflow-x:hidden; scroll-behavior: smooth; }
   body {
     @apply m-0 min-h-screen font-sans;
+    max-width:100%; overflow-x:hidden;
     background: var(--bg);
     color: var(--text);
   }
@@ -800,6 +801,15 @@
   .course-curriculum-head,.practice-hero { align-items:stretch; flex-direction:column; }.course-lesson-row { grid-template-columns:36px 1fr 18px; gap:10px; }.lesson-duration,.lesson-score { display:none; }
   .lesson-content { padding:0 2px; }.lesson-heading { flex-direction:column; }.lesson-heading h1 { font-size:1.85rem; }.lesson-block { padding:21px; }.quiz-choices,.practice-options { grid-template-columns:1fr; }.quiz-result,.practice-feedback { align-items:flex-start; flex-direction:column; }.lesson-navigation { grid-template-columns:1fr; }.lesson-navigation > span { display:none; }
   .practice-card,.practice-result { padding:28px 20px; }.practice-scorebar { grid-template-columns:1fr auto; }.practice-scorebar .academy-progress-track { grid-column:1/-1; grid-row:2; }.practice-card > h2 { font-size:2rem; }
+}
+
+/* Service Point demo pages must remain usable down to 320px in both RTL and LTR. */
+.sp-demo-shell,.sp-demo-shell main{max-width:100%;overflow-x:hidden}
+.sp-demo-shell *,.sp-demo-shell main *{min-width:0}
+@media(max-width:430px){
+  .sp-demo-shell h1,.sp-demo-shell h2,.sp-demo-shell h3{overflow-wrap:anywhere}
+  .sp-demo-shell .card{padding:15px}
+  .sp-demo-shell .btn{min-height:44px;padding-inline:12px}
 }
 }
 

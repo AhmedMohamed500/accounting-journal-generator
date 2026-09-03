@@ -16,6 +16,7 @@ export * from "./scenarios";
 export * from "./academy";
 export * from "./arena";
 export * from "./pos";
+export * from "./service-point-demo";
 export * from "./vat";
 export * from "./accounting-office";
 export * from "./merchant";
