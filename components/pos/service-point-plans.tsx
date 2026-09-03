@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Check, Cloud, Copy, Crown, ShieldCheck, Sparkles, X } from "lucide-react";
 import { servicePointCommercialConfig } from "@/data/service-point-plans";
 import { activationRequestCode, planPrice } from "@/lib/pos/demo";
-import { appendLocalAudit, loadLocalSubscription, saveLocalSubscription } from "@/lib/storage/service-point-demo";
+import { appendLocalAudit, loadLocalSubscription, loadServicePointSettings, saveLocalSubscription } from "@/lib/storage/service-point-demo";
 import type { Locale } from "@/types";
 import type { PlanId } from "@/types/service-point-demo";
 
@@ -17,6 +17,7 @@ export function ServicePointPlans({ locale }: { locale: Locale }) {
   const plans = servicePointCommercialConfig.plans;
   const chosen = useMemo(() => plans.find((item) => item.id === selected), [plans, selected]);
   const choose = (id: PlanId) => { setSelected(id); setCode(activationRequestCode(id)); };
+  const copyRequest = async () => { if (!chosen) return; const business = loadServicePointSettings().businessName || "FINORA Local Demo", text = `FINORA Subscription Request\nBusiness: ${business}\nPlan: ${chosen.nameEn}\nCycle: ${cycle}\nRequest Code: ${code}`; await copyWithFallback(text); };
 
   return <main className="min-h-screen overflow-x-hidden bg-[#f4f7fb] px-3 py-8 text-slate-950" dir={ar ? "rtl" : "ltr"}>
     <div className="mx-auto max-w-6xl">
@@ -48,10 +49,12 @@ export function ServicePointPlans({ locale }: { locale: Locale }) {
         <div className="flex justify-between"><div><small className="text-blue-700">{ar ? "طلب تفعيل يدوي" : "Manual activation request"}</small><h2 className="mt-1">{ar ? chosen.nameAr : chosen.nameEn}</h2></div><button onClick={() => setSelected(undefined)}><X/></button></div>
         <div className="mt-5 grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 p-4"><span>{ar ? "شهري" : "Monthly"}<b className="block">{chosen.monthlyPrice.toLocaleString()} {ar ? "ج.م" : "EGP"}</b></span><span>{ar ? "سنوي" : "Annual"}<b className="block">{planPrice(chosen, "annual").toLocaleString()} {ar ? "ج.م" : "EGP"}</b></span></div>
         <p className="mt-5 text-sm leading-7 text-slate-600">{ar ? "للتفعيل تواصل مع FINORA وأرسل كود الطلب التالي. هذا الكود تجربة بيع وليس نظام ترخيص أمنيًا." : "Contact FINORA and send this request code. It is a sales aid, not a secure license."}</p>
-        <button className="mt-4 flex w-full items-center justify-between rounded-2xl border border-dashed border-blue-400 bg-blue-50 p-4 font-mono font-bold text-blue-950" onClick={() => navigator.clipboard?.writeText(code)}><span dir="ltr">{code}</span><Copy size={18}/></button>
+        <button className="mt-4 flex w-full items-center justify-between rounded-2xl border border-dashed border-blue-400 bg-blue-50 p-4 font-mono font-bold text-blue-950" onClick={copyRequest}><span dir="ltr">{code}</span><span className="flex items-center gap-2 font-sans text-xs"><Copy size={18}/>{ar?"نسخ طلب الاشتراك":"Copy request"}</span></button>
         <button className="btn btn-primary mt-5 w-full" onClick={() => { const subscription = loadLocalSubscription(); saveLocalSubscription({ ...subscription, currentPlan: chosen.id, billingCycle: cycle, subscriptionStatus: "active-demo", activationCode: code }); appendLocalAudit("select-plan", "subscription", `${chosen.id} ${cycle} — ${code}`); setSelected(undefined); }}><Sparkles/>{ar ? "معاينة التفعيل اليدوي" : "Preview manual activation"}</button>
         <p className="mt-3 text-center text-xs text-amber-700">{ar ? "لا توجد بوابة دفع أو عملية تحصيل داخل هذه النسخة." : "No payment gateway or charge is made in this edition."}</p>
       </section>
     </div>}
   </main>;
 }
+
+async function copyWithFallback(text:string){try{await navigator.clipboard.writeText(text);return true;}catch{const area=document.createElement("textarea");area.value=text;area.style.position="fixed";area.style.opacity="0";document.body.appendChild(area);area.select();const copied=document.execCommand("copy");area.remove();return copied;}}

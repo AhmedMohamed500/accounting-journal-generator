@@ -17,6 +17,7 @@ export * from "./academy";
 export * from "./arena";
 export * from "./pos";
 export * from "./service-point-demo";
+export * from "./sales-demo";
 export * from "./pos-owner";
 export * from "./vat";
 export * from "./accounting-office";

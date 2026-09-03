@@ -1,5 +1,9 @@
 # FINORA — Accounting Operations Platform
 
+## Installable Service Point demo
+
+FINORA Service Point now includes an installable local-first PWA and a deterministic seven-step sales demo at `/ar/service-point/demo` and `/en/service-point/demo`. It exercises the real shift, transaction, recommendation, and close engines while keeping demo data isolated. See [the PWA and interactive demo guide](docs/service-point-pwa-sales-demo.md).
+
 > Last updated: 3 September 2026
 
 ## FINORA Arena

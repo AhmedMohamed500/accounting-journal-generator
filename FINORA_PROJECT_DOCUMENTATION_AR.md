@@ -1,5 +1,9 @@
 # FINORA — التوثيق الشامل للمشروع
 
+## FINORA PWA & Interactive Sales Demo
+
+أصبح Service Point قابلًا للتثبيت كتطبيق PWA مع Manifest وأيقونات وService Worker وصفحة Offline وتحديث آمن لا يحذف البيانات المحلية. المسار `/ar/service-point/demo` (والنسخة الإنجليزية) يقدم جولة مبيعات تفاعلية من سبع خطوات تستخدم محركات العمليات والورديات والتوصيات الفعلية، وتحفظ التقدم في Dataset تجريبية معزولة قابلة لإعادة الضبط. دليل التنفيذ والتشغيل الكامل في `docs/service-point-pwa-sales-demo.md`.
+
 > آخر تحديث: 3 سبتمبر 2026 — إضافة FINORA Service Point Zero-Cost Demo Edition.
 
 ## FINORA Service Point — Zero-Cost Demo Edition
