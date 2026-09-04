@@ -27,7 +27,12 @@ export function ArenaWorkspace({ locale }: { locale: Locale; mode?: "dashboard" 
   const completedLines = lines.filter((line): line is ArenaTaskLine => Boolean(line.accountCode && line.side && line.amount > 0));
   const validation = validateArenaJournal(completedLines), exact = isExactTaskAnswer(task, completedLines);
   const updateLine = (index: number, patch: Partial<ArenaDraftLine>) => setLines((current) => current.map((line, lineIndex) => lineIndex === index ? { ...line, ...patch } : line));
-  useEffect(() => setProfile(loadArenaProfile()), []);
+  useEffect(() => {
+    setProfile(loadArenaProfile());
+    window.scrollTo(0, 0);
+    const frame = window.requestAnimationFrame(() => window.scrollTo(0, 0));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
   const verify = () => { setResult(scoreArenaTask(task, completedLines, hints, 240)); setStep(4); };
   const approve = () => { if (!exact || approved) return; const score = result ?? scoreArenaTask(task, completedLines, hints, 240), attempt: ArenaAttempt = { caseId: task.id, mode: "work-shift", difficulty: task.difficulty, accuracy: score.accountingAccuracy, score: score.total * 10, hintsUsed: hints, durationSeconds: 240, completedAt: new Date().toISOString(), skills: task.skillIds, ranked: true }, next = applyAttempt(profile, attempt); setProfile(next); saveArenaProfile(next); setApproved(true); setStep(5); };
   const reset = () => { setLines(blankJournal()); setStep(0); setHints(0); setResult(undefined); setApproved(false); };
