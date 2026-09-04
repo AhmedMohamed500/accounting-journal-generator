@@ -21,7 +21,7 @@ const today = () => new Date().toISOString();
 
 export function WorkspaceShell({ locale, children }: { locale: Locale; children: React.ReactNode }) {
   const ar = locale === "ar", pathname = usePathname();
-  const publicExperience = pathname === `/${locale}` || pathname.startsWith(`/${locale}/arena`) || pathname.startsWith(`/${locale}/academy`) || pathname.startsWith(`/${locale}/missions`) || pathname.startsWith(`/${locale}/detective`) || pathname.startsWith(`/${locale}/money-flow`) || pathname.startsWith(`/${locale}/service-point`);
+  const publicExperience = pathname === `/${locale}` || pathname.startsWith(`/${locale}/service-point`);
   const [ready, setReady] = useState(false), [workspace, setWorkspace] = useState<WorkspaceData>({ companies: [], branches: [], fiscalYears: [], members: [] });
   const [sessionValid, setSessionValid] = useState(false);
   const [form, setForm] = useState({ companyAr: "", companyEn: "", owner: "", email: "", pin: "" });

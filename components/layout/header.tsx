@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BanknoteArrowDown, BarChart3, BookOpen, BriefcaseBusiness, Building2, ChevronDown, CircleDollarSign, FileBarChart,
-  FileSpreadsheet, GraduationCap, Landmark, Languages, LayoutDashboard, Menu, Moon, Plus, ReceiptText,
+  FileSpreadsheet, Landmark, Languages, LayoutDashboard, Menu, Moon, Plus, ReceiptText,
   ScanText, Settings, ShieldCheck, Sparkles, Store, Users, WalletCards, Workflow, X,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -13,7 +13,7 @@ import type { Locale } from "@/types";
 
 export function Header({ locale }: { locale: Locale }) {
   const { setTheme, resolvedTheme } = useTheme();
-  const pathname = usePathname(), ar = locale === "ar", other = ar ? "en" : "ar", landing = pathname === `/${locale}`, arenaWorkspace = pathname === `/${locale}/arena` || pathname === `/${locale}/arena/career`, learningMode = pathname.startsWith(`/${locale}/arena`) || pathname.startsWith(`/${locale}/missions`) || pathname.startsWith(`/${locale}/money-flow`) || pathname.startsWith(`/${locale}/academy/detective`) || pathname.startsWith(`/${locale}/detective`);
+  const pathname = usePathname(), ar = locale === "ar", other = ar ? "en" : "ar", landing = pathname === `/${locale}`;
   const [open, setOpen] = useState(false), [activeMenu, setActiveMenu] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -56,16 +56,11 @@ export function Header({ locale }: { locale: Locale }) {
   ];
   const activePath = (path: string) => pathname === `/${locale}/${path}` || pathname.startsWith(`/${locale}/${path}/`);
 
-  if (arenaWorkspace) return null;
-
   return <header ref={headerRef} className={`nav no-print ${landing ? "landing-nav" : ""}`} data-no-bilingual><div className="container nav-inner">
     <Link className="brand" href={`/${locale}`}><span className="brand-mark">ف</span><span><b>فينورا</b><small>FINORA</small></span></Link>
-    {learningMode ? <nav className={`nav-links missions-nav-links ${open ? "mobile-open" : ""}`}><Link href={`/${locale}`}>{ar?"الرئيسية":"Home"}</Link><Link href={`/${locale}/arena`}>{ar?"Arena":"Arena"}</Link><Link className={pathname.startsWith(`/${locale}/missions`)?"active":""} href={`/${locale}/missions`}>{ar?"المهمات":"Missions"}</Link><Link className={pathname.startsWith(`/${locale}/money-flow`)?"active":""} href={`/${locale}/money-flow`}>{ar?"تدفق الأموال":"Money Flow"}</Link><Link className={pathname.includes("detective")?"active":""} href={`/${locale}/detective`}>{ar?"المحقق":"Detective"}</Link><Link href={`/${locale}/arena/leaderboard`}>{ar?"الترتيب":"Leaderboard"}</Link><Link href={`/${locale}/arena/profile`}>{ar?"الملف المهني":"Profile"}</Link><Link className="keep btn" href={`/${other}${pathname.slice(3)}`}><Languages size={17}/>{other.toUpperCase()}</Link><button className="btn icon-btn" aria-label={ar?"تغيير المظهر":"Toggle theme"} onClick={()=>setTheme(resolvedTheme==="dark"?"light":"dark")}><Moon size={17}/></button></nav>
-    : landing ? <nav className={`nav-links landing-nav-links ${open ? "mobile-open" : ""}`}>{landingLinks.map(([anchor,labelAr,labelEn])=><a key={anchor} href={`#${anchor}`} onClick={()=>setOpen(false)}>{ar?labelAr:labelEn}</a>)}<Link className="btn" href={`/${locale}/dashboard`}><Sparkles size={16}/>{ar?"دخول النظام":"Open app"}</Link><Link className="keep btn" href={`/${other}`}><Languages size={17}/>{other.toUpperCase()}</Link><button className="btn icon-btn" aria-label={ar?"تغيير المظهر":"Toggle theme"} onClick={()=>setTheme(resolvedTheme==="dark"?"light":"dark")}><Moon size={17}/></button></nav>
+    {landing ? <nav className={`nav-links landing-nav-links ${open ? "mobile-open" : ""}`}>{landingLinks.map(([anchor,labelAr,labelEn])=><a key={anchor} href={`#${anchor}`} onClick={()=>setOpen(false)}>{ar?labelAr:labelEn}</a>)}<Link className="btn" href={`/${locale}/dashboard`}><Sparkles size={16}/>{ar?"دخول النظام":"Open app"}</Link><Link className="keep btn" href={`/${other}`}><Languages size={17}/>{other.toUpperCase()}</Link><button className="btn icon-btn" aria-label={ar?"تغيير المظهر":"Toggle theme"} onClick={()=>setTheme(resolvedTheme==="dark"?"light":"dark")}><Moon size={17}/></button></nav>
     : <nav className={`nav-links app-nav-links categorized-nav ${open ? "mobile-open" : ""}`}>
       <Link className={`nav-home-link ${activePath("dashboard") ? "active" : ""}`} href={`/${locale}/dashboard`} onClick={()=>setOpen(false)}><LayoutDashboard size={18}/>{ar?"لوحة العمل":"Dashboard"}</Link>
-      <Link className={`nav-home-link nav-academy-link ${activePath("arena") ? "active" : ""}`} href={`/${locale}/arena`} onClick={()=>setOpen(false)}><GraduationCap size={18}/>FINORA Arena</Link>
-      <Link className={`nav-home-link ${activePath("missions") ? "active" : ""}`} href={`/${locale}/missions`} onClick={()=>setOpen(false)}><Sparkles size={18}/>{ar?"المهمات":"Missions"}</Link>
       {groups.map((group) => { const GroupIcon=group.icon, groupActive=group.items.some((item)=>activePath(item.path)), expanded=activeMenu===group.labelEn; return <div className={`nav-group ${groupActive?"active":""} ${expanded?"open":""}`} key={group.labelEn}><button type="button" className="nav-group-trigger" aria-expanded={expanded} onClick={()=>setActiveMenu(expanded?null:group.labelEn)}><GroupIcon size={17}/><span>{ar?group.labelAr:group.labelEn}</span><ChevronDown className="nav-chevron" size={15}/></button>{expanded&&<div className="nav-dropdown">{group.items.map((item)=>{const ItemIcon=item.icon;return <Link className={activePath(item.path)?"active":""} key={item.path} href={`/${locale}/${item.path}`} onClick={()=>{setOpen(false);setActiveMenu(null);}}><ItemIcon size={19}/><span><b>{ar?item.ar:item.en}</b><small>{ar?item.descAr:item.descEn}</small></span></Link>;})}</div>}</div>; })}
       <Link className="btn btn-primary nav-new-entry" style={{ color: "#fff" }} href={`/${locale}/generator`} onClick={()=>setOpen(false)}><Plus size={17} color="#fff"/><span style={{ color: "#fff" }}>{ar?"قيد جديد":"New entry"}</span></Link>
       <Link className="keep btn icon-btn" href={`/${other}`} aria-label={ar?"English":"العربية"}><Languages size={17}/><span>{other.toUpperCase()}</span></Link>
