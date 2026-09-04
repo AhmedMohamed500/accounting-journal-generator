@@ -49,7 +49,7 @@ Status vocabulary: **Keep** = unchanged; **Transform** = core idea becomes gamep
 - 6 Academy courses, 28 lessons, 28 knowledge checks, and all embedded examples remain in `data/academy.ts`.
 - 5 Quick Missions in `data/missions.ts`, 5 Detective cases in `data/detective/cases.ts`, and 7 Money Flow scenarios in `data/money-flow/scenarios.ts` are reused rather than duplicated.
 - Journal, posting, ledger, trial balance, statements, receivables, banking, VAT, periods, closing, document, invoice, spreadsheet, and storage engines were reviewed. Arena logic lives separately under `lib/arena/`.
-- Arena reads the canonical account definitions and uses the shared journal validator, but imports no operational storage adapter. Its only persistence key is `finora-training-arena-v1`.
+- Arena reads the canonical account definitions and uses the shared journal validator, but imports no operational storage adapter. Its only persistence key is `finora-training-arena-v2`.
 
 ## Account Nature exception
 

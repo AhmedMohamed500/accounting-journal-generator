@@ -35,9 +35,9 @@ Professional evaluation is configurable in `lib/arena/engine.ts`:
 
 Season 1, Service Company world architecture, Work Shifts, professional Boss Challenges, Company Health, CFO Trust, Daily Challenge, achievement/performance-review models, profile visibility, and future talent-network fields are included as a local-first foundation. The leaderboard uses real sorting logic with demo competitors; live multi-user seasons and employer discovery require a future backend.
 
-Arena reads account definitions from FINORA's existing `data/accounts.ts`, filters them through the shared postability rules, and validates training entries with the existing journal validator. It persists only to `finora-training-arena-v1` and never calls operational journal, company, customer, supplier, bank, VAT, report, or close storage adapters. RTL Arabic, LTR English, tap/select alternatives, and layouts for 320px through desktop are included. See [the Arena game-system guide](docs/arena-game-system.md).
+Arena reads account definitions from FINORA's existing `data/accounts.ts`, filters them through the shared postability rules, and validates training entries with the existing journal validator. It persists only to `finora-training-arena-v2` and never calls operational journal, company, customer, supplier, bank, VAT, report, or close storage adapters. New learners begin with blank journal fields and zero progress; invoice facts and task guidance are shown without pre-filling the answer. RTL Arabic, LTR English, tap/select alternatives, and layouts for 320px through desktop are included. See [the Arena game-system guide](docs/arena-game-system.md).
 
-Release verification: TypeScript, ESLint, and all **349 tests across 57 test files** pass; production-build verification is part of every release.
+Release verification: TypeScript, ESLint, and all **376 tests across 60 test files** pass; production-build verification is part of every release.
 
 آخر تحديث: 2 سبتمبر 2026 — FINORA Money Flow Lab. الحالة الحالية: مكتمل محليًا، ومغطى بالاختبارات، ومتصل بـFINORA Learn وMissions.
 

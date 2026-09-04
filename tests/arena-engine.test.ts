@@ -48,6 +48,7 @@ describe("FINORA Arena professional evaluation",()=>{
 });
 
 describe("Arena architecture and isolation",()=>{
+ it("starts a new learner with no fabricated progress",()=>{const profile=createArenaProfile();expect(profile).toMatchObject({professionalScore:0,accuracy:0,uniqueCases:0,currentStreak:0,cfoTrust:{value:0}});expect(Object.values(profile.companyHealth).every(value=>value===0)).toBe(true);expect(Object.values(profile.skills).every(skill=>skill.score===0)).toBe(true)});
  it("defines all twenty requested skill dimensions including recovery",()=>{expect(skillIds).toHaveLength(20);expect(skillIds).toContain("recovery")});
  it("starts the career from zero and ends with a full cycle",()=>{expect(careerStages[0].id).toBe("why-accounts");expect(careerStages.at(-1)?.id).toBe("full-cycle")});
  it("ships only the active service company world",()=>{expect(serviceWorld).toMatchObject({id:"service-company",active:true})});

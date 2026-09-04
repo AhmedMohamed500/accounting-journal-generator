@@ -22,7 +22,7 @@ The primary workflow is visible at all times: Document → Analysis → Accounts
 
 `data/accounts.ts` is the account source. `lib/arena/account-adapter.ts` creates cloned, training-only cards from active postable leaf accounts. It adds plain-language bilingual descriptions but does not redefine account codes, names, types, normal balances, or posting availability.
 
-Arena journal drafts are passed to `lib/accounting/validation.ts`. The adapter does not import `lib/storage/accounting.ts`, and approval only writes the Arena profile key `finora-training-arena-v1`. Training activity therefore cannot create, edit, post, or close operational company records.
+Arena journal drafts are passed to `lib/accounting/validation.ts`. The adapter does not import `lib/storage/accounting.ts`, and approval only writes the Arena profile key `finora-training-arena-v2`. Training activity therefore cannot create, edit, post, or close operational company records. A new learner starts with zero progress and entirely blank account, side, and amount fields; the interface provides task instructions and source-document facts without pre-filling the journal answer.
 
 ## Current mission
 
