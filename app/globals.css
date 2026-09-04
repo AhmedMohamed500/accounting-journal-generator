@@ -919,6 +919,27 @@ html:has(.arena-reference),body:has(.arena-reference){max-width:100%;overflow-x:
 @media(max-width:1450px) and (min-width:1181px){.arena-ref-grid{grid-template-columns:minmax(190px,17fr) minmax(0,58fr) minmax(270px,25fr)}.arena-ref-center{padding:10px}.arena-accounting-console>*{padding:10px}.arena-ref-top{gap:5px}.arena-ref-top>button{width:38px}.arena-student-guide{grid-template-columns:1fr 1.7fr}.arena-student-guide dl{grid-column:1/-1}}
 
 /* Keep the complete Arena status row visible after refresh, back navigation, or page scrolling. */
-.arena-ref-top{position:sticky;inset-block-start:0;z-index:40;padding-block:8px;background:#f8fbff}
+.arena-ref-top{position:sticky;inset-block-start:0;z-index:40;background:#f8fbff}
+
+/* Compact the desktop composition on short Windows/Chrome viewports without shrinking the text. */
+@media(min-width:1181px) and (max-height:900px){
+  .arena-reference{padding:8px}
+  .arena-ref-top{min-height:44px;margin-bottom:6px;gap:5px}
+  .arena-ref-logo{min-width:138px}.arena-ref-logo>span{width:38px;height:42px}.arena-ref-logo strong{font-size:1.5rem}.arena-ref-logo small{margin-top:2px;font-size:.82rem}
+  .arena-ref-top>nav{gap:6px}.arena-ref-top>nav article{gap:6px;padding:5px 7px}.arena-ref-top>nav article>svg{width:22px;height:22px}
+  .arena-ref-grid,.arena-ref-left,.arena-ref-center,.arena-ref-right{gap:7px}.arena-ref-center,.arena-ref-card{padding:8px}
+  .arena-ref-title{margin-bottom:5px}.arena-ref-title h2{font-size:.88rem}.arena-ref-title p{margin-top:1px}
+  .arena-ref-career>div{gap:4px}.arena-ref-career article{min-height:42px;padding:3px 6px}.arena-ref-career article>span{width:29px;height:29px}.arena-ref-career article{grid-template-columns:33px 1fr 17px}.arena-ref-career>div::before{inset-inline-start:14px}
+  .arena-ref-challenges article{padding:5px;margin-top:4px}.arena-ref-challenges article i{margin-top:4px}.arena-ref-empty{margin:4px 0;padding:5px;line-height:1.35}
+  .arena-operations-title h1{font-size:1.05rem}.arena-operations-title p{margin:1px 0}.arena-operations-title>span{padding:4px 9px}
+  .arena-ref-mission{height:130px;min-height:130px}.arena-ref-mission>div{padding:8px 10px}.arena-ref-mission h2{font-size:1.12rem}.arena-ref-mission p{margin:3px 0 6px}.arena-ref-mission footer>button{min-height:33px}.arena-ref-mission footer>strong{padding:4px 8px}
+  .arena-ref-workflow{gap:6px;padding:4px}.arena-ref-workflow>div{min-height:32px;padding:2px 5px}.arena-ref-workflow>div:not(:last-child)::after{inset-block-start:15px}.arena-ref-workflow b{margin-top:1px}.arena-ref-workflow small{margin-top:0}
+  .arena-student-guide{grid-template-columns:minmax(180px,.8fr) minmax(0,1.6fr) minmax(220px,1fr);gap:7px;padding:6px 9px}.arena-student-guide header>svg{width:20px}.arena-student-guide header small,.arena-student-guide ol{line-height:1.25}.arena-student-guide ol{gap:1px}.arena-student-guide dl{grid-column:auto}.arena-student-guide dl>div{padding:4px}
+  .arena-accounting-console>*{padding:7px}.arena-ref-accounts header p,.arena-ref-impact header p{margin:2px 0 5px}.arena-ref-accounts>div{gap:4px}.arena-ref-accounts button{min-height:58px;padding:4px}.arena-ref-accounts button svg{width:23px;height:23px}.arena-ref-accounts button b{margin-top:1px}.arena-ref-accounts>a{margin-top:4px}
+  .arena-journal-sides{margin-bottom:3px}.arena-ref-journal>div:nth-child(2){gap:4px}.arena-ref-journal article{grid-template-columns:minmax(0,1fr) 68px 112px;gap:4px;padding:4px}.arena-ref-journal article>select:first-child{grid-column:1}.arena-ref-journal article>select:nth-child(2){grid-column:2}.arena-ref-journal article>label{grid-column:3;grid-row:1}.arena-ref-journal article>em{display:none}.arena-ref-journal select,.arena-ref-journal input{height:29px}.arena-ref-totals{margin-top:4px;padding-top:4px}.arena-ref-journal-actions{margin-top:4px}.arena-ref-journal-actions button{min-height:25px}.arena-ref-journal>button{min-height:33px;margin-top:4px}
+  .arena-ref-cfo{min-height:235px;padding:12px}.arena-ref-cfo h2{margin-bottom:9px;font-size:1rem}.arena-ref-cfo p{font-size:.7rem;line-height:1.55}.arena-ref-cfo>b{margin-top:8px}.arena-ref-cfo>img{inset-block-end:-20px}
+  .arena-ref-readiness{padding:9px}.arena-readiness-score{margin:4px 0 7px;padding:5px}.arena-readiness-score>i{width:46px;height:46px}.arena-readiness-score>i b{width:36px;height:36px}.arena-ref-readiness h3{margin:6px 0 4px}.arena-skill-badges article>span{width:38px;height:42px}.arena-skill-badges svg{width:18px}.arena-skill-badges b{margin-top:2px}
+  .arena-ref-season{position:fixed;z-index:35;inset-inline:8px;inset-block-end:8px;width:auto;max-width:none;min-height:45px;margin:0;padding:5px 14px}.arena-ref-season>div{padding-inline:14px}.arena-ref-season>strong{padding:6px 10px}
+}
 @media(max-width:1180px){.arena-student-guide{grid-template-columns:1fr}.arena-student-guide dl{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:560px){.arena-student-guide dl{grid-template-columns:1fr}.arena-student-guide ol{font-size:.68rem}}
