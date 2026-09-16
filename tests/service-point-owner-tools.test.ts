@@ -1,0 +1,12 @@
+import { describe, expect, it } from "vitest";
+import { calculatePosOperation } from "@/lib/pos/engine";
+import { defaultLocalRules } from "@/lib/pos/local-intelligence";
+import { calculateDailyTargetProgress, calculateHourlyActivity, calculateProfitCalendar, forecastNextOperatingDay, simulateBusiness } from "@/lib/pos/owner-tools";
+import type { PosOperation } from "@/types";
+
+function transaction(date: string, index = 0): PosOperation { return { ...calculatePosOperation({ shiftId: "s1", businessDate: date, type: "send-transfer", providerId: "fawry", amount: 100, customerFee: 10, providerCost: 2 }), at: `${date}T${String(10 + index).padStart(2, "0")}:00:00`, status: "successful" }; }
+describe("owner tools", () => {
+  it("excludes pending and reversed operations from targets and calendar", () => { const operations = [transaction("2026-09-16"), transaction("2026-09-16", 1), { ...transaction("2026-09-16"), status: "pending" as const }, { ...transaction("2026-09-16"), status: "reversed" as const }]; const progress = calculateDailyTargetProgress(operations, defaultLocalRules(), "2026-09-16"); expect(progress).toMatchObject({ profit: 16, transactionCount: 2, pending: 1 }); expect(calculateProfitCalendar(operations, [], "2026-09")[0]).toMatchObject({ profit: 16, transactions: 2 }); });
+  it("keeps scenarios out of original operations and refuses thin history", () => { const operations = [transaction("2026-09-14"), transaction("2026-09-15"), transaction("2026-09-16")]; const before = JSON.stringify(operations); expect(simulateBusiness(operations.slice(0, 2), { feeChange: 2, volumeChangePercent: 20, providerCostChange: 1, expenseChangePercent: 0, additionalShiftCost: 0 })).toBeNull(); expect(simulateBusiness(operations, { feeChange: 2, volumeChangePercent: 0, providerCostChange: 1, expenseChangePercent: 0, additionalShiftCost: 0 })).toMatchObject({ revenue: 36, providerCost: 9, operatingProfit: 27 }); expect(JSON.stringify(operations)).toBe(before); });
+  it("forecasts only after three operating dates and groups activity by hour", () => { const operations = [transaction("2026-09-14"), transaction("2026-09-15"), transaction("2026-09-16")]; expect(forecastNextOperatingDay(operations.slice(0, 2))).toBeNull(); expect(forecastNextOperatingDay(operations)).toMatchObject({ operatingDays: 3, transactions: 1, cashRequirement: 0 }); expect(calculateHourlyActivity(operations.filter((item) => item.businessDate === "2026-09-16"))[10].transactions).toBe(1); });
+});

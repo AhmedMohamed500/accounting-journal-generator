@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, BarChart3, BriefcaseBusiness, Building2, CheckCircle2, Copy, Eye, EyeOff, FileDown, Gauge, Home, Info, Layers3, ListFilter, LockKeyhole, PlusCircle, Printer, RefreshCw, ShieldAlert, Sparkles, Store, Users, WalletCards } from "lucide-react";
 import { posProviders } from "@/data/pos";
+import { ServicePointOwnerTools } from "@/components/pos/service-point-owner-tools";
 import { calculatePosCommandCenter } from "@/lib/pos/analytics";
 import { calculatePosShiftSnapshot } from "@/lib/pos/engine";
 import { buildOwnerCommandCenter, compareStores, planCanAccess } from "@/lib/pos/recommendations";
@@ -85,6 +86,7 @@ export function OwnerDashboard({ locale }: { locale: Locale }) {
     </div></header>
 
     <main className="mx-auto grid max-w-6xl gap-5 p-3 sm:p-5">
+      <ServicePointOwnerTools locale={locale} input={data.input}/>
       <div className="owner-screen-only flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-950"><span><Info className="me-1 inline" size={14}/>{ar ? "التحليل مبني على بيانات هذا الجهاز فقط. لا توجد مزامنة سحابية في Demo Edition." : "Insights use this device's data only. Demo Edition has no cloud sync."}</span><Link className="font-bold underline" href={`/${locale}/service-point/plans`}>{status === "trial" ? (ar ? `${days} يومًا متبقيًا · ${plan.toUpperCase()}` : `${days} days left · ${plan.toUpperCase()}`) : (ar ? `الباقة: ${plan.toUpperCase()}` : `Plan: ${plan.toUpperCase()}`)}</Link></div>
 
       <section className="overflow-hidden rounded-[2rem] bg-[#082c52] text-white shadow-xl"><div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1.2fr_.8fr]">
