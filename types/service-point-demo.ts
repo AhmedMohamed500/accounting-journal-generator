@@ -48,7 +48,7 @@ export interface LocalSubscription {
 
 export interface ServicePointBackup {
   product: "FINORA Service Point";
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   exportedAt: string;
   businessName: string;
   settings: ServicePointDemoSettings;
@@ -57,4 +57,5 @@ export interface ServicePointBackup {
   subscription: LocalSubscription;
   stores: unknown[];
   storeData: Record<string, { shifts: unknown[]; operations: unknown[]; entries: unknown[] }>;
+  innovationData?: Record<string, unknown>;
 }
