@@ -13,6 +13,38 @@
   --radius-card: 1.125rem;
 }
 
+:root {
+  color-scheme: light;
+  --bg: #f4f6fa;
+  --card: #ffffff;
+  --text: #19263a;
+  --muted: #53647a;
+  --line: #dbe3ed;
+  --primary: #2457a6;
+  --primary-action: #2457a6;
+  --surface-soft: #edf3fb;
+  --surface-success: #e9f5ef;
+  --surface-warning: #fff3e2;
+  --surface-danger: #fcebea;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #0e1724;
+  --card: #192637;
+  --text: #edf2f8;
+  --muted: #b0bfd0;
+  --line: #34465c;
+  --primary: #a4c8ff;
+  --primary-action: #2c61b2;
+  --surface-soft: #223b5b;
+  --surface-success: #173d36;
+  --surface-warning: #48341e;
+  --surface-danger: #482b30;
+}
+
+body { background: var(--bg); color: var(--text); }
+
 /* Tailwind-powered reusable accounting components. */
 @layer components {
   .card {
@@ -27,7 +59,7 @@
     color: var(--text);
   }
   .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px #0b234514; }
-  .btn-primary { background: var(--primary); color: #fff; border-color: transparent; }
+  .btn-primary { background: var(--primary-action); color: #fff; border-color: transparent; }
   .btn-danger { color: #b42318; }
   .grid { @apply grid gap-[1.125rem]; }
   .actions { @apply flex flex-wrap gap-[.5625rem]; }
@@ -525,6 +557,85 @@
   .pos-entry-print { break-inside: avoid; page-break-inside: avoid; }
   .pos-receipt-overlay { position: absolute !important; inset: 0 !important; overflow: visible !important; background: #fff !important; }
   .pos-receipt-paper { width: 90mm !important; margin: 0 auto !important; padding: 8mm !important; }
+}
+
+/* Service Point: a quieter financial palette with matching light and dark surfaces. */
+@media screen {
+  .sp-demo-shell, .owner-command-center { background: var(--bg); color: var(--text); }
+  .sp-onboarding-choice { background: var(--bg); color: var(--text); }
+  .sp-onboarding-choice h1, .sp-onboarding-choice h2 { color: var(--text); }
+  .sp-onboarding-choice p { color: var(--muted); }
+  .sp-onboarding-choice > div > div:first-child > span { background: var(--surface-soft); color: var(--primary); }
+  .sp-onboarding-choice button { border: 1px solid var(--line); background: var(--card); color: var(--text); box-shadow: 0 12px 32px #172b4612; }
+  .sp-onboarding-choice button:hover { border-color: var(--primary); background: var(--surface-soft); }
+  .sp-onboarding-choice button b { color: var(--primary); }
+  .sp-onboarding-choice button p { color: var(--muted); }
+  .sp-onboarding-choice button svg { color: var(--primary); }
+  .sp-onboarding-choice > div > p { color: var(--muted); }
+  .sp-onboarding-setup { background: var(--bg); color: var(--text); }
+  .sp-onboarding-setup > div { border: 1px solid var(--line); background: var(--card); box-shadow: 0 16px 48px #172b4612; }
+  .sp-onboarding-setup h1, .sp-onboarding-setup h2, .sp-onboarding-setup h3 { color: var(--text); }
+  .sp-onboarding-setup .bg-blue-50, .sp-onboarding-setup .bg-slate-100 { background: var(--surface-soft); }
+  .sp-onboarding-setup .text-blue-800 { color: var(--primary); }
+  .sp-onboarding-setup input { border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  .sp-onboarding-setup label.border { border-color: var(--line); }
+  .sp-product-tour { background: var(--card); color: var(--text); }
+  .sp-product-tour h2 { color: var(--text); }
+  .sp-product-tour p, .sp-product-tour .text-slate-500 { color: var(--muted); }
+  .sp-demo-shell .card, #pos-app-root .card { background: var(--card); border-color: var(--line); box-shadow: 0 5px 18px #172b4610; }
+  #pos-app-root h1, #pos-app-root h2, #pos-app-root h3, .owner-command-center h1, .owner-command-center h2, .owner-command-center h3 { color: inherit; }
+  #pos-app-root :is(input:not([type="checkbox"]), select, textarea),
+  .owner-command-center :is(input:not([type="checkbox"]), select, textarea) { border: 1px solid var(--line); background: var(--card); color: var(--text); }
+  #pos-app-root :is(input, select, textarea):focus-visible,
+  .owner-command-center :is(input, select, textarea):focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  #pos-app-root table, .owner-command-center table { color: var(--text); }
+  #pos-app-root th, .owner-command-center th { background: var(--surface-soft); color: var(--text); }
+  #pos-app-root td, #pos-app-root th, .owner-command-center td, .owner-command-center th { border-color: var(--line); }
+  #pos-app-root tr:nth-child(even), .owner-command-center tr:nth-child(even) { background: color-mix(in srgb, var(--card) 85%, var(--bg)); }
+  .owner-command-center .bg-white { background: var(--card); }
+  .owner-command-center > header { background: color-mix(in srgb, var(--card) 94%, transparent); border-color: var(--line); }
+  .owner-command-center .bg-slate-50, .owner-command-center .bg-slate-100 { background: var(--surface-soft); }
+  .owner-command-center .border-slate-200, .owner-command-center .border-slate-300 { border-color: var(--line); }
+  .owner-command-center .text-slate-950, .owner-command-center .text-slate-900 { color: var(--text); }
+  .owner-command-center .text-slate-500, .owner-command-center .text-slate-600, .owner-command-center .text-slate-700 { color: var(--muted); }
+  .owner-command-center .bg-blue-50, #pos-app-root .bg-blue-50 { background: var(--surface-soft); }
+  .owner-command-center .bg-amber-50, #pos-app-root .bg-amber-50 { background: var(--surface-warning); }
+  .owner-command-center .bg-orange-50, #pos-app-root .bg-orange-50 { background: var(--surface-warning); }
+  .owner-command-center .bg-emerald-50, #pos-app-root .bg-emerald-50 { background: var(--surface-success); }
+  .owner-command-center .bg-red-50, #pos-app-root .bg-red-50 { background: var(--surface-danger); }
+  .sp-demo-shell .btn-primary, .owner-command-center .btn-primary { background: var(--primary-action); color: #fff; }
+  .sp-demo-shell .btn:not(.btn-primary), .owner-command-center .btn:not(.btn-primary) { border-color: var(--line); background: var(--card); color: var(--text); }
+  .sp-demo-shell .btn:not(.btn-primary):hover, .owner-command-center .btn:not(.btn-primary):hover { background: var(--surface-soft); }
+  #pos-app-root .sp-shift-hero, .owner-command-center .owner-hero { background: #245079; background-image: none; color: #fff; }
+  .sp-demo-shell .bg-gradient-to-l { background-image: none; background-color: #245079; }
+  .sp-demo-shell .bg-gradient-to-br { background-image: none; background-color: #203d61; }
+  .dark .sp-demo-shell .bg-white, .dark .sp-demo-shell .bg-slate-50 { background: var(--card); }
+  .dark .sp-demo-shell .text-slate-950, .dark .sp-demo-shell .text-slate-900 { color: var(--text); }
+  .dark .sp-demo-shell .text-slate-500, .dark .sp-demo-shell .text-slate-600 { color: var(--muted); }
+  .dark .sp-demo-shell .border-slate-200 { border-color: var(--line); }
+  .dark .sp-demo-shell .bg-blue-50 { background: var(--surface-soft); }
+  .dark .sp-demo-shell .bg-amber-50 { background: var(--surface-warning); }
+  .dark .sp-demo-shell .bg-orange-50 { background: var(--surface-warning); }
+  .dark .sp-demo-shell .bg-emerald-50 { background: var(--surface-success); }
+  .dark .sp-demo-shell .bg-red-50 { background: var(--surface-danger); }
+  .dark .sp-demo-shell .text-blue-900, .dark .sp-demo-shell .text-blue-950,
+  .dark .owner-command-center .text-blue-700, .dark .owner-command-center .text-blue-800,
+  .dark .owner-command-center .text-blue-900, .dark .owner-command-center .text-blue-950 { color: #d5e7ff; }
+  .dark .sp-demo-shell .text-amber-800, .dark .sp-demo-shell .text-amber-900, .dark .sp-demo-shell .text-amber-950,
+  .dark .sp-demo-shell .text-orange-900, .dark #pos-app-root .text-orange-900,
+  .dark .owner-command-center .text-amber-800, .dark .owner-command-center .text-amber-900 { color: #f7d8a4; }
+  .dark .sp-demo-shell .text-emerald-700, .dark .sp-demo-shell .text-emerald-800,
+  .dark .owner-command-center .text-emerald-700, .dark .owner-command-center .text-emerald-800 { color: #9be1c0; }
+  .dark .sp-demo-shell .text-red-700, .dark .sp-demo-shell .text-red-800,
+  .dark .owner-command-center .text-red-700 { color: #ffc0c0; }
+  .dark .owner-command-center .owner-hero, .dark #pos-app-root .sp-shift-hero { background: #253c59; }
+  .dark .sp-demo-shell nav.fixed { background: var(--card); border-color: var(--line); }
+  .dark .sp-demo-shell .card, .dark #pos-app-root .card { box-shadow: none; }
+  .dark .sp-onboarding-choice button, .dark .sp-onboarding-setup > div { box-shadow: none; }
+}
+
+@media print {
+  :root, .dark { --bg: #fff; --card: #fff; --text: #111827; --muted: #4b5563; --line: #d1d5db; }
 }
 
 /* Service Point demo pages must remain usable down to 320px in both RTL and LTR. */
