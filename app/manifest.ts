@@ -3,14 +3,14 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/ar/service-point",
-    name: "FINORA",
-    short_name: "FINORA",
+    name: "Hawally — حوّلي",
+    short_name: "Hawally — حوّلي",
     description: "إدارة نقاط الخدمات والورديات والسيولة والربح محليًا",
     start_url: "/ar/service-point",
     scope: "/",
     display: "standalone",
-    background_color: "#eef3f8",
-    theme_color: "#082c52",
+    background_color: "#f2f8ff",
+    theme_color: "#1687ff",
     orientation: "portrait-primary",
     lang: "ar",
     dir: "rtl",

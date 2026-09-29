@@ -29,7 +29,7 @@ export function planPrice(plan: { monthlyPrice: number }, cycle: "monthly" | "an
 }
 
 export function activationRequestCode(plan: PlanId, seed = Math.random().toString(36).slice(2, 8)) {
-  return `FINORA-${plan.toUpperCase()}-${seed.toUpperCase().padEnd(6, "0").slice(0, 6)}`;
+  return `HAWALLY-${plan.toUpperCase()}-${seed.toUpperCase().padEnd(6, "0").slice(0, 6)}`;
 }
 
 export async function hashLocalPin(pin: string, salt: string) {

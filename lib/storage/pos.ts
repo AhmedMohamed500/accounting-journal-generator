@@ -15,7 +15,7 @@ const storeKey = (key: string, storeId: string) => `${companyKey(key)}:store:${s
 function load<T>(key: string, fallback: T): T { if (typeof window === "undefined") return fallback; try { return JSON.parse(localStorage.getItem(key) || "null") as T || fallback; } catch { return fallback; } }
 function save<T>(key: string, value: T) { localStorage.setItem(key, JSON.stringify(value)); }
 
-export function loadPosStores() { return load<PosStore[]>(catalogKey(POS_STORES_KEY), []); }
+export function loadPosStores() { const stores=load<PosStore[]>(catalogKey(POS_STORES_KEY), []),next=stores.map((store)=>store.name==="FINORA Demo Store"?{...store,name:"Hawally Demo Store"}:store);if(next.some((store,index)=>store.name!==stores[index]?.name))save(catalogKey(POS_STORES_KEY),next);return next; }
 export function savePosStores(stores: PosStore[]) { save(catalogKey(POS_STORES_KEY), stores); }
 export function loadActivePosStoreId() { return localStorage.getItem(catalogKey(POS_ACTIVE_STORE_KEY)) || ""; }
 export function setActivePosStoreId(storeId: string) { localStorage.setItem(catalogKey(POS_ACTIVE_STORE_KEY), storeId); }

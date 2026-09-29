@@ -15,32 +15,37 @@
 
 :root {
   color-scheme: light;
-  --bg: #f4f6fa;
+  --bg: #f2f8ff;
   --card: #ffffff;
-  --text: #19263a;
-  --muted: #53647a;
-  --line: #dbe3ed;
-  --primary: #2457a6;
-  --primary-action: #2457a6;
-  --surface-soft: #edf3fb;
-  --surface-success: #e9f5ef;
-  --surface-warning: #fff3e2;
-  --surface-danger: #fcebea;
+  --text: #102445;
+  --muted: #5f7391;
+  --line: #dceafa;
+  --primary: #1687ff;
+  --primary-action: #1687ff;
+  --accent: #3dd6e8;
+  --surface-soft: #edf6ff;
+  --surface-success: #e9fbf5;
+  --surface-warning: #fff7df;
+  --surface-danger: #fff0f2;
+  --shadow-card: 0 12px 35px #1b70bd12;
+  --radius-card: 1.35rem;
 }
 
 .dark {
   color-scheme: dark;
-  --bg: #0e1724;
-  --card: #192637;
-  --text: #edf2f8;
-  --muted: #b0bfd0;
-  --line: #34465c;
-  --primary: #a4c8ff;
-  --primary-action: #2c61b2;
-  --surface-soft: #223b5b;
-  --surface-success: #173d36;
-  --surface-warning: #48341e;
-  --surface-danger: #482b30;
+  --bg: #081426;
+  --card: #10233c;
+  --text: #edf7ff;
+  --muted: #9db2ca;
+  --line: #23415f;
+  --primary: #63b3ff;
+  --primary-action: #218bff;
+  --accent: #35c9df;
+  --surface-soft: #142e4d;
+  --surface-success: #123d38;
+  --surface-warning: #493a1d;
+  --surface-danger: #4b2531;
+  --shadow-card: 0 16px 35px #0209164d;
 }
 
 body { background: var(--bg); color: var(--text); }
@@ -48,12 +53,14 @@ body { background: var(--bg); color: var(--text); }
 /* Tailwind-powered reusable accounting components. */
 @layer components {
   .card {
-    @apply rounded-[1.125rem] border p-[1.375rem] shadow-[0_10px_30px_#0b234510];
+    @apply border p-[1.375rem];
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
     background: var(--card);
     border-color: var(--line);
   }
   .btn {
-    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-[.6875rem] border px-[1.0625rem] py-[.6875rem] font-bold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-[1.0625rem] py-[.6875rem] font-bold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50;
     border-color: var(--line);
     background: var(--card);
     color: var(--text);
@@ -681,5 +688,100 @@ body { background: var(--bg); color: var(--text); }
   .sp-demo-shell h1,.sp-demo-shell h2,.sp-demo-shell h3{overflow-wrap:anywhere}
   .sp-demo-shell .card{padding:15px}
   .sp-demo-shell .btn{min-height:44px;padding-inline:12px}
+}
+
+/* Hawally brand and Service Point shell */
+.hawally-brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none}
+.hawally-mark{display:grid;place-items:center;overflow:hidden;flex:0 0 42px;width:42px;height:42px;border-radius:14px;color:#fff;background:linear-gradient(145deg,#35c8ff,#1687ff 55%,#1264dc);box-shadow:0 10px 24px #1687ff38}
+.hawally-mark::before{content:"H";font-size:1.3rem;font-weight:950;line-height:1;letter-spacing:-.08em}
+.hawally-wordmark{display:grid;gap:1px;line-height:1}.hawally-wordmark b{font-size:1.28rem;font-weight:950;letter-spacing:-.02em}.hawally-wordmark small{color:var(--primary);font-size:.6rem;font-weight:900;letter-spacing:.13em}
+.brand{color:var(--primary)}.brand-mark{background:linear-gradient(145deg,#35c8ff,#1687ff)}
+
+body:has(.hawally-app-shell)>.pwa-update,
+body:has(.hawally-app-shell) .nav,
+body:has(.hawally-app-shell) .workspace-scope-bar,
+body:has(.hawally-app-shell) .footer{display:none}
+body:has(.hawally-app-shell){background:var(--bg)}
+.hawally-app-shell{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh;background:var(--bg);color:var(--text)}
+.hawally-sidebar{position:sticky;top:0;z-index:45;display:flex;height:100vh;flex-direction:column;padding:24px 18px;border-inline-end:1px solid var(--line);background:var(--card)}
+.hawally-sidebar>.hawally-brand{padding:0 10px 24px}
+.hawally-sidebar nav{display:grid;gap:7px;margin-top:10px}
+.hawally-sidebar nav :is(a,button){display:flex;align-items:center;gap:12px;min-height:48px;padding:0 14px;border:0;border-radius:14px;color:var(--muted);background:transparent;font:inherit;font-size:.86rem;font-weight:800;text-align:start;text-decoration:none;cursor:pointer;transition:.18s ease}
+.hawally-sidebar nav :is(a,button) svg{width:19px;height:19px}
+.hawally-sidebar nav :is(a,button):hover{color:var(--primary);background:var(--surface-soft)}
+.hawally-sidebar nav .active{color:#fff;background:linear-gradient(135deg,#2799ff,#1687ff);box-shadow:0 10px 22px #1687ff35}
+.hawally-sidebar-plan{display:flex;align-items:center;gap:9px;margin-top:auto;padding:14px;border:1px solid #bfe0ff;border-radius:16px;color:#0d6cc8;background:#edf7ff;font-size:.76rem;font-weight:900;text-decoration:none}
+.dark .hawally-sidebar-plan{border-color:#27557d;color:#8bc7ff;background:#102e4e}
+.hawally-main{min-width:0}
+.hawally-topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:18px;min-height:72px;padding:10px clamp(14px,2vw,28px);border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px)}
+.hawally-mobile-brand{display:none}
+.hawally-search{display:flex;align-items:center;gap:10px;flex:1;max-width:620px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:15px;color:var(--muted);background:var(--surface-soft);font-size:.82rem;text-decoration:none}
+.hawally-search svg{width:18px;color:var(--primary)}.hawally-search span{flex:1}.hawally-search kbd{padding:4px 7px;border:1px solid #bcd9f5;border-radius:7px;color:var(--primary);background:var(--card);font:inherit;font-size:.65rem}
+.hawally-top-actions{display:flex;align-items:center;gap:8px;margin-inline-start:auto}
+.hawally-icon-button{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:13px;color:var(--text);background:var(--card);cursor:pointer}.hawally-icon-button svg{width:18px}
+.hawally-user{display:flex;align-items:center;gap:10px;padding:5px 6px 5px 12px;border:0;border-radius:14px;color:var(--text);background:transparent;cursor:pointer}.hawally-user>span{display:grid;text-align:end}.hawally-user b{font-size:.78rem}.hawally-user small{color:var(--muted);font-size:.65rem}.hawally-user>svg{box-sizing:content-box;padding:9px;border-radius:12px;color:var(--primary);background:var(--surface-soft)}
+.hawally-content{display:grid;gap:18px;width:min(100% - 34px,1500px);margin:0 auto;padding:24px 0 92px}
+.hawally-welcome{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:176px;padding:30px clamp(22px,4vw,48px);border:1px solid #cfe8ff;border-radius:28px;background:linear-gradient(120deg,#fff 0%,#eef8ff 58%,#dff2ff 100%);box-shadow:var(--shadow-card)}
+.hawally-welcome::after{content:"";position:absolute;inset-inline-end:-50px;inset-block-start:-100px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,#3dd6e844,transparent 68%)}
+.hawally-welcome>div{position:relative;z-index:1}.hawally-welcome span{color:var(--primary);font-size:.78rem;font-weight:950}.hawally-welcome h1{margin:7px 0 6px;color:#102445;font-size:clamp(1.7rem,3vw,2.65rem);letter-spacing:-.035em}.hawally-welcome p{margin:0;color:#58708e;line-height:1.8}.hawally-welcome-actions{display:flex;flex-wrap:wrap;justify-content:flex-end}
+.dark .hawally-welcome{border-color:#234e73;background:linear-gradient(120deg,#10233c,#123150 65%,#133955)}.dark .hawally-welcome h1{color:var(--text)}.dark .hawally-welcome p{color:var(--muted)}
+.hawally-quick-links{display:flex;flex-wrap:wrap;gap:9px}.hawally-quick-links .btn{min-height:44px}
+.hawally-inline-alert,.hawally-info-card{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;border:1px solid #f2d99f;border-radius:16px;color:#745310;background:var(--surface-warning);font-size:.82rem}.hawally-inline-alert span{display:flex;align-items:center;gap:8px}.hawally-inline-alert svg{width:18px}.hawally-inline-alert button{border:0;color:inherit;background:transparent;font-weight:900;text-decoration:underline;cursor:pointer}
+.dark .hawally-inline-alert,.dark .hawally-info-card{border-color:#8b6b2f;color:#ffe4a1;background:#33280f}
+.hawally-info-card{display:block}.hawally-info-card p{margin:5px 0 0}
+.hawally-mobile-nav{display:none}
+
+@media screen{
+  .hawally-app-shell #pos-app-root{gap:18px}
+  .hawally-app-shell #pos-app-root>.card,
+  .hawally-app-shell #pos-app-root>section:not(.sp-shift-hero),
+  .owner-command-center main>section{border-color:var(--line);background:var(--card);box-shadow:var(--shadow-card)}
+  .hawally-app-shell #pos-app-root .sp-shift-hero{border:1px solid #b9ddff;background:linear-gradient(115deg,#1687ff,#3fa9ff 62%,#3dd6e8);box-shadow:0 16px 38px #1687ff2b}
+  .dark .hawally-app-shell #pos-app-root .sp-shift-hero{border-color:#266696;background:linear-gradient(115deg,#145da2,#187bd1 62%,#178fa5)}
+  .hawally-app-shell #pos-app-root>section.grid>article{border:1px solid var(--line);border-radius:20px;background:var(--card);box-shadow:var(--shadow-card)}
+  .hawally-app-shell #pos-app-root>section.grid>article svg{color:var(--primary)}
+  .hawally-app-shell .pos-balance-grid article{min-height:82px;border-color:var(--line);background:linear-gradient(145deg,var(--card),var(--surface-soft));box-shadow:0 8px 22px #1b70bd0d}
+  .hawally-app-shell #service-point-intelligence>header,
+  .hawally-app-shell #pos-app-root .bg-\[\#0f315d\]{background:linear-gradient(125deg,#1687ff,#247fe5);color:#fff}
+  .hawally-app-shell :is(input:not([type=checkbox]),select,textarea){min-height:44px;border-color:var(--line);border-radius:12px;background:var(--card);color:var(--text)}
+  .hawally-app-shell :is(input,select,textarea):focus{border-color:var(--primary);box-shadow:0 0 0 3px #1687ff1f;outline:0}
+  .hawally-app-shell table{border-collapse:separate;border-spacing:0}
+  .hawally-app-shell th{background:var(--surface-soft);color:#244565}
+  .dark .hawally-app-shell th{color:var(--text)}
+  .hawally-app-shell .badge{color:#08785c;background:#e6fbf5}
+  .hawally-app-shell .bg-blue-50,.owner-command-center .bg-blue-50{background:var(--surface-soft)}
+  .hawally-app-shell .text-blue-700,.owner-command-center .text-blue-700{color:var(--primary)}
+}
+
+.owner-command-center{background:var(--bg);color:var(--text)}
+.owner-command-center>header{background:color-mix(in srgb,var(--card) 94%,transparent);box-shadow:0 8px 26px #1b70bd0c}
+.owner-command-center .owner-hero{border:1px solid #b9ddff;background:linear-gradient(120deg,#1687ff,#278de8 65%,#27bfd4);box-shadow:0 18px 42px #1687ff2b}
+.dark .owner-command-center .owner-hero{border-color:#2b628b;background:linear-gradient(120deg,#134b82,#176eac 65%,#177e91)}
+.owner-command-center main{width:min(100% - 30px,1450px)}
+.owner-command-center main>section,.owner-command-center main>div>section{border-radius:24px}
+
+.sp-onboarding-choice,.sp-onboarding-setup,.demo-page,.demo-finale{background:radial-gradient(circle at 82% 0,#dff2ff 0,transparent 29%),var(--bg)}
+.demo-header{border-color:var(--line);background:color-mix(in srgb,var(--card) 92%,transparent)}
+.demo-task-card{background:linear-gradient(145deg,#0f5eac,#1687ff)}
+.demo-action{background:#1687ff;box-shadow:0 10px 24px #1687ff2d}
+.demo-step-head>span{color:#0b7fc3;background:#e5f6ff}
+.demo-progress i{background:linear-gradient(90deg,#3dd6e8,#1687ff)}
+.demo-landing{background:radial-gradient(circle at 85% 15%,#3dd6e833 0,transparent 31%),linear-gradient(135deg,#0b3260,#126ed0 62%,#1599ad)}
+
+@media(max-width:1024px){
+  .hawally-app-shell{grid-template-columns:88px minmax(0,1fr)}
+  .hawally-sidebar{padding-inline:13px}.hawally-sidebar>.hawally-brand{justify-content:center;padding-inline:0}.hawally-sidebar .hawally-wordmark,.hawally-sidebar nav :is(a,button){font-size:0}.hawally-sidebar nav :is(a,button){justify-content:center;padding:0}.hawally-sidebar nav :is(a,button) svg{width:21px;height:21px}.hawally-sidebar-plan{justify-content:center;font-size:0}.hawally-sidebar-plan svg{width:20px}
+}
+@media(max-width:760px){
+  body:has(.hawally-app-shell){padding-bottom:72px}
+  .hawally-app-shell{display:block}.hawally-sidebar{display:none}
+  .hawally-topbar{min-height:64px;padding:8px 12px}.hawally-mobile-brand{display:block}.hawally-mobile-brand .hawally-mark{width:38px;height:38px}.hawally-mobile-brand .hawally-wordmark{display:none}.hawally-search{display:none}.hawally-user>span{display:none}
+  .hawally-content{width:min(100% - 20px,1500px);padding:14px 0 28px}
+  .hawally-welcome{display:block;min-height:0;padding:23px;border-radius:22px}.hawally-welcome h1{font-size:1.65rem}.hawally-welcome p{font-size:.88rem}.hawally-welcome-actions{justify-content:flex-start;margin-top:18px}.hawally-welcome-actions .btn{flex:1}
+  .hawally-quick-links{display:grid;grid-template-columns:1fr 1fr}.hawally-quick-links .btn{padding-inline:8px;font-size:.74rem}
+  .hawally-mobile-nav{position:fixed;z-index:60;inset-inline:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 7px calc(7px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:color-mix(in srgb,var(--card) 95%,transparent);box-shadow:0 -12px 30px #10244512;backdrop-filter:blur(14px)}
+  .hawally-mobile-nav :is(a,button){display:grid;place-items:center;gap:4px;min-height:48px;border:0;border-radius:11px;color:var(--muted);background:transparent;font:inherit;font-size:.62rem;font-weight:850;text-decoration:none}.hawally-mobile-nav svg{width:19px;height:19px}.hawally-mobile-nav :first-child{color:var(--primary);background:var(--surface-soft)}
+  .hawally-inline-alert{align-items:flex-start;flex-direction:column}
+  .owner-command-center main{width:min(100% - 20px,1450px)}
 }
 

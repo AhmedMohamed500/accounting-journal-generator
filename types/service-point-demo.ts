@@ -47,7 +47,7 @@ export interface LocalSubscription {
 }
 
 export interface ServicePointBackup {
-  product: "FINORA Service Point";
+  product: "FINORA Service Point" | "Hawally Service Point";
   schemaVersion: 1 | 2;
   exportedAt: string;
   businessName: string;

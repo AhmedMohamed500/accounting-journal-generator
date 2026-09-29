@@ -79,7 +79,7 @@ export function WorkspaceShell({ locale, children }: { locale: Locale; children:
     refresh();
   };
   if (!sessionValid) return <GateFrame ar={ar}>
-    <div className="workspace-gate-heading"><span><KeyRound /></span><div><small>FINORA LOCAL</small><h1>{ar ? "الدخول إلى مساحة الشركة" : "Sign in to company workspace"}</h1><p>{ar ? "ادخل بالبريد ورمز الدخول المحلي المحفوظين على هذا الجهاز." : "Use the local email and PIN saved on this device."}</p></div></div>
+    <div className="workspace-gate-heading"><span><KeyRound /></span><div><small>Hawally LOCAL</small><h1>{ar ? "الدخول إلى مساحة الشركة" : "Sign in to company workspace"}</h1><p>{ar ? "ادخل بالبريد ورمز الدخول المحلي المحفوظين على هذا الجهاز." : "Use the local email and PIN saved on this device."}</p></div></div>
     <form className="grid" onSubmit={signIn}><label>{ar ? "البريد" : "Email"}<input dir="ltr" type="email" autoComplete="username" value={login.email} onChange={(event) => setLogin({ ...login, email: event.target.value })} /></label><label>{ar ? "رمز الدخول" : "PIN"}<input dir="ltr" type="password" inputMode="numeric" autoComplete="current-password" value={login.pin} onChange={(event) => setLogin({ ...login, pin: event.target.value.replace(/\D/g, "").slice(0, 8) })} /></label><button className="btn btn-primary" type="submit"><KeyRound size={18}/>{ar ? "دخول" : "Sign in"}</button></form>
     {message && <p className="warning error">{message}</p>}<p className="workspace-local-note"><LockKeyhole size={17}/>{ar ? "البيانات والدخول موجودان على هذا المتصفح فقط." : "Data and sign-in exist only in this browser."}</p>
   </GateFrame>;

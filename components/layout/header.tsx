@@ -10,13 +10,15 @@ import {
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/types";
+import { HawallyBrand } from "@/components/brand/hawally-brand";
 
 export function Header({ locale }: { locale: Locale }) {
   const { setTheme, resolvedTheme } = useTheme();
   const pathname = usePathname(), ar = locale === "ar", other = ar ? "en" : "ar", landing = pathname === `/${locale}`;
-  const [open, setOpen] = useState(false), [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [open, setOpen] = useState(false), [activeMenu, setActiveMenu] = useState<string | null>(null), [mounted, setMounted] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   useEffect(() => {
+    setMounted(true);
     const closeOutside = (event: PointerEvent) => { if (!headerRef.current?.contains(event.target as Node)) setActiveMenu(null); };
     const closeEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setActiveMenu(null); };
     document.addEventListener("pointerdown", closeOutside); document.addEventListener("keydown", closeEscape);
@@ -56,8 +58,10 @@ export function Header({ locale }: { locale: Locale }) {
   ];
   const activePath = (path: string) => pathname === `/${locale}/${path}` || pathname.startsWith(`/${locale}/${path}/`);
 
+  if (mounted && (pathname === `/${locale}/service-point` || pathname.startsWith(`/${locale}/service-point/`))) return null;
+
   return <header ref={headerRef} className={`nav no-print ${landing ? "landing-nav" : ""}`} data-no-bilingual><div className="container nav-inner">
-    <Link className="brand" href={`/${locale}`}><span className="brand-mark">ف</span><span><b>فينورا</b><small>FINORA</small></span></Link>
+    <HawallyBrand locale={locale} href={`/${locale}`}/>
     {landing ? <nav className={`nav-links landing-nav-links ${open ? "mobile-open" : ""}`}>{landingLinks.map(([anchor,labelAr,labelEn])=><a key={anchor} href={`#${anchor}`} onClick={()=>setOpen(false)}>{ar?labelAr:labelEn}</a>)}<Link className="btn" href={`/${locale}/dashboard`}><Sparkles size={16}/>{ar?"دخول النظام":"Open app"}</Link><Link className="keep btn" href={`/${other}`}><Languages size={17}/>{other.toUpperCase()}</Link><button className="btn icon-btn" aria-label={ar?"تغيير المظهر":"Toggle theme"} onClick={()=>setTheme(resolvedTheme==="dark"?"light":"dark")}><Moon size={17}/></button></nav>
     : <nav className={`nav-links app-nav-links categorized-nav ${open ? "mobile-open" : ""}`}>
       <Link className={`nav-home-link ${activePath("dashboard") ? "active" : ""}`} href={`/${locale}/dashboard`} onClick={()=>setOpen(false)}><LayoutDashboard size={18}/>{ar?"لوحة العمل":"Dashboard"}</Link>

@@ -26,7 +26,7 @@ export function PwaProvider({ children }: { children: React.ReactNode }) {
     return () => { window.removeEventListener("beforeinstallprompt", beforeInstall); window.removeEventListener("appinstalled", syncMode); window.removeEventListener("online", syncOnline); window.removeEventListener("offline", syncOnline); media.removeEventListener("change", syncMode); navigator.serviceWorker?.removeEventListener("controllerchange", reload); };
   }, []);
   const value = useMemo<PwaContextValue>(() => ({ installable: Boolean(prompt), installed, ios, online, version: FINORA_PWA_VERSION, install: async () => { if (!prompt) return false; await prompt.prompt(); const result = await prompt.userChoice; if (result.outcome === "accepted") setPrompt(undefined); return result.outcome === "accepted"; } }), [prompt, installed, ios, online]);
-  return <PwaContext.Provider value={value}>{children}{!online && <div className="pwa-connection"><WifiOff size={15}/><span>Local mode · وضع محلي</span></div>}{update && <div className="pwa-update"><span>يتوفر تحديث جديد لـ FINORA · A FINORA update is ready</span><button onClick={() => update.waiting?.postMessage({ type: "SKIP_WAITING" })}><RefreshCw size={15}/>تحديث الآن</button></div>}</PwaContext.Provider>;
+  return <PwaContext.Provider value={value}>{children}{!online && <div className="pwa-connection"><WifiOff size={15}/><span>Local mode · وضع محلي</span></div>}{update && <div className="pwa-update"><span>يتوفر تحديث جديد لـ حوّلي · A Hawally update is ready</span><button onClick={() => update.waiting?.postMessage({ type: "SKIP_WAITING" })}><RefreshCw size={15}/>تحديث الآن</button></div>}</PwaContext.Provider>;
 }
 
 export const usePwa = () => useContext(PwaContext);

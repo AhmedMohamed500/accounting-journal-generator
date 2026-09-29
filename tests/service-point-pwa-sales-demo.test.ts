@@ -5,7 +5,7 @@ import { detectIos, detectStandalone, localStorageSizeKb, pwaInstallGuidance } f
 import { demoAcknowledgeAlert, demoAcknowledgeOwner, demoCloseShift, demoRecordFawry, demoRecordPending, demoRecordVodafone, demoStartShift, initializeInteractiveSalesDemo, loadSalesDemoProgress, resetInteractiveSalesDemo, saveSalesDemoProgress } from "@/lib/storage/service-point-sales-demo";
 import { createPosStore, loadPosOperations, loadPosShifts, loadPosStores } from "@/lib/storage/pos";
 
-describe("FINORA installable PWA helpers", () => {
+describe("Hawally installable PWA helpers", () => {
   it("detects standalone and iOS without assuming browser support", () => {
     expect(detectStandalone(true, false)).toBe(true);
     expect(detectStandalone(false, true)).toBe(true);
@@ -24,7 +24,7 @@ describe("FINORA installable PWA helpers", () => {
   });
 });
 
-describe("FINORA 5-minute sales demo", () => {
+describe("Hawally 5-minute sales demo", () => {
   beforeEach(() => localStorage.clear());
 
   it("initializes an isolated dataset and preserves a real store", () => {

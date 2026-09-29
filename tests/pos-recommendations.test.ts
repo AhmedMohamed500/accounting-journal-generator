@@ -22,7 +22,7 @@ function fixture(storeId = "s1", storeName = "Main"): OwnerCommandCenterInput {
   return { storeId, storeName, shifts: [shift], operations, snapshot: calculatePosShiftSnapshot(shift, operations), settings: { schemaVersion: 1, onboardingComplete: true, profileMode: "demo", businessName: storeName, enabledProviders: posProviders.map((provider) => provider.id), salesDemoMode: true, tourComplete: true, lastBackupAt: "2026-08-01T00:00:00.000Z" }, subscription: { trialStartedAt: "2026-09-01T00:00:00.000Z", trialEndsAt: "2026-09-04T00:00:00.000Z", currentPlan: "pro", subscriptionStatus: "trial", billingCycle: "monthly" }, now };
 }
 
-describe("FINORA owner recommendations", () => {
+describe("Hawally owner recommendations", () => {
   it("generates deterministic balance, pending, duplicate, backup, and trial signals", () => {
     const types = buildOwnerCommandCenter(fixture()).recommendations.map((item) => item.type);
     expect(types).toEqual(expect.arrayContaining(["LOW_SERVICE_BALANCE", "IDLE_SERVICE_BALANCE", "PENDING_TOO_LONG", "DUPLICATE_RISK", "BACKUP_OVERDUE", "TRIAL_ENDING"]));
