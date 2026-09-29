@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { posProviders } from "@/data/pos";
 import { getServicePointPlan, servicePointCommercialConfig } from "@/data/service-point-plans";
 import { canLocalRole, effectiveSubscriptionStatus, trialDaysRemaining } from "@/lib/pos/demo";
-import { appendLocalAudit, backupOverdue, createLocalUser, currentLocalUser, ensureLocalSubscription, exportServicePointBackup, loadLocalAudit, loadLocalSubscription, loadLocalUsers, loadServicePointSettings, parseServicePointBackup, resetSalesDemo, restoreServicePointBackup, saveLocalSubscription, saveServicePointSettings, seedSalesDemo, setCurrentLocalUser, verifyLocalPin } from "@/lib/storage/service-point-demo";
+import { appendLocalAudit, createLocalUser, currentLocalUser, ensureLocalSubscription, exportServicePointBackup, loadLocalAudit, loadLocalSubscription, loadLocalUsers, loadServicePointSettings, parseServicePointBackup, resetSalesDemo, restoreServicePointBackup, saveLocalSubscription, saveServicePointSettings, seedSalesDemo, setCurrentLocalUser, verifyLocalPin } from "@/lib/storage/service-point-demo";
 import { createPosStore, openPosShift } from "@/lib/storage/pos";
 import type { Locale, PosProviderId, PosShift } from "@/types";
 import type { LocalRole, PlanId, ServicePointBackup } from "@/types/service-point-demo";
@@ -37,6 +37,7 @@ export function ServicePointDemoShell({locale,children}:{locale:Locale;children:
         <a href="#shift-actions"><Store/>{ar?"الورديات والتسوية":"Shifts & reconcile"}</a>
         <Link href={`/${locale}/service-point/owner-dashboard`}><BarChart3/>{ar?"لوحة المالك":"Owner dashboard"}</Link>
         <button onClick={()=>setPanel("audit")}><Bell/>{ar?"التنبيهات والسجل":"Alerts & audit"}</button>
+        <button onClick={()=>setPanel("backup")}><HardDriveDownload/>{ar?"النسخ والتقارير":"Backup & reports"}</button>
         <button onClick={()=>setPanel("settings")}><Settings/>{ar?"الإعدادات":"Settings"}</button>
       </nav>
       <Link className="hawally-sidebar-plan" href={`/${locale}/service-point/plans`}><Crown/>{status==="expired-demo"?(ar?"انتهت التجربة":"Trial expired"):(ar?`${days} يوم متبقٍ`:`${days} days left`)}</Link>
@@ -53,10 +54,6 @@ export function ServicePointDemoShell({locale,children}:{locale:Locale;children:
         </div>
       </header>
       <div className="hawally-content">
-        <section className="hawally-welcome no-print"><div><span>{ar?"مرحبًا بك في حوّلي":"Welcome to Hawally"}</span><h1>{settings.businessName|| (ar?"نقطة خدمات حوّلي":"Hawally Service Point")}</h1><p>{ar?"كل خدماتك وأرصدتك ووردية اليوم في مساحة تشغيل واحدة واضحة.":"Your services, balances, and today's shift in one clear workspace."}</p></div><div className="hawally-welcome-actions"><Link className="btn btn-primary" href={`/${locale}/service-point/demo`}><Play/>{ar?"تجربة 5 دقائق":"5-minute demo"}</Link><button className="btn" onClick={()=>setPanel("backup")}><HardDriveDownload/>{ar?"نسخة احتياطية":"Backup"}</button></div></section>
-        {backupOverdue(settings)&&<div className="hawally-inline-alert"><span><HardDriveDownload/>{ar?"لم تنشئ نسخة احتياطية خلال آخر 7 أيام. بياناتك محفوظة على هذا الجهاز.":"No backup in the last 7 days. Your data lives on this device."}</span><button onClick={()=>setPanel("backup")}>{ar?"إنشاء نسخة":"Create backup"}</button></div>}
-        <div className="hawally-quick-links no-print"><Link className="btn btn-primary" href={`/${locale}/service-point/demo`}><Play/>{ar?"تجربة 5 دقائق":"5-minute demo"}</Link><Link className="btn" href={`/${locale}/service-point/owner-dashboard`}>{ar?"لوحة المالك":"Owner dashboard"}</Link><button className="btn" onClick={()=>setPanel("backup")}>{ar?"النسخ والتقارير":"Backup & reports"}</button><button className="btn" onClick={()=>setPanel("users")}>{ar?"إدارة الكاشير":"Users"}</button><Link className="btn" href={`/${locale}/service-point/plans`}>{ar?"الباقات":"Plans"}</Link></div>
-        <PwaInstallCard locale={locale}/>
         {panel!=="none"&&<DemoPanel locale={locale} panel={panel} close={()=>setPanel("none")} changed={()=>setRefresh(x=>x+1)}/>}
         {status==="expired-demo"&&<div className="hawally-info-card"><b>{ar?"انتهت التجربة المجانية — بياناتك ما زالت محفوظة.":"Your free trial ended — your data is still safe."}</b><p>{ar?"يمكنك الاستعراض والطباعة والنسخ الاحتياطي واختيار باقة في أي وقت.":"You can still view, print, back up, and choose a plan."}</p></div>}
         {children}
