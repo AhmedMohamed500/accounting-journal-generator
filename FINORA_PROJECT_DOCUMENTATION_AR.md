@@ -1,10 +1,11 @@
-# FINORA — المرجع الشامل للمشروع
+# Hawally | حوّلي — المرجع الشامل للمشروع
 
-> آخر مراجعة للكود: 28 سبتمبر 2026
+> آخر مراجعة للكود: 29 سبتمبر 2026
 > نسخة العمل الحالية: `E:\My Portofolio\Fawry`
 > المسار الأصلي المذكور في التسليم السابق: `C:\Users\TRUE TECH\Desktop\Accountant Jouranal\accounting-journal-generator`
 > الفرع الحالي: `feat/service-point-local-intelligence`
-> آخر commit وقت إعداد الملف: `65831bb — Polish Service Point light and dark palettes`
+> خط الأساس قبل مراجعة الهوية الحالية: `b6f7ca3 — docs: refresh comprehensive FINORA project guide`
+> commit تنفيذ الهوية والواجهة: `1f5d5a8 — feat: rebrand service point as Hawally and refresh UI`
 
 ## 1. الغرض من هذا الملف
 
@@ -14,9 +15,9 @@
 
 ---
 
-## 2. ملخص المنتج
+## 2. الهوية الحالية وملخص المنتج
 
-**FINORA** منصة عمليات محاسبية وإدارة أعمال ثنائية اللغة، عربية أولًا. تجمع دورة العمل المحاسبية من المستند أو العملية حتى القيد والترحيل والأستاذ وميزان المراجعة والتقارير.
+**Hawally | حوّلي** هي العلامة العامة الحالية لمنصة العمليات المحاسبية ونقاط الخدمات ثنائية اللغة، عربية أولًا. تجمع دورة العمل المحاسبية من المستند أو العملية حتى القيد والترحيل والأستاذ وميزان المراجعة والتقارير.
 
 النظام الحالي **Frontend-first وLocal-first**:
 
@@ -31,7 +32,16 @@
 - لا يوجد تكامل مباشر مع Fawry أو المحافظ أو بوابة دفع.
 - لا يستخدم خدمة ذكاء اصطناعي خارجية؛ التحليلات والتوصيات الموجودة حتمية وقائمة على قواعد.
 
-تم فصل الوحدات التعليمية القديمة مثل Academy وArena وMissions وMoney Flow وAccounting Detective إلى منتج مستقل باسم **Debit & Credit**. لا تُعد هذه الوحدات جزءًا من FINORA الحالي حتى لو ظهرت في وثائق تاريخية قديمة.
+تم فصل الوحدات التعليمية القديمة مثل Academy وArena وMissions وMoney Flow وAccounting Detective إلى منتج مستقل باسم **Debit & Credit**. لا تُعد هذه الوحدات جزءًا من Hawally الحالي حتى لو ظهرت في وثائق تاريخية قديمة.
+
+### قرار التوافق بعد إعادة التسمية
+
+- تغيّر الاسم الظاهر للعميل إلى Hawally بالإنجليزية وحوّلي بالعربية.
+- تغيّرت Metadata وPWA وواجهات Service Point ولوحة المالك والديمو والباقات والطباعة.
+- بقيت أسماء مسارات الكود وأسماء الملفات ومفاتيح التخزين `finora-*` كما هي حتى لا تضيع بيانات المتصفح القديمة.
+- تصدير Service Point الجديد يكتب Hawally Service Point، والاستعادة تقبل هذا الاسم وFINORA Service Point القديم.
+- ملفات الأيقونات القديمة تحت أسماء `finora-icon-*.png` بقيت بنفس المسار للتوافق، لكن محتواها البصري أصبح شعار Hawally.
+- ذكر FINORA داخل تاريخ المشروع أو اسم ملف قديم لا يعني أنه ما زال الاسم الظاهر للمنتج.
 
 ---
 
@@ -345,7 +355,7 @@ npm run check
 
 ---
 
-## 9. FINORA Service Point
+## 9. Hawally Service Point
 
 ### 9.1 الهدف والخدمات
 
@@ -571,7 +581,10 @@ npm run check
 - المسارات تبدأ بـ`/ar` أو `/en`.
 - `components/i18n/bilingual-accounting-labels.tsx` يدعم التسميات الثنائية.
 - `components/theme-provider.tsx` و`next-themes` يديران Light/Dark.
-- ألوان Service Point تستخدم tokens في `app/globals.css`.
+- ألوان Service Point تستخدم tokens في `app/globals.css`: خلفية ثلجية فاتحة، بطاقات بيضاء، نص كحلي، أزرق ملكي للإجراءات، وتركواز كلون مساعد.
+- الوضع الداكن يستخدم كحليًا عميقًا مع بطاقات زرقاء داكنة وحدود واضحة وألوان تنبيه مقروءة.
+- غلاف Service Point الجديد موجود في `components/pos/service-point-demo-shell.tsx` ويضيف Sidebar وTopbar ومنطقة ترحيب وروابط سريعة وشريط تنقل سفلي للهاتف.
+- الشعار البرمجي المشترك موجود في `components/brand/hawally-brand.tsx`، وأصول PWA المتوافقة داخل `public/finora-icon-*.png` تحمل شكل Hawally الجديد.
 - آخر تعديل وحّد الخلفيات والبطاقات والحدود والمدخلات والتنبيهات في Light وDark، بما فيها لوحة المالك وOnboarding وProduct Tour.
 - واجهات Service Point تستجيب للهاتف والتابلت والكمبيوتر.
 - الطباعة تستخدم Browser Print ويمكن الحفظ PDF.
@@ -581,6 +594,15 @@ npm run check
 ## 13. الاختبارات
 
 تشمل الاختبارات سلامة القيود والحسابات ودورة القيد والأستاذ والتقارير وVAT والفترات والبنك والعملاء والمستندات والعهد وExcel وWorkspace وService Point والرقابة والتوصيات والربحية والسيولة وDemo وPWA وBackup.
+
+آخر تحقق كامل في 29 سبتمبر 2026:
+
+- `npm run lint`: ناجح بلا تحذيرات.
+- `npm run typecheck`: ناجح.
+- `npm run test`: نجح `52` ملف اختبار و`274` اختبارًا.
+- `npm run build`: ناجح، وشمل جميع مسارات Service Point والـmanifest وصفحة Offline.
+- `npm run check`: ناجح بالكامل.
+- المراجعة البصرية اليدوية: Light Mode وDark Mode على الكمبيوتر، وتخطيط الهاتف للشاشة الرئيسية ولوحة المالك.
 
 عند تعديل منطق مالي:
 
@@ -617,6 +639,8 @@ https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```text
 الفرع: feat/service-point-local-intelligence
 
+1f5d5a8  feat: rebrand service point as Hawally and refresh UI
+b6f7ca3  docs: refresh comprehensive FINORA project guide
 65831bb  Polish Service Point light and dark palettes
 e2d37aa  docs: document zero-cost service point features and limits
 f22cf45  feat: improve service point shift and owner workflows
@@ -624,7 +648,7 @@ a21dfeb  feat: add local service point leakage and liquidity intelligence
 5d977c8  refactor: separate accounting education product
 ```
 
-التغييرات الأربعة الأولى الخاصة بـService Point موجودة محليًا على هذا الفرع. افحص remote قبل أي نشر أو Pull Request.
+تغييرات Service Point والهوية موجودة محليًا على هذا الفرع. افحص remote قبل أي نشر أو Pull Request.
 
 ---
 
@@ -713,7 +737,7 @@ a21dfeb  feat: add local service point leakage and liquidity intelligence
 
 ## 20. رسالة جاهزة لبدء شات جديد
 
-> أعمل على مشروع FINORA الموجود حاليًا في `E:\My Portofolio\Fawry`. ابدأ بقراءة `FINORA_PROJECT_DOCUMENTATION_AR.md`، ثم افحص `git status` والفرع والكود والاختبارات لأن الكود هو المصدر النهائي للحقيقة. المشروع Next.js/React/TypeScript، ثنائي اللغة، Local-first ويستخدم localStorage. لا يوجد Backend أو Database أو Cloud Sync أو Fawry API أو بوابة دفع أو AI خارجي. الوحدات التعليمية القديمة نُقلت إلى Debit & Credit وليست جزءًا من FINORA الحالي. حافظ على عزل الشركة/الفرع/السنة والمتجر، وعلى توافق البيانات والـBackup، ولا تخلط Demo مع البيانات الحقيقية. المطلوب الآن: **[اكتب المهمة هنا]**.
+> أعمل على مشروع Hawally | حوّلي الموجود حاليًا في `E:\My Portofolio\Fawry`. ابدأ بقراءة `FINORA_PROJECT_DOCUMENTATION_AR.md`، ثم افحص `git status` والفرع والكود والاختبارات لأن الكود هو المصدر النهائي للحقيقة. اسم ملف الوثيقة وبعض معرفات `finora-*` قديمة ومحتفظ بها للتوافق فقط. المشروع Next.js/React/TypeScript، ثنائي اللغة، Local-first ويستخدم localStorage. لا يوجد Backend أو Database أو Cloud Sync أو Fawry API أو بوابة دفع أو AI خارجي. الوحدات التعليمية القديمة نُقلت إلى Debit & Credit وليست جزءًا من Hawally الحالي. حافظ على عزل الشركة/الفرع/السنة والمتجر، وعلى توافق البيانات والـBackup، ولا تخلط Demo مع البيانات الحقيقية. المطلوب الآن: **[اكتب المهمة هنا]**.
 
 وعند نهاية المهمة اطلب ملخص التغييرات والملفات والصيغ وتغييرات التخزين والاختبارات ونتيجة الفحوص واسم الفرع وآخر commit وحالة Push وDeployment والقيود المؤجلة.
 
@@ -721,6 +745,6 @@ a21dfeb  feat: add local service point leakage and liquidity intelligence
 
 ## 21. خلاصة الحالة
 
-FINORA الحالي منتج محاسبي محلي واسع يغطي اليومية ودليل الحسابات والتقارير والمستندات والبنوك والعملاء والعهد والضريبة والإقفال وExcel ومكتب المحاسبة ونقطة الخدمات. أقوى جزء تجاري حاليًا هو Service Point مع دورة وردية كاملة ولوحة مالك وتحليلات محلية وPWA وDemo.
+Hawally | حوّلي منتج محاسبي محلي واسع يغطي اليومية ودليل الحسابات والتقارير والمستندات والبنوك والعملاء والعهد والضريبة والإقفال وExcel ومكتب المحاسبة ونقطة الخدمات. أقوى جزء تجاري حاليًا هو Service Point مع دورة وردية كاملة ولوحة مالك وتحليلات محلية وPWA وDemo.
 
 النسخة مناسبة للتجربة والعرض والتشغيل المحلي المحدود. الانتقال إلى منتج مالي متعدد المستخدمين والأجهزة يحتاج Backend وتكاملات رسمية وأمنًا وتدقيقًا ونسخًا احتياطيًا إنتاجيًا.

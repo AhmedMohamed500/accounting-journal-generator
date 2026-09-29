@@ -1,6 +1,6 @@
-# FINORA
+# Hawally | حوّلي
 
-FINORA is a bilingual, frontend-first accounting operations and business-management product. Educational training has been extracted into the independent [Debit & Credit](https://github.com/AhmedMohamed500/Debit-Credit) product by Money Coder.
+Hawally is the public brand of this bilingual, frontend-first accounting operations, business-management, and service-point product. Selected `finora-*` technical identifiers remain unchanged to preserve local data and backup compatibility. Educational training has been extracted into the independent [Debit & Credit](https://github.com/AhmedMohamed500/Debit-Credit) product by Money Coder.
 
 ## Operational scope
 
@@ -12,7 +12,7 @@ FINORA is a bilingual, frontend-first accounting operations and business-managem
 - Accounting-office, service-point/POS, spreadsheet analysis, and decision simulation.
 - Arabic/English localization, RTL/LTR layout, PWA support, and local persistence.
 
-FINORA no longer contains Academy, Arena, Missions, Money Flow, Accounting Detective, learner profiles, or educational progress storage. Those modules, their real content, and their tests live in Debit & Credit.
+Hawally no longer contains Academy, Arena, Missions, Money Flow, Accounting Detective, learner profiles, or educational progress storage. Those modules, their real content, and their tests live in Debit & Credit.
 
 ## Stack
 
