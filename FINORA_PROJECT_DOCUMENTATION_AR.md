@@ -1,15 +1,15 @@
 # Hawally | حوّلي — المرجع الشامل للمشروع
 
-> آخر مراجعة للكود: 29 سبتمبر 2026
+> آخر مراجعة للكود والواجهة والنشر: 30 سبتمبر 2026
 > نسخة العمل الحالية: `E:\My Portofolio\Fawry`
 > المسار الأصلي المذكور في التسليم السابق: `C:\Users\TRUE TECH\Desktop\Accountant Jouranal\accounting-journal-generator`
-> الفرع الحالي: `feat/service-point-local-intelligence`
-> خط الأساس قبل مراجعة الهوية الحالية: `b6f7ca3 — docs: refresh comprehensive FINORA project guide`
-> commit تنفيذ الهوية والواجهة: `1f5d5a8 — feat: rebrand service point as Hawally and refresh UI`
+> الفرع الحالي والمنشور: `main`
+> آخر مرجع وظيفي منشور: `c36c6ec — Polish service point operations layout`
+> رابط الإنتاج: `https://accounting-journal-generator.vercel.app/ar/service-point`
 
 ## 1. الغرض من هذا الملف
 
-هذا هو ملف التسليم الرئيسي للمشروع. يصلح لفهم المنتج والمعمارية، ولبدء شات تطوير جديد، ولمعرفة ما هو منفذ فعلًا وما يحتاج Backend قبل الاستخدام الإنتاجي.
+هذا هو ملف التسليم الرئيسي والمرجع الواحد المعتمد للمشروع. يصلح لفهم المنتج والمعمارية، ولبدء شات تطوير جديد، ولمعرفة ما هو منفذ فعلًا وما يحتاج Backend قبل الاستخدام الإنتاجي. اسم الملف يحتفظ بكلمة `FINORA` للتوافق مع روابط التسليم القديمة، بينما الاسم العام الحالي للمنتج هو **Hawally | حوّلي**.
 
 الكود هو المصدر النهائي للحقيقة. عند تنفيذ تعديل جديد يجب فحص `git status` والفرع الحالي والملفات والاختبارات، لأن حالة المستودع قد تتغير بعد تاريخ هذا الملف.
 
@@ -428,6 +428,16 @@ npm run check
 - تحافظ الواجهة على نفس الترتيب البصري في Light وDark، وتتحول إلى أعمدة مناسبة للهاتف مع شريط تنقل سفلي.
 - تبقى مساحة التشغيل الكاملة، المحلات، مركز التجار، الذكاء المحلي، البحث، الإقفال والطباعة أسفل لوحة القيادة.
 
+#### التنقل ومساحة العمليات الحالية
+
+- لوحة القيادة تعرض الملخصات والاختصارات فقط، بينما كل عنصر رئيسي يفتح مساحة العمل الخاصة به بدل حشد كل الأدوات في الصفحة الرئيسية.
+- الشريط الجانبي يصل إلى الرئيسية والعمليات والخدمات والأرصدة والمبيعات والتسوية والتقارير والمحلات والفريق والرقابة ولوحة المالك والتنبيهات والنسخ والإعدادات.
+- شاشة العمليات تستخدم رأسًا مختصرًا وزر عودة واضحًا، ثم العمليات السريعة، ونموذج تسجيل مستقل، وجدول الوردية كامل العرض.
+- نموذج العملية عربي واضح بلا تسميات إنجليزية مكررة في الواجهة العربية، ويُعرض في أربعة أعمدة على الشاشات الواسعة ثم عمودين أو عمود واحد حسب العرض.
+- جدول الوردية يحافظ على عرض الأعمدة وأزرار الإيصال والاعتماد والفشل والاسترداد داخل حاوية أفقية عند الحاجة، ولا ينضغط داخل نصف البطاقة.
+- بطاقات مقدمي الخدمة تعرض علامة لونية وهوية مختصرة مع اسم الشركة، وتختار مقدم الخدمة عند الانتقال إلى عملية جديدة.
+- بانر لوحة القيادة صورة فعلية من `public/hawally-service-point-banner.png` ومندمج داخل التصميم، وليس أيقونة منفردة.
+
 ### 9.6 الذكاء المحلي المنفذ
 
 كل ما يلي حسابات محلية حتمية:
@@ -609,14 +619,14 @@ npm run check
 
 تشمل الاختبارات سلامة القيود والحسابات ودورة القيد والأستاذ والتقارير وVAT والفترات والبنك والعملاء والمستندات والعهد وExcel وWorkspace وService Point والرقابة والتوصيات والربحية والسيولة وDemo وPWA وBackup.
 
-آخر تحقق كامل في 29 سبتمبر 2026:
+آخر تحقق كامل في 30 سبتمبر 2026:
 
 - `npm run lint`: ناجح بلا تحذيرات.
 - `npm run typecheck`: ناجح.
 - `npm run test`: نجح `52` ملف اختبار و`274` اختبارًا.
 - `npm run build`: ناجح، وشمل جميع مسارات Service Point والـmanifest وصفحة Offline.
 - `npm run check`: ناجح بالكامل.
-- المراجعة البصرية اليدوية: Light Mode وDark Mode على الكمبيوتر، وتخطيط الهاتف للشاشة الرئيسية ولوحة المالك.
+- المراجعة البصرية اليدوية: Light Mode وDark Mode، تخطيط الهاتف، لوحة القيادة، شاشة العمليات، نموذج التسجيل، وجدول الوردية كامل العرض.
 
 عند تعديل منطق مالي:
 
@@ -637,32 +647,35 @@ npm run check
 https://github.com/AhmedMohamed500/accounting-journal-generator.git
 ```
 
-الروابط المذكورة في الوثائق السابقة:
+الروابط الحالية:
 
 ```text
 https://accounting-journal-generator.vercel.app/ar
+https://accounting-journal-generator.vercel.app/ar/service-point
+https://accounting-journal-generator.vercel.app/ar/service-point/owner-dashboard
 https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```
 
-لم يتم التحقق في جلسة إعداد هذا الملف من أن Vercel يحتوي على آخر commits المحلية. آخر محاولة Push سابقة رُفضت تلقائيًا قبل إرسال البيانات؛ لذلك لا تُعتبر النسخة المنشورة مطابقة للفرع المحلي إلا بعد Push ناجح والتحقق من Deployment.
+تم رفع `c36c6ec` إلى `origin/main` والتحقق من اكتمال Deployment على Vercel بنجاح في 30 سبتمبر 2026. بعد أي تعديل لاحق يجب التحقق مجددًا من حالة النشر ومن الصفحة العامة نفسها، لأن هذا السطر يصف لقطة زمنية وليس ضمانًا دائمًا.
 
 ---
 
 ## 15. حالة Git الحالية
 
 ```text
-الفرع: feat/service-point-local-intelligence
+الفرع: main
 
+c36c6ec  Polish service point operations layout
+9e7e0f9  Redesign service point dashboard navigation
+d265c63  feat: add photographic Hawally dashboard banner
+8d1caa6  feat: rebuild Hawally dashboard from visual reference
+3565af3  docs: update Hawally project guide
 1f5d5a8  feat: rebrand service point as Hawally and refresh UI
 b6f7ca3  docs: refresh comprehensive FINORA project guide
 65831bb  Polish Service Point light and dark palettes
-e2d37aa  docs: document zero-cost service point features and limits
-f22cf45  feat: improve service point shift and owner workflows
-a21dfeb  feat: add local service point leakage and liquidity intelligence
-5d977c8  refactor: separate accounting education product
 ```
 
-تغييرات Service Point والهوية موجودة محليًا على هذا الفرع. افحص remote قبل أي نشر أو Pull Request.
+المرجع الوظيفي `c36c6ec` موجود على `origin/main` ومنشور على Vercel. افحص `git status` و`git log` وحالة النشر قبل الاعتماد على هذه اللقطة في جلسة مستقبلية.
 
 ---
 

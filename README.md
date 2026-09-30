@@ -14,6 +14,10 @@ Hawally is the public brand of this bilingual, frontend-first accounting operati
 
 Hawally no longer contains Academy, Arena, Missions, Money Flow, Accounting Detective, learner profiles, or educational progress storage. Those modules, their real content, and their tests live in Debit & Credit.
 
+## Full project documentation
+
+The complete Arabic handoff and technical reference is available in [`FINORA_PROJECT_DOCUMENTATION_AR.md`](./FINORA_PROJECT_DOCUMENTATION_AR.md). The legacy filename is retained for compatibility; the current public product name is Hawally | حوّلي.
+
 ## Stack
 
 - Next.js App Router
