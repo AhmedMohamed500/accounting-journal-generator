@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArchiveRestore, BarChart3, Bell, Check, ChevronLeft, ChevronRight, Cloud, Crown, Download, HardDriveDownload, Home, KeyRound, Languages, Menu, Moon, Play, Plus, ReceiptText, Rocket, Search, Settings, ShieldCheck, Sparkles, Store, Upload, UserRound, WalletCards, X } from "lucide-react";
+import { ArchiveRestore, BarChart3, Bell, Building2, Check, ChevronLeft, ChevronRight, Cloud, Crown, Download, FileBarChart, HardDriveDownload, Home, KeyRound, Languages, Menu, Moon, Play, Plus, ReceiptText, Rocket, Search, Settings, ShieldCheck, Sparkles, Store, Upload, UserRound, UsersRound, WalletCards, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { posProviders } from "@/data/pos";
 import { getServicePointPlan, servicePointCommercialConfig } from "@/data/service-point-plans";
@@ -18,11 +18,13 @@ const roleNames:Record<LocalRole,{ar:string;en:string}>={owner:{ar:"المالك
 
 export function ServicePointDemoShell({locale,children}:{locale:Locale;children:React.ReactNode}){
   const ar=locale==="ar",[ready,setReady]=useState(false),[refresh,setRefresh]=useState(0),[panel,setPanel]=useState<"none"|"settings"|"users"|"audit"|"backup"|"login">("none"),[tour,setTour]=useState(0);
+  const [activeHash,setActiveHash]=useState("#pos-app-root");
   const {setTheme,resolvedTheme}=useTheme();
   void refresh;
   const settings=ready?loadServicePointSettings():undefined,subscription=ready?ensureLocalSubscription():undefined,user=ready?currentLocalUser():undefined;
   useEffect(()=>setReady(true),[]);
   useEffect(()=>{if(settings?.onboardingComplete&&!settings.tourComplete)setTour(1);},[settings]);
+  useEffect(()=>{const sync=()=>setActiveHash(window.location.hash||"#pos-app-root");sync();window.addEventListener("hashchange",sync);return()=>window.removeEventListener("hashchange",sync);},[]);
   if(!ready)return <div className="min-h-[60vh]"/>;
   if(!settings?.onboardingComplete)return <div className="sp-demo-shell"><Onboarding locale={locale} onDone={()=>setRefresh(x=>x+1)}/></div>;
   const days=subscription?trialDaysRemaining(subscription):0,status=subscription?effectiveSubscriptionStatus(subscription):"trial";
@@ -31,21 +33,24 @@ export function ServicePointDemoShell({locale,children}:{locale:Locale;children:
     <aside className="hawally-sidebar no-print">
       <HawallyBrand locale={locale} href={`/${locale}/service-point`}/>
       <nav>
-        <a className="active" href="#pos-app-root"><Home/>{ar?"الرئيسية":"Home"}</a>
-        <a href="#new-operation"><ReceiptText/>{ar?"العمليات":"Operations"}</a>
-        <a href="#service-point-intelligence"><WalletCards/>{ar?"الخدمات والأرصدة":"Services & balances"}</a>
-        <a href="#shift-actions"><Store/>{ar?"الورديات والتسوية":"Shifts & reconcile"}</a>
+        <a className={activeHash==="#pos-app-root"?"active":""} href="#pos-app-root"><Home/>{ar?"الرئيسية":"Home"}</a>
+        <a className={activeHash==="#new-operation"?"active":""} href="#new-operation"><ReceiptText/>{ar?"العمليات":"Operations"}</a>
+        <a className={activeHash==="#service-point-intelligence"?"active":""} href="#service-point-intelligence"><WalletCards/>{ar?"الخدمات والأرصدة":"Services & balances"}</a>
+        <a className={activeHash==="#shift-actions"?"active":""} href="#shift-actions"><Store/>{ar?"الورديات والتسوية":"Shifts & reconcile"}</a>
+        <a className={activeHash==="#service-point-reports"?"active":""} href="#service-point-reports"><FileBarChart/>{ar?"التقارير":"Reports"}</a>
+        <a className={activeHash==="#store-accounts"?"active":""} href="#store-accounts"><Building2/>{ar?"المحلات":"Stores"}</a>
+        <a className={activeHash==="#service-point-control"?"active":""} href="#service-point-control"><UsersRound/>{ar?"الفريق والرقابة":"Team & control"}</a>
         <Link href={`/${locale}/service-point/owner-dashboard`}><BarChart3/>{ar?"لوحة المالك":"Owner dashboard"}</Link>
-        <button onClick={()=>setPanel("audit")}><Bell/>{ar?"التنبيهات والسجل":"Alerts & audit"}</button>
+        <button className={panel==="audit"?"active":""} onClick={()=>setPanel("audit")}><Bell/>{ar?"التنبيهات والسجل":"Alerts & audit"}</button>
         <button onClick={()=>setPanel("backup")}><HardDriveDownload/>{ar?"النسخ والتقارير":"Backup & reports"}</button>
-        <button onClick={()=>setPanel("settings")}><Settings/>{ar?"الإعدادات":"Settings"}</button>
+        <button className={panel==="settings"?"active":""} onClick={()=>setPanel("settings")}><Settings/>{ar?"الإعدادات":"Settings"}</button>
       </nav>
       <Link className="hawally-sidebar-plan" href={`/${locale}/service-point/plans`}><Crown/>{status==="expired-demo"?(ar?"انتهت التجربة":"Trial expired"):(ar?`${days} يوم متبقٍ`:`${days} days left`)}</Link>
     </aside>
     <div className="hawally-main">
       <header className="hawally-topbar no-print">
         <div className="hawally-mobile-brand"><HawallyBrand locale={locale} href={`/${locale}/service-point`} compact/></div>
-        <a className="hawally-search" href="#operation-search"><Search/><span>{ar?"ابحث عن عملية أو مرجع...":"Search operations or references..."}</span><kbd>Ctrl K</kbd></a>
+        <a className={`hawally-search ${activeHash==="#operation-search"?"active":""}`} href="#operation-search"><Search/><span>{ar?"ابحث عن عملية أو مرجع...":"Search operations or references..."}</span><kbd>Ctrl K</kbd></a>
         <div className="hawally-top-actions">
           <Link href={`/${other}/service-point`} className="hawally-icon-button" aria-label={ar?"English":"العربية"}><Languages/></Link>
           <button className="hawally-icon-button" onClick={()=>setTheme(resolvedTheme==="dark"?"light":"dark")} aria-label={ar?"تغيير المظهر":"Toggle theme"}><Moon/></button>
@@ -59,7 +64,7 @@ export function ServicePointDemoShell({locale,children}:{locale:Locale;children:
         {children}
       </div>
     </div>
-    <nav className="hawally-mobile-nav no-print"><a href="#pos-app-root"><Home/>{ar?"الرئيسية":"Home"}</a><a href="#new-operation"><Plus/>{ar?"عملية":"New"}</a><a href="#shift-actions"><Store/>{ar?"الوردية":"Shift"}</a><Link href={`/${locale}/service-point/owner-dashboard`}><BarChart3/>{ar?"المالك":"Owner"}</Link><button onClick={()=>setPanel("settings")}><Settings/>{ar?"المزيد":"More"}</button></nav>
+    <nav className="hawally-mobile-nav no-print"><a className={activeHash==="#pos-app-root"?"active":""} href="#pos-app-root"><Home/>{ar?"الرئيسية":"Home"}</a><a className={activeHash==="#new-operation"?"active":""} href="#new-operation"><Plus/>{ar?"عملية":"New"}</a><a className={activeHash==="#service-point-intelligence"?"active":""} href="#service-point-intelligence"><WalletCards/>{ar?"الخدمات":"Services"}</a><a className={activeHash==="#shift-actions"?"active":""} href="#shift-actions"><Store/>{ar?"الوردية":"Shift"}</a><button className={panel==="settings"?"active":""} onClick={()=>setPanel("settings")}><Settings/>{ar?"المزيد":"More"}</button></nav>
     {tour>0&&<ProductTour locale={locale} step={tour} next={()=>{if(tour===5){saveServicePointSettings({...settings,tourComplete:true});setTour(0);}else setTour(x=>x+1);}} skip={()=>{saveServicePointSettings({...settings,tourComplete:true});setTour(0);}}/>}
   </div>;
 }
