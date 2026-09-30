@@ -1,4 +1,4 @@
-export const FINORA_PWA_VERSION = "2026.09.04";
+export const HAWALLY_PWA_VERSION = "2026.09.30";
 
 export function detectStandalone(matchesDisplayMode: boolean, navigatorStandalone = false) {
   return matchesDisplayMode || navigatorStandalone;

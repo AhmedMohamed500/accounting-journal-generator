@@ -1,10 +1,10 @@
-# FINORA Installable PWA + 5-Minute Interactive Sales Demo
+# Hawally Installable PWA + 5-Minute Interactive Sales Demo
 
 آخر تحديث: 4 سبتمبر 2026
 
 ## النتيجة
 
-أصبح FINORA Service Point تطبيق ويب قابلًا للتثبيت، مع تجربة مبيعات تفاعلية مستقلة مدتها نحو خمس دقائق. رابط التجربة المباشر:
+أصبح Hawally Service Point تطبيق ويب قابلًا للتثبيت، مع تجربة مبيعات تفاعلية مستقلة مدتها نحو خمس دقائق. رابط التجربة المباشر:
 
 - العربية: `https://accounting-journal-generator.vercel.app/ar/service-point/demo`
 - English: `https://accounting-journal-generator.vercel.app/en/service-point/demo`
@@ -13,7 +13,7 @@
 
 ## مكونات الـPWA
 
-- Manifest باسم FINORA، وضع `standalone`، ألوان العلامة، اختصارات Service Point ولوحة المالك والديمو.
+- Manifest باسم Hawally | حوّلي، وضع `standalone`، ألوان العلامة، اختصارات Service Point ولوحة المالك والديمو.
 - أيقونات 192 و512 بكسل وأيقونة maskable.
 - Service Worker آمن يخزن App Shell والملفات الثابتة، ويستخدم Network-first للصفحات مع صفحة `/offline` عند تعذر الشبكة.
 - حذف الكاشات القديمة عند التفعيل وتحديث صريح عبر زر، من دون حذف بيانات النشاط أو بيانات `localStorage`.

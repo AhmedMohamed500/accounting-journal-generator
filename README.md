@@ -26,6 +26,12 @@ The complete Arabic handoff and technical reference is available in [`FINORA_PRO
 - Vitest and Testing Library
 - LocalStorage-based local-first architecture
 
+## Architecture and current limits
+
+Hawally is currently frontend-first and local-first. Data persists in the current browser, with company, branch, fiscal-year, and store scopes where applicable. The repository does not provide a production backend, central database, cross-device synchronization, server-side authentication, cloud backup, official Fawry or wallet integrations, a payment gateway, or an external AI service.
+
+Backup and restore are available as local JSON workflows. Local roles and PINs support single-device demonstrations and controlled local use, but they are not a substitute for production server authorization.
+
 ## Development
 
 ```bash

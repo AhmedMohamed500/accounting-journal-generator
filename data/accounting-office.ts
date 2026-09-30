@@ -55,10 +55,10 @@ export const officeWorkflowTemplates: WorkflowTemplate[] = [
 
 export function createOfficeSeed(companyId: string): AccountingOfficeData {
   const employees = [
-    { id: "emp-1", name: "أحمد حسن", role: "manager" as const, phone: "01000000001", email: "ahmed@finora.demo", hourlyCost: 250, dailyCapacityHours: 8, active: true, createdAt: at },
-    { id: "emp-2", name: "سارة محمود", role: "reviewer" as const, phone: "01000000002", email: "sara@finora.demo", hourlyCost: 220, dailyCapacityHours: 8, active: true, createdAt: at },
-    { id: "emp-3", name: "محمد فوزي", role: "accountant" as const, phone: "01000000003", email: "mohamed@finora.demo", hourlyCost: 150, dailyCapacityHours: 8, active: true, createdAt: at },
-    { id: "emp-4", name: "مريم علي", role: "assistant" as const, phone: "01000000004", email: "mariam@finora.demo", hourlyCost: 90, dailyCapacityHours: 7, active: true, createdAt: at },
+    { id: "emp-1", name: "أحمد حسن", role: "manager" as const, phone: "01000000001", email: "ahmed@hawally.demo", hourlyCost: 250, dailyCapacityHours: 8, active: true, createdAt: at },
+    { id: "emp-2", name: "سارة محمود", role: "reviewer" as const, phone: "01000000002", email: "sara@hawally.demo", hourlyCost: 220, dailyCapacityHours: 8, active: true, createdAt: at },
+    { id: "emp-3", name: "محمد فوزي", role: "accountant" as const, phone: "01000000003", email: "mohamed@hawally.demo", hourlyCost: 150, dailyCapacityHours: 8, active: true, createdAt: at },
+    { id: "emp-4", name: "مريم علي", role: "assistant" as const, phone: "01000000004", email: "mariam@hawally.demo", hourlyCost: 90, dailyCapacityHours: 7, active: true, createdAt: at },
   ];
   const services = [
     { id: "svc-bookkeeping", nameAr: "إمساك الدفاتر والإقفال", nameEn: "Bookkeeping and close", category: "accounting", defaultPrice: 7000, defaultHours: 18, active: true },

@@ -1,4 +1,4 @@
-# FINORA Service Point — Local Intelligence (September 2026)
+# Hawally Service Point — Local Intelligence (September 2026)
 
 ## Scope and routes
 

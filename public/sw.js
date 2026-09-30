@@ -1,4 +1,4 @@
-const VERSION = "finora-pwa-2026-09-04-v1";
+const VERSION = "hawally-pwa-2026-09-30-v1";
 const SHELL = ["/offline", "/ar/service-point", "/en/service-point", "/manifest.webmanifest", "/finora-icon-192.png", "/finora-icon-512.png", "/finora-icon-maskable-512.png"];
 
 self.addEventListener("install", (event) => {
