@@ -4,7 +4,7 @@
 > نسخة العمل الحالية: `E:\My Portofolio\Fawry`
 > المسار الأصلي المذكور في التسليم السابق: `C:\Users\TRUE TECH\Desktop\Accountant Jouranal\accounting-journal-generator`
 > الفرع الحالي والمنشور: `main`
-> آخر مرجع وظيفي منشور: `c36c6ec — Polish service point operations layout`
+> آخر مرجع وظيفي مدقق: `569c5f6 — Audit Hawally branding and repository quality`
 > رابط الإنتاج: `https://accounting-journal-generator.vercel.app/ar/service-point`
 
 ## 1. الغرض من هذا الملف
@@ -628,6 +628,17 @@ npm run check
 - `npm run check`: ناجح بالكامل.
 - المراجعة البصرية اليدوية: Light Mode وDark Mode، تخطيط الهاتف، لوحة القيادة، شاشة العمليات، نموذج التسجيل، وجدول الوردية كامل العرض.
 
+### نتيجة تدقيق الجودة والهوية في 30 سبتمبر 2026
+
+- أزيلت بطاقة Hawally Accounting Academy من الصفحة العامة، وأزيلت صياغات التدريب المتبقية من المنتج الحالي.
+- أزيلت كتلة CSS كاملة تخص Accounting Detective بعد التأكد من عدم وجود مكونات أو مسارات تستخدمها.
+- وُحّدت أمثلة البريد وملفات التصدير وإصدار PWA وService Worker تحت اسم Hawally.
+- بقيت مفاتيح `finora-*` وأسماء ملفات أيقونات PWA القديمة وقبول اسم النسخة الاحتياطية القديمة فقط لحماية التوافق مع بيانات المستخدمين.
+- صُححت نصوص نموذج الواجهة الإنجليزية، ووصف عدد خدمات مقدمي الخدمة في الصفحة العامة.
+- أزيل تعطيل ESLint العام من مكوّني الإقفال وحسابات التاجر، وعولج السببان الفعليان للتحذير.
+- فُحصت الصفحة العامة وService Point بالعربية والإنجليزية، في Light وDark، وعلى الكمبيوتر وهاتف بعرض `390px`، ولم يظهر تمرير أفقي في الصفحات التي تم قياسها.
+- أُعيد تشغيل `npm run check` بعد آخر تعديل، ونجحت المراحل الأربع كاملة.
+
 عند تعديل منطق مالي:
 
 1. أضف اختبارًا للحالة الصحيحة.
@@ -656,7 +667,7 @@ https://accounting-journal-generator.vercel.app/ar/service-point/owner-dashboard
 https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```
 
-تم رفع `c36c6ec` إلى `origin/main` والتحقق من اكتمال Deployment على Vercel بنجاح في 30 سبتمبر 2026. بعد أي تعديل لاحق يجب التحقق مجددًا من حالة النشر ومن الصفحة العامة نفسها، لأن هذا السطر يصف لقطة زمنية وليس ضمانًا دائمًا.
+المرجع الوظيفي المدقق محليًا هو `569c5f6`. يجب التحقق من Push وDeployment للمرجع النهائي بعد رفع تحديث التوثيق الحالي، لأن نجاح Build المحلي لا يثبت اكتمال نشر Vercel.
 
 ---
 
@@ -665,6 +676,8 @@ https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```text
 الفرع: main
 
+569c5f6  Audit Hawally branding and repository quality
+5d351d8  docs: refresh comprehensive Hawally project guide
 c36c6ec  Polish service point operations layout
 9e7e0f9  Redesign service point dashboard navigation
 d265c63  feat: add photographic Hawally dashboard banner
@@ -675,7 +688,7 @@ b6f7ca3  docs: refresh comprehensive FINORA project guide
 65831bb  Polish Service Point light and dark palettes
 ```
 
-المرجع الوظيفي `c36c6ec` موجود على `origin/main` ومنشور على Vercel. افحص `git status` و`git log` وحالة النشر قبل الاعتماد على هذه اللقطة في جلسة مستقبلية.
+المرجع الوظيفي `569c5f6` اجتاز الفحوص محليًا. افحص `git status` و`git log` وحالة النشر قبل الاعتماد على هذه اللقطة في جلسة مستقبلية.
 
 ---
 
