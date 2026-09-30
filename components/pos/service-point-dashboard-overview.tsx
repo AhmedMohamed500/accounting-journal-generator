@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { AlertTriangle, ArrowLeft, ArrowRight, Banknote, CheckCircle2, CircleDollarSign, Clock3, ReceiptText, Sparkles, TrendingUp, WalletCards } from "lucide-react";
 import { posOperationTypes, posProviders } from "@/data/pos";
 import type { Locale, PosOperation, PosProviderId, PosShift } from "@/types";
@@ -101,14 +102,9 @@ export function ServicePointDashboardOverview(props: DashboardOverviewProps) {
         <p>{ar ? `تابع ${storeName} وأرصدتك وأرباحك لحظة بلحظة من مكان واحد.` : `Track ${storeName}, balances, and profit from one place.`}</p>
         <a className="hawally-hero-cta" href="#new-operation">{ar ? "ابدأ عملية جديدة" : "Start a transaction"}<Arrow size={18}/></a>
       </div>
-      <div className="hawally-storefront" aria-hidden="true">
-        <div className="hawally-store-sun"/>
-        <i className="hawally-tree tree-one"/><i className="hawally-tree tree-two"/>
-        <div className="hawally-store-building">
-          <div className="hawally-store-sign">HAWALLY</div>
-          <div className="hawally-store-windows"><i/><i/><i/></div>
-        </div>
-        <div className="hawally-growth-arrow"><TrendingUp/></div>
+      <div className="hawally-storefront">
+        <Image className="hawally-storefront-image" src="/hawally-service-point-banner.png" alt={ar ? "فرع حوّلي الحديث للخدمات المالية" : "Modern Hawally financial services branch"} fill priority sizes="(max-width: 860px) 100vw, 48vw"/>
+        <span className="hawally-storefront-shade" aria-hidden="true"/>
       </div>
       <div className="hawally-hero-side">
         <TrendingUp size={31}/><b>{ar ? "خدمات أكثر، فرص أكبر" : "More services, more opportunities"}</b>
