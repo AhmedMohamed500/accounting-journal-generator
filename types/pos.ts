@@ -48,6 +48,7 @@ export interface PosOperation {
   profit: number;
   reference?: string;
   notes?: string;
+  expenseCategoryId?: string;
   entryId?: string;
   status?: PosOperationStatus;
   reversalOfOperationId?: string;

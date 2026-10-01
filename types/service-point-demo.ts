@@ -1,4 +1,5 @@
 import type { PosProviderId } from "./pos";
+import type { ServicePointOperationsData } from "./service-point-operations";
 
 export type LocalRole = "owner" | "manager" | "cashier" | "accountant" | "viewer";
 export type DemoPermission = "manage-users" | "manage-settings" | "manage-shifts" | "create-operation" | "reverse-operation" | "view-reports" | "view-journals" | "backup";
@@ -48,7 +49,7 @@ export interface LocalSubscription {
 
 export interface ServicePointBackup {
   product: "FINORA Service Point" | "Hawally Service Point";
-  schemaVersion: 1 | 2;
+  schemaVersion: 1 | 2 | 3;
   exportedAt: string;
   businessName: string;
   settings: ServicePointDemoSettings;
@@ -58,4 +59,5 @@ export interface ServicePointBackup {
   stores: unknown[];
   storeData: Record<string, { shifts: unknown[]; operations: unknown[]; entries: unknown[] }>;
   innovationData?: Record<string, unknown>;
+  operationalData?: Record<string, ServicePointOperationsData>;
 }

@@ -1,6 +1,6 @@
 import { defaultAccounts } from "@/data/accounts";
 import { posAccountCodes, posLedgerAccounts, posProviders } from "@/data/pos";
-import type { GeneratedJournalEntry, JournalEntryLine, PosOperation, PosOperationType, PosProviderId, PosShift, PosShiftSnapshot } from "@/types";
+import type { GeneratedJournalEntry, JournalEntryLine, PosOperation, PosOperationType, PosProviderId, PosShift, PosShiftSnapshot, ServicePointMoneyMovement } from "@/types";
 import { roundCurrency } from "@/lib/accounting/calculations";
 
 export interface PosOperationInput {
@@ -14,6 +14,7 @@ export interface PosOperationInput {
   providerCost: number;
   reference?: string;
   notes?: string;
+  expenseCategoryId?: string;
 }
 
 const account = (code: string) => posLedgerAccounts.find((item) => item.code === code) || defaultAccounts.find((item) => item.code === code);
@@ -143,14 +144,16 @@ export function createPosJournalEntry(operation: PosOperation): GeneratedJournal
   };
 }
 
-export function calculatePosShiftSnapshot(shift: PosShift, operations: PosOperation[], actualCash?: number, actualProviders?: Partial<Record<PosProviderId, number>>): PosShiftSnapshot {
+export function calculatePosShiftSnapshot(shift: PosShift, operations: PosOperation[], actualCash?: number, actualProviders?: Partial<Record<PosProviderId, number>>, movements: ServicePointMoneyMovement[] = []): PosShiftSnapshot {
   const related = operations.filter((item) => item.shiftId === shift.id && !["pending", "failed"].includes(item.status || "successful"));
+  const relatedMovements = movements.filter((item) => item.shiftId === shift.id);
   const expectedProviders = Object.fromEntries(posProviders.map((provider) => [provider.id, roundCurrency(
     (shift.providers.find((item) => item.providerId === provider.id)?.openingBalance || 0)
     + related.filter((item) => item.providerId === provider.id).reduce((sum, item) => sum + item.providerBalanceChange, 0)
     + related.filter((item) => item.destinationProviderId === provider.id).reduce((sum, item) => sum + item.amount, 0)
+    + relatedMovements.filter((item) => item.balanceId === provider.id).reduce((sum, item) => sum + item.providerBalanceChange, 0)
   )])) as Record<PosProviderId, number>;
-  const expectedCash = roundCurrency(shift.openingCash + related.reduce((sum, item) => sum + item.cashChange, 0));
+  const expectedCash = roundCurrency(shift.openingCash + related.reduce((sum, item) => sum + item.cashChange, 0) + relatedMovements.reduce((sum, item) => sum + item.cashChange, 0));
   const revenue = roundCurrency(related.reduce((sum, item) => sum + item.revenue, 0));
   const expenses = roundCurrency(related.reduce((sum, item) => sum + item.expense, 0));
   const providerVariances = actualProviders ? Object.fromEntries(posProviders.map((provider) => [provider.id, roundCurrency((actualProviders[provider.id] ?? expectedProviders[provider.id]) - expectedProviders[provider.id])])) as Record<PosProviderId, number> : undefined;

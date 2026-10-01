@@ -16,8 +16,10 @@ import { appendLocalAudit, currentLocalUser } from "@/lib/storage/service-point-
 import { canLocalRole } from "@/lib/pos/demo";
 import { countCash, DEFAULT_DENOMINATIONS, previewOperationRisk } from "@/lib/pos/local-intelligence";
 import { emptyInnovationData, loadInnovationData, saveInnovationData, type InnovationStoreData, type ShiftHandover } from "@/lib/storage/service-point-innovation";
+import { emptyServicePointOperationsData, loadServicePointOperationsData } from "@/lib/storage/service-point-operations";
+import { defaultExpenseCategories } from "@/data/service-point-operations";
 
-import type { GeneratedJournalEntry, Locale, PosOperation, PosOperationStatus, PosOperationType, PosProviderId, PosShift, PosStore } from "@/types";
+import type { GeneratedJournalEntry, Locale, PosOperation, PosOperationStatus, PosOperationType, PosProviderId, PosShift, PosStore, ServicePointOperationsData } from "@/types";
 
 const today = () => new Date().toISOString().slice(0, 10);
 const money = (value: number) => `${value.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} ج.م`;
@@ -54,6 +56,8 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
   const [actualCash, setActualCash] = useState(""), [actualProviders, setActualProviders] = useState(emptyBalances), [period, setPeriod] = useState<"day" | "week" | "month">("day"), [reportProvider, setReportProvider] = useState<"all" | PosProviderId>("all");
   const [receiptOperation,setReceiptOperation]=useState<PosOperation>();
   const [innovation, setInnovation] = useState<InnovationStoreData>(emptyInnovationData);
+  const [operationalData, setOperationalData] = useState<ServicePointOperationsData>(emptyServicePointOperationsData);
+  const [expenseCategoryId, setExpenseCategoryId] = useState(defaultExpenseCategories[0].id);
   const [cashQuantities, setCashQuantities] = useState<Record<number, number>>({});
   const [handoverNotes, setHandoverNotes] = useState("");
   const [receivingCashier, setReceivingCashier] = useState("");
@@ -61,7 +65,7 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
   const [templateName, setTemplateName] = useState("");
   const [workspaceView, setWorkspaceView] = useState<ServicePointView>("overview");
 
-  const refresh = (storeId: string) => { setShifts(loadPosShifts(storeId)); setOperations(loadPosOperations(storeId)); setEntries(loadPosEntries(storeId)); setInnovation(loadInnovationData(storeId)); };
+  const refresh = (storeId: string) => { setShifts(loadPosShifts(storeId)); setOperations(loadPosOperations(storeId)); setEntries(loadPosEntries(storeId)); setInnovation(loadInnovationData(storeId)); setOperationalData(loadServicePointOperationsData(storeId)); };
   const saveInnovation = (next: InnovationStoreData) => { saveInnovationData(activeStoreId, next); setInnovation(next); };
   useEffect(() => {
     const migrated = migrateLegacyPosData();
@@ -90,11 +94,11 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
   };
   const activeStore = stores.find((store) => store.id === activeStoreId);
   const activeShift = shifts.find((shift) => shift.status === "open");
-  const snapshot = activeShift ? calculatePosShiftSnapshot(activeShift, operations) : undefined;
+  const snapshot = activeShift ? calculatePosShiftSnapshot(activeShift, operations, undefined, undefined, operationalData.movements) : undefined;
   const selectedType = posOperationTypes.find((item) => item.id === operationType)!;
   const operationPreview = (() => {
     if (!activeShift || !amount || Number(amount) <= 0) return undefined;
-    try { return calculatePosOperation({ shiftId: activeShift.id, businessDate: activeShift.businessDate, type: operationType, providerId: selectedType.needsProvider ? providerId : undefined, destinationProviderId: operationType === "internal-provider-transfer" ? destinationProviderId : undefined, amount: Number(amount), customerFee: operationType === "internal-provider-transfer" ? 0 : Number(customerFee) || 0, providerCost: operationType === "internal-provider-transfer" ? 0 : Number(providerCost) || 0, reference: reference.trim() || undefined }); }
+    try { return calculatePosOperation({ shiftId: activeShift.id, businessDate: activeShift.businessDate, type: operationType, providerId: selectedType.needsProvider ? providerId : undefined, destinationProviderId: operationType === "internal-provider-transfer" ? destinationProviderId : undefined, amount: Number(amount), customerFee: operationType === "internal-provider-transfer" ? 0 : Number(customerFee) || 0, providerCost: operationType === "internal-provider-transfer" ? 0 : Number(providerCost) || 0, reference: reference.trim() || undefined, expenseCategoryId: operationType === "store-expense" ? expenseCategoryId : undefined }); }
     catch { return undefined; }
   })();
   const riskPreview = operationPreview && snapshot ? previewOperationRisk({ operation: operationPreview, snapshot, operations, rules: innovation.rules }) : undefined;
@@ -113,7 +117,7 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
     if (!activeShift || !snapshot) return;
     try {
       const internalTransfer = operationType === "internal-provider-transfer";
-      const calculated = calculatePosOperation({ shiftId: activeShift.id, businessDate: activeShift.businessDate, type: operationType, providerId: selectedType.needsProvider ? providerId : undefined, destinationProviderId: internalTransfer ? destinationProviderId : undefined, amount: Number(amount), customerFee: internalTransfer ? 0 : Number(customerFee) || 0, providerCost: internalTransfer ? 0 : Number(providerCost) || 0, reference: reference.trim() || undefined });
+      const calculated = calculatePosOperation({ shiftId: activeShift.id, businessDate: activeShift.businessDate, type: operationType, providerId: selectedType.needsProvider ? providerId : undefined, destinationProviderId: internalTransfer ? destinationProviderId : undefined, amount: Number(amount), customerFee: internalTransfer ? 0 : Number(customerFee) || 0, providerCost: internalTransfer ? 0 : Number(providerCost) || 0, reference: reference.trim() || undefined, expenseCategoryId: operationType === "store-expense" ? expenseCategoryId : undefined });
       const nextCash = snapshot.expectedCash + calculated.cashChange;
       const nextProvider = calculated.providerId ? snapshot.expectedProviders[calculated.providerId] + calculated.providerBalanceChange : 0;
       if (nextCash < 0) throw new Error("رصيد الخزنة لا يكفي لتنفيذ العملية");
@@ -153,7 +157,7 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
     setActualProviders(Object.fromEntries(posProviders.map((provider) => [provider.id, String(snapshot.expectedProviders[provider.id])])) as Record<PosProviderId, string>);
     setMessage(ar ? "تم وضع الأرصدة المتوقعة. عدّلها حسب العد الفعلي ثم اقفل الوردية." : "Expected balances filled. Replace with actual counts, then close.");
   };
-  const closingSnapshot = activeShift && actualCash !== "" ? calculatePosShiftSnapshot(activeShift, operations, Number(actualCash), Object.fromEntries(posProviders.map((provider) => [provider.id, Number(actualProviders[provider.id])])) as Record<PosProviderId, number>) : undefined;
+  const closingSnapshot = activeShift && actualCash !== "" ? calculatePosShiftSnapshot(activeShift, operations, Number(actualCash), Object.fromEntries(posProviders.map((provider) => [provider.id, Number(actualProviders[provider.id])])) as Record<PosProviderId, number>, operationalData.movements) : undefined;
 
   const closeShift = () => {
     if(!allowed("manage-shifts")){setMessage(ar?"المستخدم الحالي لا يملك صلاحية إقفال الوردية.":"Current user cannot close shifts.");return;}
@@ -229,6 +233,10 @@ export function ServicePointCenter({ locale }: { locale: Locale }) {
           <span className="mb-2 block min-h-11"><b className="block text-sm leading-5">{ar ? (operationType === "internal-provider-transfer" ? "من رصيد" : "الخدمة أو المحفظة") : (operationType === "internal-provider-transfer" ? "From balance" : "Provider or wallet")}</b></span>
           <select disabled={!selectedType.needsProvider} value={providerId} onChange={(event)=>{const next=event.target.value as PosProviderId;setProviderId(next);if(destinationProviderId===next)setDestinationProviderId(posProviders.find((item)=>item.id!==next)!.id);}}>{posProviders.map((provider)=><option value={provider.id} key={provider.id}>{ar?provider.nameAr:provider.nameEn} — {money(snapshot!.expectedProviders[provider.id])}</option>)}</select>
         </label>
+        {operationType === "store-expense" && <label className="min-w-0">
+          <span className="mb-2 block min-h-11"><b className="block text-sm leading-5">{ar ? "تصنيف المصروف" : "Expense category"}</b></span>
+          <select value={expenseCategoryId} onChange={(event)=>setExpenseCategoryId(event.target.value)}>{operationalData.expenseCategories.filter((item)=>item.active).map((item)=><option value={item.id} key={item.id}>{ar?item.nameAr:item.nameEn}</option>)}</select>
+        </label>}
         {operationType === "internal-provider-transfer" && <label className="min-w-0">
           <span className="mb-2 block min-h-11"><b className="block text-sm leading-5">{ar ? "إلى رصيد" : "To balance"}</b></span>
           <select value={destinationProviderId} onChange={(event)=>setDestinationProviderId(event.target.value as PosProviderId)}>{posProviders.map((provider)=><option disabled={provider.id===providerId} value={provider.id} key={provider.id}>{ar?provider.nameAr:provider.nameEn} — {money(snapshot!.expectedProviders[provider.id])}</option>)}</select>

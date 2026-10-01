@@ -20,3 +20,4 @@ export * from "./pos-owner";
 export * from "./vat";
 export * from "./accounting-office";
 export * from "./merchant";
+export * from "./service-point-operations";
