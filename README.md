@@ -16,7 +16,7 @@ Hawally no longer contains Academy, Arena, Missions, Money Flow, Accounting Dete
 
 ## Full project documentation
 
-The complete Arabic handoff and technical reference is available in [`FINORA_PROJECT_DOCUMENTATION_AR.md`](./FINORA_PROJECT_DOCUMENTATION_AR.md). The legacy filename is retained for compatibility; the current public product name is Hawally | حوّلي.
+The complete Arabic handoff, operating guide, architecture reference, deployment status, and module map are available in [`HAWALLY_PROJECT_FULL_GUIDE_AR.md`](./HAWALLY_PROJECT_FULL_GUIDE_AR.md). Files using the legacy FINORA name remain for compatibility and project history.
 
 ## Stack
 
