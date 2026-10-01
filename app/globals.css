@@ -657,10 +657,10 @@ body { background: var(--bg); color: var(--text); }
 }
 
 /* Hawally brand and Service Point shell */
-.hawally-brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none}
-.hawally-mark{display:grid;place-items:center;overflow:hidden;flex:0 0 42px;width:42px;height:42px;border-radius:14px;color:#fff;background:linear-gradient(145deg,#35c8ff,#1687ff 55%,#1264dc);box-shadow:0 10px 24px #1687ff38}
-.hawally-mark::before{content:"H";font-size:1.3rem;font-weight:950;line-height:1;letter-spacing:-.08em}
-.hawally-wordmark{display:grid;gap:1px;line-height:1}.hawally-wordmark b{font-size:1.28rem;font-weight:950;letter-spacing:-.02em}.hawally-wordmark small{color:var(--primary);font-size:.6rem;font-weight:900;letter-spacing:.13em}
+.hawally-brand{display:inline-flex;align-items:center;gap:12px;color:var(--text);text-decoration:none}
+.hawally-mark{display:grid;place-items:center;overflow:hidden;flex:0 0 48px;width:48px;height:48px;border-radius:15px;color:#fff;background:linear-gradient(145deg,#35c8ff,#1687ff 55%,#1264dc);box-shadow:0 10px 24px #1687ff38}
+.hawally-mark::before{content:"H";font-size:1.45rem;font-weight:950;line-height:1;letter-spacing:-.08em}
+.hawally-wordmark{display:grid;gap:3px;min-width:74px;line-height:1.05}.hawally-wordmark b{font-size:1.42rem;font-weight:950;line-height:1.1;letter-spacing:-.02em}.hawally-wordmark small{color:var(--primary);font-size:.64rem;font-weight:950;letter-spacing:.12em;line-height:1.2}
 .brand{color:var(--primary)}.brand-mark{background:linear-gradient(145deg,#35c8ff,#1687ff)}
 
 body:has(.hawally-app-shell)>.pwa-update,
@@ -670,7 +670,7 @@ body:has(.hawally-app-shell) .footer{display:none}
 body:has(.hawally-app-shell){background:var(--bg)}
 .hawally-app-shell{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh;background:var(--bg);color:var(--text)}
 .hawally-sidebar{position:sticky;top:0;z-index:45;display:flex;height:100vh;flex-direction:column;padding:24px 18px;border-inline-end:1px solid var(--line);background:var(--card)}
-.hawally-sidebar>.hawally-brand{padding:0 10px 24px}
+.hawally-sidebar>.hawally-brand{min-height:70px;padding:0 10px 22px}
 .hawally-sidebar nav{display:grid;gap:7px;margin-top:10px}
 .hawally-sidebar nav :is(a,button){display:flex;align-items:center;gap:12px;min-height:48px;padding:0 14px;border:0;border-radius:14px;color:var(--muted);background:transparent;font:inherit;font-size:.86rem;font-weight:800;text-align:start;text-decoration:none;cursor:pointer;transition:.18s ease}
 .hawally-sidebar nav :is(a,button) svg{width:19px;height:19px}
