@@ -23,7 +23,7 @@ export function Header({ locale }: { locale: Locale }) {
     document.addEventListener("pointerdown", closeOutside); document.addEventListener("keydown", closeEscape);
     return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", closeEscape); };
   }, []);
-  const landingLinks = [["product", "المنتج", "Product"], ["service-point", "نقطة الخدمات", "Service Point"], ["accounting", "المحاسبة", "Accounting"], ["owner", "لوحة المالك", "Owner Control"], ["how-it-works", "كيف يعمل", "How it works"], ["plans", "الباقات", "Plans"]];
+  const landingLinks = [["services", "الخدمات", "Services"], ["operations", "العمليات", "Operations"], ["how-it-works", "كيف يعمل", "How it works"], ["owner", "لوحة المالك", "Owner"], ["control", "التحكم", "Control"], ["plans", "الباقات", "Plans"]];
   const groups = [
     { labelAr: "العمل اليومي", labelEn: "Daily work", icon: BriefcaseBusiness, items: [
       { path: "operations", ar: "بطاقات العمليات", en: "Operations", descAr: "تابع قصة كل عملية من المستند للترحيل", descEn: "Track each transaction from document to posting", icon: Workflow },

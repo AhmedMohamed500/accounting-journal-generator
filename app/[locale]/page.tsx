@@ -6,10 +6,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
   const { locale } = await params;
   const ar = locale === "ar";
   const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const title = ar ? "حوّلي | تشغيل ومحاسبة ورقابة مالية لنقاط الخدمات" : "Hawally | Operations, Accounting & Financial Control";
+  const title = ar ? "حوّلي | تشغيل نقاط الخدمات من الوردية حتى التسوية" : "Hawally | Service Point Operations from Shift to Reconciliation";
   const description = ar
-    ? "شغّل عمليات العملاء والخزنة وأرصدة الخدمات والورديات والتسوية والربحية والمحاسبة من واجهة واحدة عربية وإنجليزية."
-    : "Run customer operations, cash, provider balances, shifts, reconciliation, profitability, and accounting from one bilingual system.";
+    ? "أدر عمليات فوري والمحافظ والخزنة وأرصدة الخدمات والورديات والربح والتسوية ورقابة المالك من واجهة واحدة."
+    : "Manage payment operations, cash, provider balances, shifts, profit, reconciliation, and owner control from one Hawally interface.";
   const canonical = `${base}/${locale}`;
   return {
     title,
