@@ -1,11 +1,12 @@
 # Hawally | حوّلي — المرجع الشامل للمشروع
 
-> آخر مراجعة للكود والواجهة والنشر: 1 أكتوبر 2026
+> آخر مراجعة للكود والتوثيق وفحوص الجودة المحلية: 2 أكتوبر 2026
 > نسخة العمل الحالية: `E:\My Portofolio\Fawry`
 > المسار الأصلي المذكور في التسليم السابق: `C:\Users\TRUE TECH\Desktop\Accountant Jouranal\accounting-journal-generator`
 > الفرع الحالي والمنشور: `main`
-> آخر مرجع وظيفي مدقق ومنشور: `3c857b8 — Polish service point workspace layouts`
-> رابط الإنتاج: `https://accounting-journal-generator.vercel.app/ar/service-point?deploy=3c857b8`
+> مرجع الكود الحالي المدقق محليًا: `30fd219 — Complete service point operations suite`
+> آخر نشر إنتاج موثّق داخل المشروع: `3c857b8 — Polish service point workspace layouts`
+> رابط الإنتاج الموثّق: `https://accounting-journal-generator.vercel.app/ar/service-point?deploy=3c857b8`
 
 ## 1. الغرض من هذا الملف
 
@@ -164,13 +165,15 @@ npm run check
 
 `npm run check` يشغل lint ثم typecheck ثم جميع الاختبارات ثم production build.
 
-آخر فحص كامل موثق قبل هذا الملف نجح في:
+آخر فحص كامل موثق في 2 أكتوبر 2026 نجح في:
 
-- 52 ملف اختبار.
-- 274 اختبارًا.
+- 53 ملف اختبار.
+- 280 اختبارًا.
 - ESLint بلا تحذيرات.
 - TypeScript بلا أخطاء.
 - Next.js production build ناجح.
+
+ملاحظة بيئية: أمر `npm` المختصر في PowerShell يشير إلى Prefix عام غير موجود. استُخدم npm CLI المثبت مع Node مباشرة لتشغيل سكربتات `lint` و`typecheck` و`test` و`build` و`check` نفسها، ونجحت كلها. هذه مشكلة في Wrapper الجهاز وليست في المشروع أو تبعياته المحلية.
 
 ---
 
@@ -197,7 +200,7 @@ npm run check
 | `public/` | الأيقونات وService Worker وQR |
 | `docs/` | أدلة الوحدات التفصيلية |
 
-وقت المراجعة يحتوي المشروع على نحو 55 مكوّن React، و66 ملف منطق TypeScript داخل `lib`، و52 ملف اختبار.
+وقت المراجعة يحتوي المشروع على 58 مكوّن React، و68 ملف منطق TypeScript داخل `lib`، و53 ملف اختبار يشغّلها Vitest، بالإضافة إلى ملف إعداد الاختبارات.
 
 ---
 
@@ -284,6 +287,37 @@ npm run check
 5. يتابع المستخدم الخزنة والسيولة والربح والتنبيهات من لوحات التشغيل والمالك.
 6. في نهاية الوردية يعد النقد حسب الفئات ويدخل الأرصدة الفعلية وملاحظات التسليم.
 7. يحسب النظام الفروق، وينشئ تسوية عند الحاجة، ثم يحفظ الإقفال والتقرير.
+
+---
+
+### 7.2 الصفحة التسويقية العامة
+
+المساران `/ar` و`/en` يعرضان صفحة المنتج العامة ثنائية اللغة. أُعيد بناؤها لتشرح Hawally كاملًا مع إبراز Service Point كمركز تجاري، من دون تغيير الواجهات الداخلية أو منطق الحسابات.
+
+ترتيب القصة التسويقية:
+
+1. Hero يوضح التشغيل والمحاسبة ورقابة المالك ويستخدم تركيبًا بصريًا من واجهة Hawally وبيانات Demo الفعلية.
+2. شريط القدرات المؤكدة: اللغتان وRTL/LTR وLight/Dark وPWA وLocal-first والمحرك المحاسبي.
+3. طبقات المنتج الثلاث: Service Point وAccounting وOwner Control.
+4. دورة تشغيل نقطة الخدمات، مقدمو الخدمة، أنواع العمليات، والمنطق الصحيح للربح.
+5. لوحة المالك والتحليلات المحلية وحزمة التحكم التشغيلي المكتملة.
+6. منظومة المحاسبة ومسار العملية من المستند حتى الإقفال.
+7. أدوات PDF وOCR وExcel/CSV والبنك، ثم Local-first وPWA.
+8. معاينة الباقات من الإعداد المركزي مع توضيح أن التفعيل يدوي بلا بوابة دفع.
+9. مقارنة طريقة العمل المبعثرة بحوّلي، ثم CTA للديمو وService Point.
+
+الملفات الأساسية:
+
+- `components/landing/landing-page.tsx`: محتوى الصفحة وأقسامها الثنائية اللغة.
+- `components/marketing/product-previews.tsx`: عروض المنتج المبنية من بيانات Demo وبانر Hawally الفعلي.
+- `components/layout/header.tsx`: التنقل العام وروابط الأقسام وCTA للديمو.
+- `components/layout/footer.tsx`: يخفي Footer التطبيق في الصفحة العامة لصالح Footer التسويقي.
+- `app/globals.css`: نظام الصفحة التسويقية واستجابتها وDark Mode.
+- `app/[locale]/page.tsx`: Metadata عربية وإنجليزية وCanonical وOpen Graph وTwitter.
+
+لا تدّعي الصفحة Cloud Sync أو AI خارجيًا أو تكاملًا رسميًا مع Fawry والمحافظ. الأسعار وحدود المحلات والمستخدمين تأتي مباشرة من `data/service-point-plans.ts`، والتفعيل موصوف كتفعيل يدوي.
+
+تمت مراجعة نسخة Production بصريًا في العربية والإنجليزية، وفي Light وDark، على `390px` للهاتف و`768px` للتابلت و`1280px` لسطح المكتب. لم يظهر تمرير أفقي، وكانت قيم `scrollWidth` داخل عرض الصفحة في المقاسات المختبرة، ولم تظهر أخطاء أو تحذيرات في Console نسخة الإنتاج.
 
 ---
 
@@ -550,16 +584,20 @@ npm run check
 
 هذه الطبقة مناسبة للعرض أو جهاز واحد. المستخدم يستطيع تعديل `localStorage`، لذلك الـroles والـplan gating والـPIN ليست ضمانًا أمنيًا إنتاجيًا.
 
-### 9.11 مزايا مؤجلة
+### 9.11 التحكم التشغيلي المنفذ والحدود المؤجلة
 
-- حركات مالك ومدير بقيود محاسبية مستقلة كاملة.
-- موازنات شهرية لفئات المصروفات.
-- Incident Log متكامل.
-- Checklists افتتاح وإقفال قابلة للتخصيص.
-- Shift Timeline مستقل.
-- Daily Owner Pack موحد.
-- Morning/Evening modes كاملة.
-- مزامنة لوحة المالك عبر الأجهزة.
+أكد فحص الكود والاختبارات في 2 أكتوبر 2026 أن العناصر التالية **منفذة حاليًا** وليست Roadmap:
+
+- حركات المالك والمدير بقيود محاسبية مستقلة.
+- موازنات شهرية حسب فئات المصروفات.
+- Incident Log بالحالة ودرجة الأهمية وسجل الحل.
+- Checklists افتتاح وإقفال افتراضية وقابلة للتخصيص.
+- Shift Timeline يجمع العمليات والحركات والحوادث والقوائم والتسليم.
+- Daily Owner Pack موحد وقابل للطباعة.
+- وضعي Morning وEvening داخل مركز التحكم.
+- Provider Statement ومطابقة موحدة ومركز استثناءات ومؤشرات واقعية للكاشير.
+
+المؤجل والمعتمد على Backend هو المزامنة الحقيقية بين الأجهزة، والمصادقة والصلاحيات الخادمية، والنسخ الاحتياطي السحابي، والسجل المركزي غير القابل للتلاعب، والتكامل الرسمي المباشر مع مقدمي الخدمة.
 
 ### 9.12 ملفات Service Point
 
@@ -571,6 +609,7 @@ npm run check
 - `components/pos/service-point-operation-search.tsx`
 - `components/pos/service-point-owner-tools.tsx`
 - `components/pos/service-point-control.tsx`
+- `components/pos/service-point-operations-suite.tsx`
 - `components/pos/merchant-accounting-center.tsx`
 - `lib/pos/engine.ts`
 - `lib/pos/analytics.ts`
@@ -578,13 +617,16 @@ npm run check
 - `lib/pos/local-intelligence.ts`
 - `lib/pos/owner-tools.ts`
 - `lib/pos/recommendations.ts`
+- `lib/pos/operations-suite.ts`
 - `lib/storage/pos.ts`
 - `lib/storage/service-point-demo.ts`
 - `app/hawally-dashboard.css`
 - `public/hawally-service-point-banner.png`
 - `lib/storage/service-point-innovation.ts`
+- `lib/storage/service-point-operations.ts`
 - `types/pos.ts`
 - `types/pos-owner.ts`
+- `types/service-point-operations.ts`
 
 ### 9.13 واجهة الإصدار المنشور في 1 أكتوبر 2026
 
@@ -685,16 +727,16 @@ npm run check
 
 تشمل الاختبارات سلامة القيود والحسابات ودورة القيد والأستاذ والتقارير وVAT والفترات والبنك والعملاء والمستندات والعهد وExcel وWorkspace وService Point والرقابة والتوصيات والربحية والسيولة وDemo وPWA وBackup.
 
-آخر تحقق كامل في 1 أكتوبر 2026:
+آخر تحقق كامل في 2 أكتوبر 2026:
 
-- `npm run lint`: ناجح بلا تحذيرات.
-- `npm run typecheck`: ناجح.
-- `npm run test`: نجح `52` ملف اختبار و`274` اختبارًا.
-- `npm run build`: ناجح، وشمل جميع مسارات Service Point والـmanifest وصفحة Offline.
-- `npm run check`: ناجح بالكامل.
+- ESLint المحلي: ناجح بلا تحذيرات.
+- TypeScript المحلي (`tsc --noEmit`): ناجح.
+- Vitest المحلي: نجح `53` ملف اختبار و`280` اختبارًا.
+- Next.js production build المحلي: ناجح، وولّد `65` صفحة ثابتة وشمل جميع مسارات Service Point والـmanifest وصفحة Offline.
+- `npm run check`: ناجح بالكامل عند استدعائه عبر npm CLI المثبت مع Node؛ Wrapper PowerShell المختصر لـnpm على جهاز المراجعة يحتاج إصلاح مساره العام.
 - المراجعة البصرية اليدوية: Light وDark، الهاتف والكمبيوتر، لوحة القيادة، العمليات، الورديات، الربحية، التقارير، سجل النشاط، والإعدادات.
 
-### نتيجة تدقيق الجودة والهوية والواجهة حتى 1 أكتوبر 2026
+### نتيجة تدقيق الجودة والهوية والواجهة حتى 2 أكتوبر 2026
 
 - أزيلت بطاقة Hawally Accounting Academy من الصفحة العامة، وأزيلت صياغات التدريب المتبقية من المنتج الحالي.
 - أزيلت كتلة CSS كاملة تخص Accounting Detective بعد التأكد من عدم وجود مكونات أو مسارات تستخدمها.
@@ -734,7 +776,7 @@ https://accounting-journal-generator.vercel.app/ar/service-point/owner-dashboard
 https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```
 
-المرجع الوظيفي المدقق والمنشور هو `3c857b8`. حالة Vercel لهذا المرجع كانت `success`، وتمت مراجعة الرابط النهائي بصريًا بعد النشر.
+آخر مرجع منشور موثّق داخل المشروع هو `3c857b8`. حالة Vercel لهذا المرجع كانت `success`، وتمت مراجعة الرابط النهائي بصريًا بعد النشر. الكود المحلي الحالي عند `30fd219` أحدث من مرجع النشر الموثّق، وقد اجتاز فحوص الجودة المحلية، لكن هذا الملف لا يدّعي نشره دون تحقق مستقل من Vercel.
 
 ---
 
@@ -743,7 +785,8 @@ https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```text
 الفرع: main
 
-39a1f81  Document complete Hawally project
+30fd219  Complete service point operations suite
+39a1f81  Add comprehensive Hawally project guide
 3c857b8  Polish service point workspace layouts
 180569f  Document Hawally quality audit
 569c5f6  Audit Hawally branding and repository quality

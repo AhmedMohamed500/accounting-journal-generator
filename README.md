@@ -27,6 +27,10 @@ The complete Arabic handoff, operating guide, architecture reference, deployment
 - Vitest and Testing Library
 - LocalStorage-based local-first architecture
 
+## Public product experience
+
+The localized public routes `/ar` and `/en` present the complete Hawally product around three connected layers: Service Point Operations, Accounting Operations, and Owner Control. The landing experience uses verified demo data and the real Hawally visual system, links directly to the interactive Service Point demo, and describes local-first/PWA capabilities without claiming cloud sync, external AI, or official provider API integrations.
+
 ## Architecture and current limits
 
 Hawally is currently frontend-first and local-first. Data persists in the current browser, with company, branch, fiscal-year, and store scopes where applicable. The repository does not provide a production backend, central database, cross-device synchronization, server-side authentication, cloud backup, official Fawry or wallet integrations, a payment gateway, or an external AI service.

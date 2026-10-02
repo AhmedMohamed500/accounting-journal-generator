@@ -15,16 +15,15 @@ import { HawallyBrand } from "@/components/brand/hawally-brand";
 export function Header({ locale }: { locale: Locale }) {
   const { setTheme, resolvedTheme } = useTheme();
   const pathname = usePathname(), ar = locale === "ar", other = ar ? "en" : "ar", landing = pathname === `/${locale}`;
-  const [open, setOpen] = useState(false), [activeMenu, setActiveMenu] = useState<string | null>(null), [mounted, setMounted] = useState(false);
+  const [open, setOpen] = useState(false), [activeMenu, setActiveMenu] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    setMounted(true);
     const closeOutside = (event: PointerEvent) => { if (!headerRef.current?.contains(event.target as Node)) setActiveMenu(null); };
     const closeEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setActiveMenu(null); };
     document.addEventListener("pointerdown", closeOutside); document.addEventListener("keydown", closeEscape);
     return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", closeEscape); };
   }, []);
-  const landingLinks = [["features", "المميزات", "Features"], ["workflow", "كيف يعمل", "How it works"], ["product-tour", "جولة داخل النظام", "Product tour"]];
+  const landingLinks = [["product", "المنتج", "Product"], ["service-point", "نقطة الخدمات", "Service Point"], ["accounting", "المحاسبة", "Accounting"], ["owner", "لوحة المالك", "Owner Control"], ["how-it-works", "كيف يعمل", "How it works"], ["plans", "الباقات", "Plans"]];
   const groups = [
     { labelAr: "العمل اليومي", labelEn: "Daily work", icon: BriefcaseBusiness, items: [
       { path: "operations", ar: "بطاقات العمليات", en: "Operations", descAr: "تابع قصة كل عملية من المستند للترحيل", descEn: "Track each transaction from document to posting", icon: Workflow },
@@ -58,11 +57,11 @@ export function Header({ locale }: { locale: Locale }) {
   ];
   const activePath = (path: string) => pathname === `/${locale}/${path}` || pathname.startsWith(`/${locale}/${path}/`);
 
-  if (mounted && (pathname === `/${locale}/service-point` || pathname.startsWith(`/${locale}/service-point/`))) return null;
+  if (pathname === `/${locale}/service-point` || pathname.startsWith(`/${locale}/service-point/`)) return null;
 
   return <header ref={headerRef} className={`nav no-print ${landing ? "landing-nav" : ""}`} data-no-bilingual><div className="container nav-inner">
     <HawallyBrand locale={locale} href={`/${locale}`}/>
-    {landing ? <nav className={`nav-links landing-nav-links ${open ? "mobile-open" : ""}`}>{landingLinks.map(([anchor,labelAr,labelEn])=><a key={anchor} href={`#${anchor}`} onClick={()=>setOpen(false)}>{ar?labelAr:labelEn}</a>)}<Link className="btn" href={`/${locale}/dashboard`}><Sparkles size={16}/>{ar?"دخول النظام":"Open app"}</Link><Link className="keep btn" href={`/${other}`}><Languages size={17}/>{other.toUpperCase()}</Link><button className="btn icon-btn" aria-label={ar?"تغيير المظهر":"Toggle theme"} onClick={()=>setTheme(resolvedTheme==="dark"?"light":"dark")}><Moon size={17}/></button></nav>
+    {landing ? <nav className={`nav-links landing-nav-links ${open ? "mobile-open" : ""}`}>{landingLinks.map(([anchor,labelAr,labelEn])=><a key={anchor} href={`#${anchor}`} onClick={()=>setOpen(false)}>{ar?labelAr:labelEn}</a>)}<Link className="btn btn-primary" href={`/${locale}/service-point/demo`}><Sparkles size={16}/>{ar?"جرّب النظام":"Try the demo"}</Link><Link className="keep btn" href={`/${other}`}><Languages size={17}/>{other.toUpperCase()}</Link><button className="btn icon-btn" aria-label={ar?"تغيير المظهر":"Toggle theme"} onClick={()=>setTheme(resolvedTheme==="dark"?"light":"dark")}><Moon size={17}/></button></nav>
     : <nav className={`nav-links app-nav-links categorized-nav ${open ? "mobile-open" : ""}`}>
       <Link className={`nav-home-link ${activePath("dashboard") ? "active" : ""}`} href={`/${locale}/dashboard`} onClick={()=>setOpen(false)}><LayoutDashboard size={18}/>{ar?"لوحة العمل":"Dashboard"}</Link>
       {groups.map((group) => { const GroupIcon=group.icon, groupActive=group.items.some((item)=>activePath(item.path)), expanded=activeMenu===group.labelEn; return <div className={`nav-group ${groupActive?"active":""} ${expanded?"open":""}`} key={group.labelEn}><button type="button" className="nav-group-trigger" aria-expanded={expanded} onClick={()=>setActiveMenu(expanded?null:group.labelEn)}><GroupIcon size={17}/><span>{ar?group.labelAr:group.labelEn}</span><ChevronDown className="nav-chevron" size={15}/></button>{expanded&&<div className="nav-dropdown">{group.items.map((item)=>{const ItemIcon=item.icon;return <Link className={activePath(item.path)?"active":""} key={item.path} href={`/${locale}/${item.path}`} onClick={()=>{setOpen(false);setActiveMenu(null);}}><ItemIcon size={19}/><span><b>{ar?item.ar:item.en}</b><small>{ar?item.descAr:item.descEn}</small></span></Link>;})}</div>}</div>; })}
