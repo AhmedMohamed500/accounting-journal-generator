@@ -4,7 +4,7 @@
 > نسخة العمل الحالية: `E:\My Portofolio\Fawry`
 > المسار الأصلي المذكور في التسليم السابق: `C:\Users\TRUE TECH\Desktop\Accountant Jouranal\accounting-journal-generator`
 > الفرع الحالي والمنشور: `main`
-> مرجع الكود الحالي المدقق محليًا: `30fd219 — Complete service point operations suite`
+> مرجع تسليم صفحة الهبوط والمنتج المدقق محليًا: `3786f10 — feat: build Hawally product landing experience`
 > آخر نشر إنتاج موثّق داخل المشروع: `3c857b8 — Polish service point workspace layouts`
 > رابط الإنتاج الموثّق: `https://accounting-journal-generator.vercel.app/ar/service-point?deploy=3c857b8`
 
@@ -776,7 +776,7 @@ https://accounting-journal-generator.vercel.app/ar/service-point/owner-dashboard
 https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```
 
-آخر مرجع منشور موثّق داخل المشروع هو `3c857b8`. حالة Vercel لهذا المرجع كانت `success`، وتمت مراجعة الرابط النهائي بصريًا بعد النشر. الكود المحلي الحالي عند `30fd219` أحدث من مرجع النشر الموثّق، وقد اجتاز فحوص الجودة المحلية، لكن هذا الملف لا يدّعي نشره دون تحقق مستقل من Vercel.
+آخر مرجع منشور موثّق داخل المشروع هو `3c857b8`. حالة Vercel لهذا المرجع كانت `success`، وتمت مراجعة الرابط النهائي بصريًا بعد النشر. تسليم صفحة الهبوط عند `3786f10` أحدث من مرجع النشر الموثّق، وقد اجتاز فحوص الجودة المحلية، لكن هذا الملف لا يدّعي نشره دون تحقق مستقل من Vercel.
 
 ---
 
@@ -785,6 +785,7 @@ https://accounting-journal-generator.vercel.app/ar/service-point/demo
 ```text
 الفرع: main
 
+3786f10  feat: build Hawally product landing experience
 30fd219  Complete service point operations suite
 39a1f81  Add comprehensive Hawally project guide
 3c857b8  Polish service point workspace layouts
